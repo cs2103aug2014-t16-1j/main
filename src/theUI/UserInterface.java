@@ -38,7 +38,11 @@ public class UserInterface {
 	 *  Can access storage.
 	*/
 	private void executeCommands(String userCommand) {
-		
+		if (userCommand.equals("exit")) {
+			System.out.println("bye!!!");
+			System.exit(0);
+		}
+		System.out.println("hello world");
 	}
 	
 	/** This is to extract the information of the command */
