@@ -24,12 +24,6 @@ public class Logic {
 	}
 	
 	public String add(Task task) {
-	/** public String add(Task task){
-	 * 		differentiate different types of adding using switch
-	 * 		then add accordingly to storage
-	 * 		using API of Task class to get start, end timing, location, date, frequency
-	 * 
-	 */
 		return null;
 	}
 	
@@ -42,10 +36,6 @@ public class Logic {
 	}
 	
 	public String delete(int lineNum) {
-	/**public String delete(Task task){
-	 * 		find description [using task.getDescription()] in storage, then delete it
-	 * }
-	 */
 		return null;
 	}
 	
