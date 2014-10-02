@@ -1,10 +1,10 @@
-package theUI;
+package src.theUI;
 
 import java.util.Scanner;
 
-import storage.Storage;
-import tkLibrary.Task;
-import tkLogic.Logic;
+import src.storage.Storage;
+import src.tkLibrary.Task;
+import src.tkLogic.Logic;
 
 
 /*

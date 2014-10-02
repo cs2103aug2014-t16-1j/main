@@ -1,8 +1,8 @@
-package storage;
+package src.storage;
 
 import java.util.ArrayList;
 
-import tkLibrary.Task;
+import src.tkLibrary.Task;
 
 public class Storage {
 	// everything that goes to the main storage has to pass the cache

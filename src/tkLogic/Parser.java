@@ -1,10 +1,10 @@
-package tkLogic;
+package src.tkLogic;
 
 import java.util.Date;
 
-import tkLibrary.FrequencyType;
-import tkLibrary.StateType;
-import tkLibrary.Task;
+import src.tkLibrary.FrequencyType;
+import src.tkLibrary.StateType;
+import src.tkLibrary.Task;
 
 /*
  * receive a string of command
