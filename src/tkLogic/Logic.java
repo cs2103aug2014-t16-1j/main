@@ -1,11 +1,11 @@
-package src.tkLogic;
+package tkLogic;
 
 import java.util.ArrayList;
 import java.util.Date;
 
-import src.storage.Storage;
-import src.tkLibrary.StateType;
-import src.tkLibrary.Task;
+import storage.Storage;
+import tkLibrary.StateType;
+import tkLibrary.Task;
 
 /*
  * Basically the logic functions should be very clear and simple.

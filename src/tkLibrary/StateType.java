@@ -1,4 +1,4 @@
-package src.tkLibrary;
+package tkLibrary;
 
 public enum StateType {
 	DONE, PENDING, GIVEUP

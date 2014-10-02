@@ -1,4 +1,4 @@
-package src.tkLibrary;
+package tkLibrary;
 
 import java.util.Date;
 

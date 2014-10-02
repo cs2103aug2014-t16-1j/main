@@ -1,6 +1,4 @@
-package src;
-
-import src.theUI.UserInterface;
+import theUI.UserInterface;
 
 /*
  * the main class. can add user here.
