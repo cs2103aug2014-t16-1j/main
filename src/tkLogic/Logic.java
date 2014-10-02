@@ -71,6 +71,10 @@ public class Logic {
 		
 	}
 	
+	public void storeCommand() {
+	    // store the last command in the storage for the method Undo
+	}
+	
 	// this logic function is to sort an array of tasks, helpful when printing
 	public ArrayList<Task> sort(ArrayList<Task> tasks) {
 		return null;
