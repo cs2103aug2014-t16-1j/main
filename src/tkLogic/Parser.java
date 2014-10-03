@@ -40,11 +40,16 @@ public class Parser {
     }
 
     private static void parseAll(String userCommand, Task task) {
+        String[] userInput = splitUserInput(userCommand);
         task.setStartTime(parseStartTime(userCommand));
         task.setEndTime(parseEndTime(userCommand));
         task.setDescription(parseDescription(userCommand));
         task.setLocation(parseLocation(userCommand));
         task.setFrequency(parseFrequency(userCommand));
         task.setState(StateType.PENDING);
+    }
+
+    public static String[] splitUserInput(String userCommand) {
+        return userCommand.trim().split("\\s+");
     }
 }
