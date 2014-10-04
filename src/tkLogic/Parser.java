@@ -53,35 +53,18 @@ public class Parser {
         UserInput userInput = new UserInput(determineCommandType(userInputArray[0]), task);
 
         String word;
-        CommandKey commandKey = "description";
+        CommandKey commandKey = determineCommandKey("-d");
         for (int i = 0; i < userInputArray.length; i++) {
             word = userInputArray[i];
             if (word.substring(0, 1) == "-") {
-
-                switch (commandKey) {
-                case DESCRIPTION:
-                    return parseDescription(word);
-                case FROM:
-                    return parseStartTime(word);
-                case TO:
-                    return parseEndTime(word);
-                case AT:
-                    return parseLocation(word);
-                case ON:
-                    return parseDate(word);
-                case BY:
-                    return parseEndTime();
-                case EVERY:
-                    return parseFrequency(userCommand);
-                default:
-                    throw new Error("Unrecognized command type");
-                }
+                
+                executeCommandKey(word, commandKey);
                 
                 // do something about the previous description
                 // store the command type instead of command string?
                 // -f from -t to -@ -o on -b by -e every
 
-                CommandKey commandKey = determineCommandType(word);
+                commandKey = determineCommandKey(word);
 
                
             } else {
@@ -97,6 +80,50 @@ public class Parser {
         task.setState(StateType.PENDING);
 
         return userInput;
+    }
+
+    private static CommandKey determineCommandKey(String commandKeyString) throws Error {
+        if (commandKeyString == null) {
+            throw new Error("command type string cannot be null!");
+        }
+
+        if (commandKeyString.equalsIgnoreCase("-d")) {
+            return CommandKey.DESCRIPTION;
+        } else if (commandKeyString.equalsIgnoreCase("-f")) {
+            return CommandKey.FROM;
+        } else if (commandKeyString.equalsIgnoreCase("-t")) {
+            return CommandKey.TO;
+        } else if (commandKeyString.equalsIgnoreCase("-@")) {
+            return CommandKey.AT;
+        } else if (commandKeyString.equalsIgnoreCase("-o")) {
+            return CommandKey.ON;
+        } else if (commandKeyString.equalsIgnoreCase("-b")) {
+            return CommandKey.BY;
+        } else {
+            return CommandKey.EVERY;
+        }
+    }
+
+    private static void executeCommandKey(String word, CommandKey commandKey)
+            throws Error {
+        switch (commandKey) {
+        case DESCRIPTION:
+            parseDescription(word);
+        case FROM:
+            parseStartTime(word);
+        case TO:
+            parseEndTime(word);
+        case AT:
+            parseLocation(word);
+        case ON:
+            parseDate(word);
+        case BY:
+            parseEndTime(word);
+        case EVERY:
+            parseFrequency(word);
+        default:
+            throw new Error("Unrecognized command type");
+        }
     }
 
     public static String[] splitUserInput(String userCommand) {
