@@ -16,57 +16,57 @@ import tkLibrary.CommandKey;
  */
 public class Parser {
 
-    private static Date parseStartTime(String userCommand) {
+    private UserInput userInput;
+    private Task task;
+    private String userCommand;
+
+    private void parseDescription(String description) {
+        task.setDescription(description);
+    }
+
+    private Date parseStartTime(String userCommand) {
         return null;
     }
 
-    private static Date parseEndTime(String userCommand) {
-        return null;
-    }
-    
-    private static Date parseDate(String userCommand) {
+    private Date parseEndTime(String userCommand) {
         return null;
     }
 
-    private static String parseDescription(String userCommand) {
+    private Date parseDate(String userCommand) {
         return null;
     }
 
-    private static String parseLocation(String userCommand) {
+    private String parseLocation(String userCommand) {
         return null;
     }
 
-    private static FrequencyType parseFrequency(String userCommand) {
+    private FrequencyType parseFrequency(String userCommand) {
         return null;
     }
 
-    public static UserInput format(String userCommand) {
-        Task task = new Task();
-        UserInput userInput;
-
-        userInput = parseAll(userCommand, task);
-        return userInput;
+    public Parser(String userCommand) {
+        task = new Task();
     }
 
-    private static UserInput parseAll(String userCommand, Task task) {
+    public UserInput format() {
         String[] userInputArray = splitUserInput(userCommand);
-        UserInput userInput = new UserInput(determineCommandType(userInputArray[0]), task);
+        userInput =
+                new UserInput(determineCommandType(userInputArray[0]), task);
 
         String word;
         CommandKey commandKey = determineCommandKey("-d");
         for (int i = 0; i < userInputArray.length; i++) {
             word = userInputArray[i];
             if (word.substring(0, 1) == "-") {
-                
+
                 executeCommandKey(word, commandKey);
-                
+
                 // do something about the previous description
                 // store the command type instead of command string?
                 // -f from -t to -@ -o on -b by -e every
 
                 commandKey = determineCommandKey(word);
 
-               
             } else {
                 word += " " + word;
             }
@@ -74,7 +74,6 @@ public class Parser {
 
         task.setStartTime(parseStartTime(userCommand));
         task.setEndTime(parseEndTime(userCommand));
-        task.setDescription(parseDescription(userCommand));
         task.setLocation(parseLocation(userCommand));
         task.setFrequency(parseFrequency(userCommand));
         task.setState(StateType.PENDING);
@@ -82,7 +81,8 @@ public class Parser {
         return userInput;
     }
 
-    private static CommandKey determineCommandKey(String commandKeyString) throws Error {
+    private CommandKey determineCommandKey(String commandKeyString)
+            throws Error {
         if (commandKeyString == null) {
             throw new Error("command type string cannot be null!");
         }
@@ -104,7 +104,7 @@ public class Parser {
         }
     }
 
-    private static void executeCommandKey(String word, CommandKey commandKey)
+    private void executeCommandKey(String word, CommandKey commandKey)
             throws Error {
         switch (commandKey) {
         case DESCRIPTION:
@@ -126,11 +126,11 @@ public class Parser {
         }
     }
 
-    public static String[] splitUserInput(String userCommand) {
+    public String[] splitUserInput(String userCommand) {
         return userCommand.trim().split("\\s+");
     }
 
-    private static CommandType determineCommandType(String commandTypeString) {
+    private CommandType determineCommandType(String commandTypeString) {
         if (commandTypeString == null) {
             throw new Error("command type string cannot be null!");
         }
