@@ -1,15 +1,15 @@
 package tkLibrary;
 
 public class UserInput {
-    private String command;
+    private CommandType command;
     private Task task;
 
-    public UserInput(String command, Task task) {
+    public UserInput(CommandType command, Task task) {
         this.command = command;
         this.task = task;
     }
 
-    public String getCommand() {
+    public CommandType getCommand() {
         return this.command;
     }
 

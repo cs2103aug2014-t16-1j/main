@@ -2,6 +2,7 @@ package tkLogic;
 
 import java.util.Date;
 
+import tkLibrary.CommandType;
 import tkLibrary.FrequencyType;
 import tkLibrary.StateType;
 import tkLibrary.Task;
@@ -20,6 +21,10 @@ public class Parser {
     }
 
     private static Date parseEndTime(String userCommand) {
+        return null;
+    }
+    
+    private static Date parseDate(String userCommand) {
         return null;
     }
 
@@ -45,36 +50,40 @@ public class Parser {
 
     private static UserInput parseAll(String userCommand, Task task) {
         String[] userInputArray = splitUserInput(userCommand);
-        UserInput userInput = new UserInput(userInputArray[0], task);
+        UserInput userInput = new UserInput(determineCommandType(userInputArray[0]), task);
 
         String word;
-        String command = "description";
+        CommandKey commandKey = "description";
         for (int i = 0; i < userInputArray.length; i++) {
             word = userInputArray[i];
             if (word.substring(0, 1) == "-") {
 
+                switch (commandKey) {
+                case DESCRIPTION:
+                    return parseDescription(word);
+                case FROM:
+                    return parseStartTime(word);
+                case TO:
+                    return parseEndTime(word);
+                case AT:
+                    return parseLocation(word);
+                case ON:
+                    return parseDate(word);
+                case BY:
+                    return parseEndTime();
+                case EVERY:
+                    return parseFrequency(userCommand);
+                default:
+                    throw new Error("Unrecognized command type");
+                }
+                
                 // do something about the previous description
                 // store the command type instead of command string?
                 // -f from -t to -@ -o on -b by -e every
 
                 CommandKey commandKey = determineCommandType(word);
 
-                switch (commandKey) {
-                case FROM:
-                    return add(userCommand);
-                case TO:
-                    return display();
-                case AT:
-                    return delete(userCommand);
-                case ON:
-                    return clear();
-                case BY:
-                    return sort();
-                case EVERY:
-                    return search(userCommand);
-                default:
-                    throw new Error("Unrecognized command type");
-                }
+               
             } else {
                 word += " " + word;
             }
@@ -99,15 +108,15 @@ public class Parser {
             throw new Error("command type string cannot be null!");
         }
 
-        if (commandTypeString.equalsIgnoreCase("-a")) {
+        if (commandTypeString.equalsIgnoreCase("add")) {
             return CommandType.ADD;
-        } else if (commandTypeString.equalsIgnoreCase("-d")) {
+        } else if (commandTypeString.equalsIgnoreCase("delete")) {
             return CommandType.DELETE;
-        } else if (commandTypeString.equalsIgnoreCase("-u")) {
+        } else if (commandTypeString.equalsIgnoreCase("undo")) {
             return CommandType.UNDO;
-        } else if (commandTypeString.equalsIgnoreCase("-e")) {
+        } else if (commandTypeString.equalsIgnoreCase("edit")) {
             return CommandType.EDIT;
-        } else if (commandTypeString.equalsIgnoreCase("-c")) {
+        } else if (commandTypeString.equalsIgnoreCase("clear")) {
             return CommandType.CLEAR;
         } else {
             return CommandType.LIST;
