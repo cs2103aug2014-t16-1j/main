@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import storage.Storage;
+import tkLibrary.Constants;
 import tkLibrary.StateType;
 import tkLibrary.Task;
 
@@ -24,13 +25,13 @@ public class Logic {
 	}
 	
 	public String add(Task task) {
-	/** public String add(Task task){
-	 * 		differentiate different types of adding using switch
-	 * 		then add accordingly to storage
-	 * 		using API of Task class to get start, end timing, location, date, frequency
-	 * 
-	 */
-		return null;
+		if(storage.queryFreeSlot(task.getStartTime()) || storage.queryFreeSlot(task.getEndTime())){
+			storage.store(task);
+		}
+		else{
+			return Constants.MESSAGE_CLASHING_TIMESLOTS;
+		}
+		return Constants.MESSAGE_TASK_ADDED;
 	}
 	
 	public String edit(int lineNum) {
