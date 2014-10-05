@@ -43,11 +43,17 @@ public class Logic {
 	}
 	
 	public String delete(int lineNum) {
-	/**public String delete(Task task){
-	 * 		find description [using task.getDescription()] in storage, then delete it
-	 * }
-	 */
 		return null;
+	}
+	
+	public String delete(Task task){
+		if(storage.queryTask(task.getDescription())){
+			storage.delete(task);
+		}
+		else{
+			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
+		}
+		return Constants.MESSAGE_TASK_DELETED;
 	}
 	
 	
@@ -74,6 +80,7 @@ public class Logic {
 	
 	public void storeCommand() {
 	    // store the last command in the storage for the method Undo
+		
 	}
 	
 	// this logic function is to sort an array of tasks, helpful when printing
