@@ -52,11 +52,7 @@ public class Logic {
 	public String undo() {
 		return null;
 	}
-	
-	public String delete(int lineNum) {
-		return null;
-	}
-	
+
 	public String delete(Task task) throws Exception{
 		if(storage.queryTask(task.getDescription())){
 			try{
