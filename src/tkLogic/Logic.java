@@ -29,7 +29,7 @@ public class Logic {
 			try{
 				storage.store(task);
 			} catch (Exception e){
-					throw new Error("Unable to add to TasKoord.");
+					throw new Exception("Unable to add to TasKoord.");
 			}
 		}
 		else{
@@ -55,7 +55,7 @@ public class Logic {
 			try{
 				storage.delete(task);
 			} catch (Exception e){
-				throw new Error("Unable to delete from TasKoord.");
+				throw new Exception("Unable to delete from TasKoord.");
 			}
 		}
 		else{
