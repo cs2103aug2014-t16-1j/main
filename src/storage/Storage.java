@@ -7,7 +7,7 @@ import tkLibrary.Task;
 public class Storage {
 	// everything that goes to the main storage has to pass the cache
 	// this will help "undo" command.
-	// I will tell Savin abt this cache later. Now just ignore the cache.
+	// I will tell Savin about this cache later. Now just ignore the cache.
 	private String fileName;
 	private String cacheName;
 	
