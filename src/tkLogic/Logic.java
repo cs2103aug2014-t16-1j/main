@@ -38,8 +38,15 @@ public class Logic {
 		return Constants.MESSAGE_TASK_ADDED;
 	}
 	
-	public String edit(int lineNum) {
-		return null;
+	public String edit(Task taskToBeEdited, Task editedTask) {
+		Logic tempLogic = new Logic(fileName);
+		try{
+			tempLogic.delete(taskToBeEdited);
+			tempLogic.add(editedTask);
+			return Constants.MESSAGE_TASK_EDITED;
+		} catch (Exception e){
+			return ("Unable to edit!");
+		}
 	}
 
 	public String undo() {
