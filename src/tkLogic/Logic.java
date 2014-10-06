@@ -24,9 +24,13 @@ public class Logic {
 		storage = new Storage(fileName);
 	}
 	
-	public String add(Task task) {
+	public String add(Task task) throws Exception {
 		if(storage.queryFreeSlot(task.getStartTime()) || storage.queryFreeSlot(task.getEndTime())){
-			storage.store(task);
+			try{
+				storage.store(task);
+			} catch (Exception e){
+					throw new Error("Unable to add to TasKoord.");
+			}
 		}
 		else{
 			return Constants.MESSAGE_CLASHING_TIMESLOTS;
@@ -46,9 +50,13 @@ public class Logic {
 		return null;
 	}
 	
-	public String delete(Task task){
+	public String delete(Task task) throws Exception{
 		if(storage.queryTask(task.getDescription())){
-			storage.delete(task);
+			try{
+				storage.delete(task);
+			} catch (Exception e){
+				throw new Error("Unable to delete from TasKoord.");
+			}
 		}
 		else{
 			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
