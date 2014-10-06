@@ -8,6 +8,7 @@ import tkLibrary.Constants;
 import tkLibrary.StateType;
 import tkLibrary.Task;
 
+
 /*
  * Basically the logic functions should be very clear and simple.
  * So that UserInterface have to parse the command and call the logic.
@@ -39,10 +40,9 @@ public class Logic {
 	}
 	
 	public String edit(Task taskToBeEdited, Task editedTask) {
-		Logic tempLogic = new Logic(fileName);
 		try{
-			tempLogic.delete(taskToBeEdited);
-			tempLogic.add(editedTask);
+			delete(taskToBeEdited);
+			add(editedTask);
 			return Constants.MESSAGE_TASK_EDITED;
 		} catch (Exception e){
 			return ("Unable to edit!");
