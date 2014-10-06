@@ -41,17 +41,9 @@ public class Logic {
 		Logic tempLogic = new Logic(fileName);
 		try{
 			tempLogic.delete(taskToBeEdited);
-		} catch (Exception e){
-		}
-		
-		try{
 			tempLogic.add(editedTask);
 		} catch (Exception e){
-		}
-		
-		try{
 			throw new Exception("Error occurred while editing task.");
-		} catch (Exception e){
 		}
 	}
 
