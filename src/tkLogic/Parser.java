@@ -18,7 +18,6 @@ public class Parser {
 
     private UserInput userInput;
     private Task task;
-    private String userCommand;
 
     private void parseDescription(String description) {
         task.setDescription(description);
@@ -44,11 +43,11 @@ public class Parser {
         return null;
     }
 
-    public Parser(String userCommand) {
+    public Parser() {
         task = new Task();
     }
 
-    public UserInput format() {
+    public UserInput format(String userCommand) {
         String[] userInputArray = splitUserInput(userCommand);
         userInput =
                 new UserInput(determineCommandType(userInputArray[0]), task);
