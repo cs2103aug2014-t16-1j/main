@@ -35,8 +35,8 @@ public class Parser {
         return null;
     }
 
-    private String parseLocation(String userCommand) {
-        return null;
+    private void parseLocation(String location) {
+        task.setLocation(location);
     }
 
     private FrequencyType parseFrequency(String userCommand) {
@@ -73,7 +73,7 @@ public class Parser {
 
         task.setStartTime(parseStartTime(userCommand));
         task.setEndTime(parseEndTime(userCommand));
-        task.setLocation(parseLocation(userCommand));
+        
         task.setFrequency(parseFrequency(userCommand));
         task.setState(StateType.PENDING);
 
