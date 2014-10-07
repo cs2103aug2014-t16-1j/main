@@ -1,5 +1,5 @@
 package tkLibrary;
 
 public enum FrequencyType {
-	DAILY, WEEKLY, MONTHLY, YEARLY, NULL
+	DAY, WEEK, MONTH, YEAR, NULL
 }

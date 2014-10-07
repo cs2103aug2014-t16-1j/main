@@ -20,8 +20,8 @@ public class Parser {
     private UserInput userInput;
     private Task task;
 
-    private void parseDescription(String description) {
-        task.setDescription(description);
+    private void parseDescription(ArrayList<String> description) {
+        task.setDescription(description.toString());
     }
 
     private Date parseStartTime(String userCommand) {
@@ -36,12 +36,13 @@ public class Parser {
         return null;
     }
 
-    private void parseLocation(String location) {
-        task.setLocation(location);
+    private void parseLocation(ArrayList<String> location) {
+        task.setLocation(location.toString());
     }
 
-    private FrequencyType parseFrequency(String userCommand) {
-        return null;
+    private void parseFrequency(ArrayList<String> frequency) {
+        FrequencyType frequencyType = determineFrequencyType(frequency.get(1));
+        task.setFrequency(Integer.valueOf(frequency.get(0)), frequencyType);
     }
 
     public Parser() {
@@ -75,8 +76,6 @@ public class Parser {
 
         task.setStartTime(parseStartTime(userCommand));
         task.setEndTime(parseEndTime(userCommand));
-        
-        task.setFrequency(parseFrequency(userCommand));
         task.setState(StateType.PENDING);
 
         return userInput;
@@ -105,8 +104,9 @@ public class Parser {
         }
     }
 
-    private void executeCommandKey(String word, CommandKey commandKey)
-            throws Error {
+    private void
+            executeCommandKey(ArrayList<String> word, CommandKey commandKey)
+                    throws Error {
         switch (commandKey) {
         case DESCRIPTION:
             parseDescription(word);
@@ -148,6 +148,24 @@ public class Parser {
             return CommandType.CLEAR;
         } else {
             return CommandType.LIST;
+        }
+    }
+
+    private FrequencyType determineFrequencyType(String frequency) throws Error {
+        if (frequency == null) {
+            throw new Error("command type string cannot be null!");
+        }
+
+        if (frequency.equalsIgnoreCase("day")) {
+            return FrequencyType.DAY;
+        } else if (frequency.equalsIgnoreCase("week")) {
+            return FrequencyType.WEEK;
+        } else if (frequency.equalsIgnoreCase("month")) {
+            return FrequencyType.MONTH;
+        } else if (frequency.equalsIgnoreCase("year")) {
+            return FrequencyType.YEAR;
+        } else {
+            return FrequencyType.NULL;
         }
     }
 }
