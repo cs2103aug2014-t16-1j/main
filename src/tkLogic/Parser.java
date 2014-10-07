@@ -1,5 +1,6 @@
 package tkLogic;
 
+import java.util.ArrayList;
 import java.util.Date;
 
 import tkLibrary.CommandType;
@@ -52,11 +53,12 @@ public class Parser {
         userInput =
                 new UserInput(determineCommandType(userInputArray[0]), task);
 
-        String word;
+        ArrayList<String> word;
+        String newWord;
         CommandKey commandKey = determineCommandKey("-d");
         for (int i = 0; i < userInputArray.length; i++) {
-            word = userInputArray[i];
-            if (word.substring(0, 1) == "-") {
+            newWord = userInputArray[i];
+            if (newWord.substring(0, 1) == "-") {
 
                 executeCommandKey(word, commandKey);
 
@@ -64,10 +66,10 @@ public class Parser {
                 // store the command type instead of command string?
                 // -f from -t to -@ -o on -b by -e every
 
-                commandKey = determineCommandKey(word);
+                commandKey = determineCommandKey(newWord);
 
             } else {
-                word += " " + word;
+                word.add(newWord);
             }
         }
 

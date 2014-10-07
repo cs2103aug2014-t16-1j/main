@@ -5,7 +5,8 @@ import java.util.Date;
 public class Task {
 	private Date startTime;
 	private Date endTime;
-	private FrequencyType frequency;
+	private int frequency;
+	private FrequencyType frequencyType;
 	private StateType state;
 	private String location;
 	private String description;
@@ -18,8 +19,9 @@ public class Task {
 		this.endTime = time;
 	}
 	
-	public void setFrequency(FrequencyType frequency) {
-		this.frequency = frequency;
+	public void setFrequency(int frequency, FrequencyType frequencyType) {
+	    this.frequency = frequency;
+		this.frequencyType = frequencyType;
 	}
 	
 	public void setState(StateType state) {
@@ -42,8 +44,12 @@ public class Task {
 		return this.endTime;
 	}
 	
-	public FrequencyType getFrequency() {
-		return this.frequency;
+	public int getFrequency() {
+        return this.frequency;
+    }
+	
+	public FrequencyType getFrequencyType() {
+		return this.frequencyType;
 	}
 	
 	public String getLocation() {
