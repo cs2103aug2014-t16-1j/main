@@ -54,7 +54,7 @@ public class Parser {
         userInput =
                 new UserInput(determineCommandType(userInputArray[0]), task);
 
-        ArrayList<String> word;
+        ArrayList<String> word = new ArrayList<String>();
         String newWord;
         CommandKey commandKey = determineCommandKey("-d");
         for (int i = 0; i < userInputArray.length; i++) {
@@ -68,6 +68,7 @@ public class Parser {
                 // -f from -t to -@ -o on -b by -e every
 
                 commandKey = determineCommandKey(newWord);
+                word = new ArrayList<String>();
 
             } else {
                 word.add(newWord);
