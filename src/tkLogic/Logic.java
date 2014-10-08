@@ -26,7 +26,7 @@ public class Logic {
 	}
 
 	public String add(Task task) throws Exception {
-		if(storage.queryFreeSlot(task.getStartTime()) || storage.queryFreeSlot(task.getEndTime())){
+		if(querySlots(task)){
 			try{
 				storage.store(task);
 			} catch (Exception e){
@@ -37,6 +37,10 @@ public class Logic {
 			return Constants.MESSAGE_CLASHING_TIMESLOTS;
 		}
 		return Constants.MESSAGE_TASK_ADDED;
+	}
+	
+	private boolean querySlots(Task task){
+		return (storage.queryFreeSlot(task.getStartTime()) || storage.queryFreeSlot(task.getEndTime()));
 	}
 
 	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
