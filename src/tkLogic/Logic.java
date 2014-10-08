@@ -40,7 +40,7 @@ public class Logic {
 	}
 	
 	private boolean isFreeTimeslots(Task task){
-		return (storage.queryFreeSlot(task.getStartTime()) || storage.queryFreeSlot(task.getEndTime()));
+		return (storage.queryTask(task) || storage.queryTask(task));
 	}
 
 	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
@@ -82,7 +82,7 @@ public class Logic {
 	}
 	
 	private boolean isExistingTask(Task task){
-		return (storage.queryTask(task.getDescription()));
+		return (!(storage.queryTask(task)));
 	}
 
 	public ArrayList<Task> list() {
