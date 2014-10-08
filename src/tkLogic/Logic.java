@@ -39,14 +39,24 @@ public class Logic {
 		return Constants.MESSAGE_TASK_ADDED;
 	}
 	
-	public String edit(Task taskToBeEdited, Task editedTask) {
+	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
 		try{
-			delete(taskToBeEdited);
-			add(editedTask);
-			return Constants.MESSAGE_TASK_EDITED;
+			if(delete(taskToBeEdited) == Constants.MESSAGE_TASK_DOES_NOT_EXIST){
+				return ("Cannot edit because task does not exist.");
+			}
+			if(add(editedTask) == Constants.MESSAGE_CLASHING_TIMESLOTS){
+				return ("Cannot edit because task clashes with other tasks.");
+			}
 		} catch (Exception e){
-			return ("Unable to edit!");
+			if(e.getMessage().equals("Unable to add to TasKoord.")){
+				throw new Exception("Edit failed because of add.");
+			}
+			if(e.getMessage().equals("Unable to delete form TasKoord.")){
+				throw new Exception("Edit failed because of delete.");
+			}
+			throw new Exception("Edit failed because of some other reason.");
 		}
+		return Constants.MESSAGE_TASK_EDITED;
 	}
 
 	public String undo() {
