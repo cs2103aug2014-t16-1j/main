@@ -1,8 +1,10 @@
 package theUI;
 
+import java.util.ArrayList;
 import java.util.Scanner;
 
 import storage.Storage;
+import tkLibrary.CommandType;
 import tkLibrary.Task;
 import tkLibrary.UserInput;
 import tkLogic.Logic;
@@ -10,17 +12,12 @@ import tkLogic.Parser;
 
 public class UserInterface {
 	private String NO_COMMAND = "";
-	private String fileName;
 	private Logic logic;
 	private Parser parser;
 	private Storage storage;
 	private Gui gui;
 	
-	//private CommandType command;
-	//private Task task;
-	
 	public void run(String fileName) {
-		this.fileName = fileName;
 		parser = new Parser();
 		logic = new Logic(fileName);
 		storage = new Storage(fileName);
@@ -29,7 +26,11 @@ public class UserInterface {
 		while (true) {
 			String userCommand = gui.getUserCommand();
 			if (userCommand != NO_COMMAND) {
-				executeCommands(userCommand);
+				try {
+					executeCommands(userCommand);
+				} catch (Exception e) {
+					gui.displayFailed(e.getMessage());
+				}
 			}
 		}
 	}
@@ -41,17 +42,17 @@ public class UserInterface {
 		
 		//ADD, DELETE, UNDO, EDIT, CLEAR, LIST
 		switch (command) {
-			case ADD: 
-				add(task); 
+			case ADD:
+				add(task);
 				break;
 			case DELETE:
 				delete(task); 
 				break;
 			case UNDO:
-				undo(); 
+				undo();
 				break;
 			case EDIT:
-				edit(); 
+				edit();
 				break;
 			case CLEAR:
 				clear(); 
@@ -64,25 +65,31 @@ public class UserInterface {
 	
 	private void add(Task task) {
 		String feedback = logic.add(task);
-		gui.display(feedback);
+		gui.displaySuccessed(feedback);
 	}
 
-	private void list(UserInput userInput) {
-		
+	private void list(Task task) {
+		ArrayList<Task> lists = logic.list(task);
+		lists = logic.sort(lists);
+		gui.display(task);
+	}
+	
+	private void delete(Task task) {
+		String feedback = logic.delete(task);
+		gui.displaySuccessed(feedback);
+	}
+	
+	private void edit(Task taskToBeEdited, Task newTask) {
+		String feedback = logic.delete(taskToBeEdited, newTask);
+		gui.displaySuccessed(feedback);
 	}
 
 	private void clear(UserInput userInput) {
-		
-	}
-
-	private void edit(UserInput userInput) {
-		
+		String feedback = logic.clear(task);
+		gui.displaySuccessed(feedback);
 	}
 
 	private void undo(UserInput userInput) {
 		
-	}
-
-	private void delte(UserInput userInput) {
 	}
 }
