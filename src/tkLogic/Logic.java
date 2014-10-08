@@ -68,7 +68,7 @@ public class Logic {
 	}
 
 	public String delete(Task task) throws Exception{
-		if(storage.queryTask(task.getDescription())){
+		if(isExistingTask(task)){
 			try{
 				storage.delete(task);
 			} catch (Exception e){
@@ -81,6 +81,9 @@ public class Logic {
 		return Constants.MESSAGE_TASK_DELETED;
 	}
 	
+	private boolean isExistingTask(Task task){
+		return (storage.queryTask(task.getDescription()));
+	}
 
 	public ArrayList<Task> list() {
 		return null;
