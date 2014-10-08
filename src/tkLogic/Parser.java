@@ -23,103 +23,59 @@ public class Parser {
     private int[] endTime;
     private int[] date;
 
-    private void parseDescription(ArrayList<String> description) {
-        task.setDescription(description.toString());
-    }
-
-    private void parseStartTime(ArrayList<String> time) {
-        int[] startingTime = new int[2];
-        startTime = updateTime(time, startingTime);
-    }
-
-    private void parseEndTime(ArrayList<String> time) {
-        int[] endingTime = new int[2];
-        endTime = updateTime(time, endingTime);
-    }
-
-    private int[] updateTime(ArrayList<String> time, int[] startingTime) {
-        for (int i = 0; i < time.get(0).length(); i++) {
-            if (time.get(0).substring(i, i + 1) == "a") {
-                Float timeValue = Float.valueOf(time.get(0).substring(0, i));
-                startingTime[0] = timeValue.intValue();
-                Float minuteValue =
-                        timeValue - Float.valueOf(startingTime[0] + "");
-                startingTime[1] = Float.valueOf(minuteValue * 100).intValue();
-            } else if (time.get(0).substring(i, i + 1) == "p") {
-                Float timeValue = Float.valueOf(time.get(0).substring(0, i));
-                startingTime[0] = timeValue.intValue() + 12;
-                Float minuteValue =
-                        timeValue - Float.valueOf(startingTime[0] + "");
-                startingTime[1] = Float.valueOf(minuteValue * 100).intValue();
-            } else if (time.get(0).substring(i, i + 1) == "h") {
-                startingTime[0] = Integer.valueOf(time.get(0).substring(0, 2));
-                startingTime[0] = Integer.valueOf(time.get(0).substring(2, 4));
-            }
-        }
-        return startingTime;
-    }
-
-    private void parseDate(ArrayList<String> day) {
-        date = new int[3];
-        date[0] = Integer.valueOf(day.get(0));
-        date[1] = determineMonth(day.get(1));
-        date[2] = Integer.valueOf(day.get(2));
-    }
-
-    private void parseTime() {
-        
-    }
-
-    private void parseLocation(ArrayList<String> location) {
-        task.setLocation(location.toString());
-    }
-
-    private void parseFrequency(ArrayList<String> frequency) {
-        FrequencyType frequencyType = determineFrequencyType(frequency.get(1));
-        task.setFrequency(Integer.valueOf(frequency.get(0)), frequencyType);
-    }
-
-    public Parser() {
-        task = new Task();
-    }
-
     public UserInput format(String userCommand) {
+        task = new Task();
+        startTime = new int[0];
+        endTime = new int[0];
+        date = new int[3];
         String[] userInputArray = splitUserInput(userCommand);
         userInput =
                 new UserInput(determineCommandType(userInputArray[0]), task);
+        parseAll(userInputArray);
+        parseTime();
+        task.setState(StateType.PENDING);
+        return userInput;
+    }
 
+    private String[] splitUserInput(String userCommand) {
+        return userCommand.trim().split("\\s+");
+    }
+
+    private CommandType determineCommandType(String commandTypeString) {
+        if (commandTypeString.equalsIgnoreCase("add")) {
+            return CommandType.ADD;
+        } else if (commandTypeString.equalsIgnoreCase("delete")) {
+            return CommandType.DELETE;
+        } else if (commandTypeString.equalsIgnoreCase("undo")) {
+            return CommandType.UNDO;
+        } else if (commandTypeString.equalsIgnoreCase("edit")) {
+            return CommandType.EDIT;
+        } else if (commandTypeString.equalsIgnoreCase("clear")) {
+            return CommandType.CLEAR;
+        } else {
+            return CommandType.LIST;
+        }
+    }
+
+    private void parseAll(String[] userInputArray) {
         ArrayList<String> word = new ArrayList<String>();
         String newWord;
         CommandKey commandKey = determineCommandKey("-d");
-        for (int i = 0; i < userInputArray.length; i++) {
+        for (int i = 1; i < userInputArray.length; i++) {
+
             newWord = userInputArray[i];
-            if (newWord.substring(0, 1) == "-") {
-
-                executeCommandKey(word, commandKey);
-
-                // do something about the previous description
-                // store the command type instead of command string?
-                // -f from -t to -@ -o on -b by -e every
-
+            if (newWord.substring(0, 1).equals("-")) {
+                executeCmdKey(word, commandKey);
                 commandKey = determineCommandKey(newWord);
                 word = new ArrayList<String>();
-
             } else {
                 word.add(newWord);
             }
         }
-
-        task.setState(StateType.PENDING);
-
-        return userInput;
+        executeCmdKey(word, commandKey);
     }
 
-    private CommandKey determineCommandKey(String commandKeyString)
-            throws Error {
-        if (commandKeyString == null) {
-            throw new Error("command type string cannot be null!");
-        }
-
+    private CommandKey determineCommandKey(String commandKeyString) {
         if (commandKeyString.equalsIgnoreCase("-d")) {
             return CommandKey.DESCRIPTION;
         } else if (commandKeyString.equalsIgnoreCase("-f")) {
@@ -136,56 +92,115 @@ public class Parser {
         }
     }
 
-    private void
-            executeCommandKey(ArrayList<String> word, CommandKey commandKey)
+    private boolean
+            executeCmdKey(ArrayList<String> word, CommandKey commandKey)
                     throws Error {
         switch (commandKey) {
         case DESCRIPTION:
-            parseDescription(word);
+            return parseDescription(word);
         case FROM:
-            parseStartTime(word);
+            return parseStartTime(word);
         case TO:
-            parseEndTime(word);
-        case AT:
-            parseLocation(word);
+            return parseEndTime(word);
         case ON:
-            parseDate(word);
+            return parseDate(word);
+        case AT:
+            return parseLocation(word);
         case EVERY:
-            parseFrequency(word);
+            return parseFrequency(word);
         default:
-            throw new Error("Unrecognized command type");
+            throw new Error("Unrecognized command key: " + commandKey);
         }
     }
 
-    public String[] splitUserInput(String userCommand) {
-        return userCommand.trim().split("\\s+");
+    private boolean parseDescription(ArrayList<String> description) {
+        task.setDescription(description.toString());
+        return true;
     }
 
-    private CommandType determineCommandType(String commandTypeString) {
-        if (commandTypeString == null) {
-            throw new Error("command type string cannot be null!");
-        }
+    private boolean parseStartTime(ArrayList<String> time) {
+        int[] startingTime = new int[2];
+        startTime = updateTime(time, startingTime);
+        return true;
+    }
 
-        if (commandTypeString.equalsIgnoreCase("add")) {
-            return CommandType.ADD;
-        } else if (commandTypeString.equalsIgnoreCase("delete")) {
-            return CommandType.DELETE;
-        } else if (commandTypeString.equalsIgnoreCase("undo")) {
-            return CommandType.UNDO;
-        } else if (commandTypeString.equalsIgnoreCase("edit")) {
-            return CommandType.EDIT;
-        } else if (commandTypeString.equalsIgnoreCase("clear")) {
-            return CommandType.CLEAR;
+    private boolean parseEndTime(ArrayList<String> time) {
+        int[] endingTime = new int[2];
+        endTime = updateTime(time, endingTime);
+        return true;
+    }
+
+    private int[] updateTime(ArrayList<String> time, int[] requiredTime) {
+        String newTime = time.get(0);
+        if (newTime.contains("h")) {
+            requiredTime[0] = Integer.valueOf(newTime.substring(0, 2));
+            requiredTime[0] = Integer.valueOf(newTime.substring(2, 4));
         } else {
-            return CommandType.LIST;
+            Float timeValue =
+                    Float.valueOf(newTime.substring(0, newTime.length() - 2));
+            Float minuteValue =
+                    timeValue - Float.valueOf(timeValue.intValue() + "");
+            requiredTime[1] = Float.valueOf(minuteValue * 100).intValue();
+            if (newTime.contains("a")) {
+                requiredTime[0] = timeValue.intValue();
+            } else if (newTime.contains("p")) {
+                requiredTime[0] = timeValue.intValue() + 12;
+            }
+        }
+        return requiredTime;
+    }
+
+    private boolean parseDate(ArrayList<String> day) {
+        date[0] = Integer.valueOf(day.get(0));
+        date[1] = determineMonth(day.get(1));
+        date[2] = Integer.valueOf(day.get(2));
+        return true;
+    }
+
+    private int determineMonth(String month) throws Error {
+        if (month.length() != 3) {
+            return Integer.valueOf(month);
+        } else if (month.equalsIgnoreCase("Jan")) {
+            return 1;
+        } else if (month.equalsIgnoreCase("Feb")) {
+            return 2;
+        } else if (month.equalsIgnoreCase("Mar")) {
+            return 3;
+        } else if (month.equalsIgnoreCase("Apr")) {
+            return 4;
+        } else if (month.equalsIgnoreCase("May")) {
+            return 5;
+        } else if (month.equalsIgnoreCase("Jun")) {
+            return 6;
+        } else if (month.equalsIgnoreCase("Jul")) {
+            return 7;
+        } else if (month.equalsIgnoreCase("Aug")) {
+            return 8;
+        } else if (month.equalsIgnoreCase("Sep")) {
+            return 9;
+        } else if (month.equalsIgnoreCase("Oct")) {
+            return 10;
+        } else if (month.equalsIgnoreCase("Nov")) {
+            return 11;
+        } else if (month.equalsIgnoreCase("Dec")) {
+            return 12;
+        } else {
+            return 0;
         }
     }
 
-    private FrequencyType determineFrequencyType(String frequency) throws Error {
-        if (frequency == null) {
-            throw new Error("command type string cannot be null!");
-        }
+    private boolean parseLocation(ArrayList<String> location) {
+        task.setLocation(location.toString());
+        return true;
+    }
 
+    private boolean parseFrequency(ArrayList<String> frequency) {
+        FrequencyType frequencyType = determineFrequencyType(frequency.get(1));
+        task.setFrequency(Integer.valueOf(frequency.get(0)), frequencyType);
+        return true;
+    }
+
+    private FrequencyType determineFrequencyType(String frequency) {
         if (frequency.equalsIgnoreCase("day")) {
             return FrequencyType.DAY;
         } else if (frequency.equalsIgnoreCase("week")) {
@@ -199,40 +214,12 @@ public class Parser {
         }
     }
 
-    private int determineMonth(String month) throws Error {
-        if (month == null) {
-            throw new Error("command type string cannot be null!");
-        }
-
-        if (month.equalsIgnoreCase("Jan") || Integer.valueOf(month) == 1) {
-            return 1;
-        } else if (month.equalsIgnoreCase("Feb") || Integer.valueOf(month) == 2) {
-            return 2;
-        } else if (month.equalsIgnoreCase("Mar") || Integer.valueOf(month) == 3) {
-            return 3;
-        } else if (month.equalsIgnoreCase("Apr") || Integer.valueOf(month) == 4) {
-            return 4;
-        } else if (month.equalsIgnoreCase("May") || Integer.valueOf(month) == 5) {
-            return 5;
-        } else if (month.equalsIgnoreCase("Jun") || Integer.valueOf(month) == 6) {
-            return 6;
-        } else if (month.equalsIgnoreCase("Jul") || Integer.valueOf(month) == 7) {
-            return 7;
-        } else if (month.equalsIgnoreCase("Aug") || Integer.valueOf(month) == 8) {
-            return 8;
-        } else if (month.equalsIgnoreCase("Sep") || Integer.valueOf(month) == 9) {
-            return 9;
-        } else if (month.equalsIgnoreCase("Oct")
-                || Integer.valueOf(month) == 10) {
-            return 10;
-        } else if (month.equalsIgnoreCase("Nov")
-                || Integer.valueOf(month) == 11) {
-            return 11;
-        } else if (month.equalsIgnoreCase("Dec")
-                || Integer.valueOf(month) == 12) {
-            return 12;
-        } else {
-            return FrequencyType.NULL;
-        }
+    private void parseTime() {
+        Calendar time = Calendar.getInstance();
+        time.set(date[2], date[1], date[0], startTime[0], startTime[1], 0);
+        task.setStartTime(time);
+        time.set(date[2], date[1], date[0], endTime[0], endTime[1], 0);
+        task.setEndTime(time);
     }
+
 }
