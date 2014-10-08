@@ -23,17 +23,19 @@ public class ParserTest {
         assertEquals("Test that the Description is correctly recorded",
                 "Meeting", task.getDescription());
         assertEquals("Test that the Start Time is correctly recorded",
-                "Fri Sep 12 09:00:00 SGT 2014", task.getStartTime().getTime().toString());
+                "Fri Sep 12 09:00:00 SGT 2014", task.getStartTime().getTime()
+                        .toString());
         assertEquals("Test that the End Time is correctly recorded",
-                "Fri Sep 12 10:00:00 SGT 2014", task.getEndTime().getTime().toString());
+                "Fri Sep 12 10:00:00 SGT 2014", task.getEndTime().getTime()
+                        .toString());
         assertEquals("Test that the Location is correctly recorded",
                 "Boardroom", task.getLocation());
-        assertEquals("Test that the State is correctly set",
-                StateType.PENDING, task.getState());
-        assertEquals("Test that the frequency is as default",
-                0, task.getFrequency());
-        assertEquals("Test that the frequency is as default",
-                null, task.getFrequencyType());
+        assertEquals("Test that the State is correctly set", StateType.PENDING,
+                task.getState());
+        assertEquals("Test that the frequency is as default", 0,
+                task.getFrequency());
+        assertEquals("Test that the frequency is as default", null,
+                task.getFrequencyType());
     }
 
 }

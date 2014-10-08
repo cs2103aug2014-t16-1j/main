@@ -61,6 +61,6 @@ public class Task {
 	}
 	
 	public StateType getState() {
-		return this.state;
-	}
+        return this.state;
+    }
 }
