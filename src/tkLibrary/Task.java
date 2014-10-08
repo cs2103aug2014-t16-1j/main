@@ -1,21 +1,21 @@
 package tkLibrary;
 
-import java.util.Date;
+import java.util.Calendar;
 
 public class Task {
-	private Date startTime;
-	private Date endTime;
+	private Calendar startTime;
+	private Calendar endTime;
 	private int frequency;
 	private FrequencyType frequencyType;
 	private StateType state;
 	private String location;
 	private String description;
 	
-	public void setStartTime(Date time) {
+	public void setStartTime(Calendar time) {
 		this.startTime = time;
 	}
 	
-	public void setEndTime(Date time) {
+	public void setEndTime(Calendar time) {
 		this.endTime = time;
 	}
 	
@@ -36,11 +36,11 @@ public class Task {
 		this.description = description;
 	}
 	
-	public Date getStartTime() {
+	public Calendar getStartTime() {
 		return this.startTime;
 	}
 	
-	public Date getEndTime() {
+	public Calendar getEndTime() {
 		return this.endTime;
 	}
 	

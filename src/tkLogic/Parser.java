@@ -59,12 +59,15 @@ public class Parser {
         return startingTime;
     }
 
-    private Calendar parseDate(String userCommand) {
-        return null;
+    private void parseDate(ArrayList<String> day) {
+        date = new int[3];
+        date[0] = Integer.valueOf(day.get(0));
+        date[1] = determineMonth(day.get(1));
+        date[2] = Integer.valueOf(day.get(2));
     }
 
     private void parseTime() {
-        determineMonth
+        
     }
 
     private void parseLocation(ArrayList<String> location) {
@@ -106,8 +109,6 @@ public class Parser {
             }
         }
 
-        task.setStartTime(parseStartTime(userCommand));
-        task.setEndTime(parseEndTime(userCommand));
         task.setState(StateType.PENDING);
 
         return userInput;
