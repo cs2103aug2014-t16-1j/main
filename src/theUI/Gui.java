@@ -1,18 +1,21 @@
 package theUI;
 
 import tkLibrary.Task;
+
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
 import javax.swing.*;
 
 import java.awt.*;
+import java.util.ArrayList;
 
 public class Gui {
-    final String NO_COMMAND = "";
+    private String NO_COMMAND = "";
     private JFrame frame = new JFrame();
     private JTextField commandBox = new JTextField();//new HintTextField("Enter Command here");
     private JTextArea historyBox = new JTextArea();
-    private JEditorPane displayBox = new JEditorPane();
+    private JTextArea displayBox = new JTextArea();
     private String userCommand = NO_COMMAND;
 
     public Gui() {
@@ -29,6 +32,8 @@ public class Gui {
         commandBox.setPreferredSize( new Dimension(400, 30 ) );
         displayBox.setPreferredSize( new Dimension(400, 400) );
         //history.setPreferredSize( new Dimension(100, 100) );
+        
+        //displayBox.setContentType("text/html");
         
         JFrame.setDefaultLookAndFeelDecorated(true);
         BoxLayout boxLayout = new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS);
@@ -54,13 +59,45 @@ public class Gui {
         );
     }
 
-    public void display(String text) {
-        displayBox.setText(text);
+    public void displayFailed(String text) {
+    	displayBox.append(text+"\n");
+    }
+    
+    public void displayDone(String text) {
+    	displayBox.append(text+"\n");
     }
 
     public void display(Task task) {
+    	String res = "";
+    	if (task.getStartTime() != null) {
+    		res += task.getStartTime().getTime();
+    	}
+    	if (task.getEndTime() != null) {
+    		res += " - " + task.getEndTime().getTime();
+    	}
+    	
+    	if (!res.equals("")) {
+    		res += "\n";
+    	}
+    	
+    	if (task.getDescription() != null) {
+    		res += "Description: " + task.getDescription() + "\n";
+    	}
+    	
+    	if (task.getLocation() != null) {
+    		res += "Location: " + task.getLocation() + "\n";
+    	}
+    	
+    	displayBox.append("\n" + res);
     }
-
+    
+    public void display(ArrayList<Task> lists) {
+    	displayBox.setText("");
+    	for (Task task : lists) {
+    		display(task);
+    	}
+    }
+ 
     public void clearDisplayBox() {
         displayBox.setText("");
     }

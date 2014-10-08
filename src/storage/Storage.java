@@ -1,216 +1,221 @@
 package storage;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileReader;
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Scanner;
 
+import tkLibrary.Constants;
 import tkLibrary.Task;
 
 public class Storage {
-	// everything that goes to the main storage has to pass the cache
-	// this will help "undo" command.
-	// I will tell Savin about this cache later. Now just ignore the cache.
 	private String fileName;
-	private String cacheName;
-	private static final int[] DAYS_IN_MONTHS = { 31, 28, 31, 30, 31, 30, 31,
-			31, 30, 31, 30, 31 };
-	private static ArrayList<Task[]> days = new ArrayList<Task[]>(365);
-
+	private PrintWriter out;
+	private Scanner in;
+	
+	private ArrayList<Task> listOfTasks;
+	
 	public Storage(String fileName) {
 		this.fileName = fileName;
-		this.cacheName = "." + fileName;
-		initialize_arraylist();
-		try {
-			initialize_fromFile();
-		} catch (Exception e) {
-			System.out.println("File Cannot be Initialized - Not Found");
-		}
+		openFileToWrite();
+		closeFileToWrite();
+		this.listOfTasks = loadFromFile();
 	}
-
-	private void initialize_arraylist() {
-		for (int i = 0; i < 365; i++) {
-			Task[] temp = new Task[24];
-			days.add(temp);
-		}
+	
+	public ArrayList<Task> load() {
+		return listOfTasks;
 	}
-
-	public void delete(Task task) {
-		int start_date = task.getStartTime().get(Calendar.DAY_OF_YEAR);
-		int end_date = task.getEndTime().get(Calendar.DAY_OF_YEAR);
-		if (start_date == end_date) {
-			Task[] tp = days.get(start_date - 1);
-			for (int i = task.getStartTime().get(Calendar.HOUR_OF_DAY) - 1; i < task
-					.getEndTime().get(Calendar.HOUR_OF_DAY); i++) {
-				tp[i] = null;
-			}
-		} else {
-			for (int i = start_date - 1; i < end_date; i++) {
-				Task[] tp = days.get(i);
-				if (i == end_date - 1) {
-					for (int j = 0; j < task.getEndTime().get(Calendar.HOUR_OF_DAY); j++) {
-						tp[j] = null;
-					}
-				} else {
-					for (int j = task.getStartTime().get(Calendar.HOUR_OF_DAY); j < 24; j++) {
-						tp[j] = null;
-					}
-				}
+	
+	public ArrayList<Task> loadFromFile() {
+		ArrayList<Task> list = new ArrayList<Task> ();
+		Task task = new Task();
+		
+		openFileToRead();
+		
+		while (in.hasNextLine()) {
+			String s = in.nextLine();
+			if (s.equals(Constants.END_OBJECT_SIGNAL)) {
+				list.add(task);
+				task = new Task();
+			} else if (s.equals(Constants.STARTTIME)) {
+				task.setStartTime(in.nextLine());
+			} else if (s.equals(Constants.ENDTIME)) {
+				task.setEndTime(in.nextLine());
+			} else if (s.equals(Constants.LOCATION)) {
+				task.setLocation(in.nextLine());
+			} else if (s.equals(Constants.DESCRIPTION)) {
+				task.setDescription(in.nextLine());
+			} else if (s.equals(Constants.FREQUENCY_TYPE)) {
+				task.setFrequencyType(in.nextLine());
+			} else if (s.equals(Constants.FREQUENCY)) {
+				task.setFrequency(in.nextInt());
+			} else if (s.equals(Constants.STATE_TYPE)) {
+				task.setState(in.nextLine());
 			}
 		}
-		try {
-			write();
-		} catch (Exception e) {
-			System.out.println("File Not Found");
-		}
+		
+		closeFileToRead();
+		return list;
 	}
-
-	private void initialize_fromFile() throws IOException {
-		BufferedReader br = new BufferedReader(new FileReader(fileName));
-		String line = null;
-		String[] temp;
-		while ((line = br.readLine()) != null) {
-			temp = line.trim().split("\\s+");
-			Calendar start = null;
-			Calendar end = null;
-			start.set(Calendar.DAY_OF_MONTH,Integer.parseInt(temp[3]));
-			start.set(Calendar.MONTH,Integer.parseInt(temp[4]));
-			start.set(Calendar.HOUR_OF_DAY,Integer.parseInt(temp[5]));
-			end.set(Calendar.DAY_OF_MONTH,Integer.parseInt(temp[6]));
-			end.set(Calendar.MONTH,Integer.parseInt(temp[7]));
-			end.set(Calendar.HOUR_OF_DAY,Integer.parseInt(temp[8]));
-			Task task = null;
-			task.setDescription(temp[1]);
-			task.setLocation(temp[2]);
-			task.setStartTime(start);
-			task.setEndTime(end);
+	
+	public void store(Task task) {
+		listOfTasks.add(task);
+		openFileToWrite();
+		
+		if (task.getStartTime() != null) {
+			out.println(Constants.STARTTIME);     
+			out.println(convertCalendarToString(task.getStartTime()));
+		}
+		
+		if (task.getEndTime() != null) {
+			out.println(Constants.ENDTIME);
+			out.println(convertCalendarToString(task.getEndTime()));
+		}
+		
+		if (task.getLocation() != null) {
+			out.println(Constants.LOCATION);
+			out.println(task.getLocation());
+		}
+		
+		if (task.getDescription() != null) {
+			out.println(Constants.DESCRIPTION);
+			out.println(task.getDescription());
+		}
+		
+		if (task.getFrequencyType() != null) {
+			out.println(Constants.FREQUENCY_TYPE);
+			switch (task.getFrequencyType()) {
+				case DAY:
+					out.println(Constants.FREQUENCY_DAY);
+					break;
+				case WEEK:
+					out.println(Constants.FREQUENCY_WEEK);
+					break;
+				case MONTH:
+					out.println(Constants.FREQUENCY_MONTH);
+					break;
+				case YEAR:
+					out.println(Constants.FREQUENCY_YEAR);
+					break;
+				default:
+					break;
+			}
+		}
+		
+		if (task.getState() != null) {
+			out.println(Constants.STATE_TYPE);
+			switch (task.getState()) {
+				case DONE:
+					out.println(Constants.STATE_DONE);
+					break;
+				case PENDING:
+					out.println(Constants.STATE_PENDING);
+					break;
+				case GIVEUP:
+					out.println(Constants.STATE_GIVEUP);
+					break;
+				default:
+					break;
+			}
+		}
+		
+		out.println(Constants.END_OBJECT_SIGNAL);
+		closeFileToWrite();
+	}
+	
+	public void store(ArrayList<Task> list) {
+		for (Task task : list) {
 			store(task);
 		}
-		br.close();
 	}
-
-	private int calculate_days(int month, int day) {
-		int sum = 0;
-		for (int i = 0; i < month - 1; i++) {
-			sum = sum + DAYS_IN_MONTHS[i];
-		}
-		sum = sum + day;
-		return sum;
-	}
-
-	// load everything from the cache.
-	public ArrayList<Task> load() {
-		return null;
-	}
-
-	// add a new task or the whole list of tasks.
-	// first copy everything from cache -> main storage.
-	// then edit the cache.
-	public void store(Task task) {
-		int start_date = task.getStartTime().get(Calendar.DAY_OF_YEAR);
-		int end_date = task.getEndTime().get(Calendar.DAY_OF_YEAR);
-		if (start_date == end_date) {
-			Task[] tp = days.get(start_date - 1);
-			for (int i = task.getStartTime().get(Calendar.HOUR_OF_DAY) - 1; i < task
-					.getEndTime().get(Calendar.HOUR_OF_DAY); i++) {
-				tp[i] = task;
-			}
-		} else {
-			for (int i = start_date - 1; i < end_date; i++) {
-				Task[] tp = days.get(i);
-				if (i == end_date - 1) {
-					for (int j = 0; j < task.getEndTime().get(Calendar.HOUR_OF_DAY); j++) {
-						tp[j] = task;
-					}
-				} else {
-					for (int j = task.getStartTime().get(Calendar.HOUR_OF_DAY); j < 24; j++) {
-						tp[j] = task;
-					}
-				}
-			}
-		}
-		try {
-			write();
-		} catch (Exception e) {
-			System.out.println("File Not Found");
-		}
-	}
-
 	
-	// query - returns if a task is there or not in calendar
-	public boolean queryTask(Task task) {
-		int start_date = task.getStartTime().get(Calendar.DAY_OF_YEAR);
-		int end_date = task.getEndTime().get(Calendar.DAY_OF_YEAR);
-		if (start_date == end_date) {
-			Task[] tp = days.get(start_date - 1);
-			for (int i = task.getStartTime().get(Calendar.HOUR_OF_DAY) - 1; i < task
-					.getEndTime().get(Calendar.HOUR_OF_DAY); i++) {
-				if (!tp[i].equals(null)) {
-					return false;
-				}
-			}
-		} else {
-			for (int i = start_date - 1; i < end_date; i++) {
-				Task[] tp = days.get(i);
-				if (i == end_date - 1) {
-					for (int j = 0; j < task.getEndTime().get(Calendar.HOUR_OF_DAY); j++) {
-						if (!tp[j].equals(null)) {
-							return false;
-						}
-					}
-				} else {
-					for (int j = task.getStartTime().get(Calendar.HOUR_OF_DAY); j < 24; j++) {
-						if (!tp[j].equals(null)) {
-							return false;
-						}
-					}
-				}
+	public void delete(Task feature) {
+		ArrayList<Task> list = new ArrayList<Task>();
+		
+		for (Task task : listOfTasks) {
+			if (!isIncluded(feature, task)) {
+				list.add(task);
 			}
 		}
+		
+		deleteFile();
+		listOfTasks.clear();
+		store(list);
+	}
+	
+	private boolean isIncluded(Task feature, Task task) {
+		if (feature.getStartTime() != null) {
+			if (!convertCalendarToString(feature.getStartTime()).equals(convertCalendarToString(task.getStartTime())))
+			return false;
+		}
+		
+		if (feature.getEndTime() != null) {
+			if (!convertCalendarToString(feature.getEndTime()).equals(convertCalendarToString(task.getEndTime())))
+			return false;
+		}
+		
+		if (feature.getLocation() != null
+				&& !feature.getLocation().equals(task.getLocation())) {
+			return false;
+		}
+		
+		if (feature.getDescription() != null
+				&& !feature.getDescription().equals(task.getDescription())) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private String convertCalendarToString(Calendar time) {
+		if (time == null) {
+			return null;
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATE_FORMAT);     
+		return formatter.format(time.getTime());
+	}
+	
+	private void openFileToWrite() {
+		try {
+			out = new PrintWriter(new FileWriter(fileName, true));
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private void closeFileToWrite() {
+		out.close();
+	}
+	
+	private void openFileToRead() {
+		try {
+			in = new Scanner(new File(fileName));
+		} catch (FileNotFoundException e) {
+			System.out.println(e.getMessage());
+		}
+	}
+	
+	private void closeFileToRead() {
+		in.close();
+	}
+	
+	private void deleteFile() {
+		File f = new File(fileName);
+		f.delete();
+	}
+
+	public boolean queryFreeSlot(Calendar startTime) {
+		// TODO Auto-generated method stub
 		return true;
 	}
 
-	// check out - why??
-	public String store(ArrayList<Task> tasks) {
-		return null;
-	}
-
-	// this if for undo command, just copy everything from the main storage ->
-	// cache;
-	public String removeCache() {
-		return null;
-	}
-	
-	//writing data from days to file
-	private void write() throws IOException {
-		PrintWriter out = new PrintWriter(new BufferedWriter(new FileWriter(
-				fileName, false)));
-		int count = 1;
-		Task last = null;
-		for (int i = 0; i < days.size(); i++) {
-			Task[] temp = days.get(i);
-			for (int j = 0; j < temp.length; j++) {
-				Task tp = temp[j];
-				if ((!tp.equals(last)) && (!tp.equals(null))) {
-					Calendar start = tp.getStartTime();
-					Calendar end = tp.getEndTime();
-					out.println((count) + " " + tp.getDescription() + " "
-							+ tp.getLocation() + " "
-							+ start.get(Calendar.DAY_OF_MONTH) + " "
-							+ start.get(Calendar.MONTH) + " "
-							+ start.get(Calendar.HOUR_OF_DAY) + " "
-							+ end.get(Calendar.DAY_OF_MONTH) + " "
-							+ end.get(Calendar.MONTH) + " "
-							+ end.get(Calendar.HOUR_OF_DAY));
-					count++;
-					last = tp;
-				}
-			}
-		}
-		out.close();
+	public boolean queryTask(Task task) {
+		// TODO Auto-generated method stub
+		return true;
 	}
 }

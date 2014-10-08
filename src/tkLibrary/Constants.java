@@ -4,6 +4,8 @@ package tkLibrary;
 public final class Constants {
 	public static final String FAILED = "failed";
 	
+	// date format
+	public static final String DATE_FORMAT = "MMM dd yyyy HH:mm:ss";
 	
 	// logic constants
 	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, unable to add to specified timeslot.";
@@ -13,6 +15,7 @@ public final class Constants {
 	public static final String MESSAGE_TASK_EDITED = "Task edited!";
 	public static final String MESSAGE_EDIT_TASK_DOES_NOT_EXIST = "Cannot edit because task does not exist.";
 	public static final String MESSAGE_EDIT_TASK_CLASHES = "Cannot edit because task clashes with other tasks.";
+	public static final String MESSAGE_TASK_CLEARED = "All tasks was deleted";
 	
 	// logic exceptions constants
 	public static final String EXCEPTIONS_ADD_FAIL = "Unable to add to TasKoord.";
@@ -21,4 +24,24 @@ public final class Constants {
 	public static final String EXCEPTIONS_EDIT_FAIL_BECAUSE_OF_DELETE = "Edit failed because of delete.";
 	public static final String EXCEPTIONS_EDIT_FAIL_BECAUSE_OF_OTHERS = "Edit failed because of other reason.";
 	
+	// storage constants
+	public static final String STARTTIME = "STARTTIME";
+	public static final String ENDTIME = "ENDTIME";
+	public static final String LOCATION = "LOCATION";
+	public static final String DESCRIPTION = "DESCRIPTION";
+	public static final String FREQUENCY = "FREQUENCY";
+	public static final String FREQUENCY_TYPE = "FREQUENCY_TYPE";
+	public static final String STATE_TYPE = "STATE_TYPE";
+	public static final String END_OBJECT_SIGNAL = "END";
+	
+	// constants for frequency type
+	public static final String FREQUENCY_DAY = "DAY";
+	public static final String FREQUENCY_WEEK = "WEEK";
+	public static final String FREQUENCY_MONTH = "MONTH";
+	public static final String FREQUENCY_YEAR = "YEAR";
+	
+	// constants for state type
+	public static final String STATE_DONE = "DONE";
+	public static final String STATE_PENDING = "PENDING";
+	public static final String STATE_GIVEUP = "GIVEUP";
 }
