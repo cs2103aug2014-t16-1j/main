@@ -92,14 +92,13 @@ public class Parser {
             return CommandKey.DESCRIPTION;
         } else if (commandKeyString.equalsIgnoreCase("-f")) {
             return CommandKey.FROM;
-        } else if (commandKeyString.equalsIgnoreCase("-t")) {
+        } else if (commandKeyString.equalsIgnoreCase("-t")
+                || commandKeyString.equalsIgnoreCase("-b")) {
             return CommandKey.TO;
         } else if (commandKeyString.equalsIgnoreCase("-@")) {
             return CommandKey.AT;
         } else if (commandKeyString.equalsIgnoreCase("-o")) {
             return CommandKey.ON;
-        } else if (commandKeyString.equalsIgnoreCase("-b")) {
-            return CommandKey.BY;
         } else {
             return CommandKey.EVERY;
         }
@@ -119,8 +118,6 @@ public class Parser {
             parseLocation(word);
         case ON:
             parseDate(word);
-        case BY:
-            parseEndTime(word);
         case EVERY:
             parseFrequency(word);
         default:
