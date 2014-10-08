@@ -1,7 +1,7 @@
 package tkLogic;
 
 import java.util.ArrayList;
-import java.util.Date;
+import java.util.Calendar;
 
 import tkLibrary.CommandType;
 import tkLibrary.FrequencyType;
@@ -19,21 +19,52 @@ public class Parser {
 
     private UserInput userInput;
     private Task task;
+    private int[] startTime;
+    private int[] endTime;
+    private int[] date;
 
     private void parseDescription(ArrayList<String> description) {
         task.setDescription(description.toString());
     }
 
-    private Date parseStartTime(String userCommand) {
+    private void parseStartTime(ArrayList<String> time) {
+        int[] startingTime = new int[2];
+        startTime = updateTime(time, startingTime);
+    }
+
+    private void parseEndTime(ArrayList<String> time) {
+        int[] endingTime = new int[2];
+        endTime = updateTime(time, endingTime);
+    }
+
+    private int[] updateTime(ArrayList<String> time, int[] startingTime) {
+        for (int i = 0; i < time.get(0).length(); i++) {
+            if (time.get(0).substring(i, i + 1) == "a") {
+                Float timeValue = Float.valueOf(time.get(0).substring(0, i));
+                startingTime[0] = timeValue.intValue();
+                Float minuteValue =
+                        timeValue - Float.valueOf(startingTime[0] + "");
+                startingTime[1] = Float.valueOf(minuteValue * 100).intValue();
+            } else if (time.get(0).substring(i, i + 1) == "p") {
+                Float timeValue = Float.valueOf(time.get(0).substring(0, i));
+                startingTime[0] = timeValue.intValue() + 12;
+                Float minuteValue =
+                        timeValue - Float.valueOf(startingTime[0] + "");
+                startingTime[1] = Float.valueOf(minuteValue * 100).intValue();
+            } else if (time.get(0).substring(i, i + 1) == "h") {
+                startingTime[0] = Integer.valueOf(time.get(0).substring(0, 2));
+                startingTime[0] = Integer.valueOf(time.get(0).substring(2, 4));
+            }
+        }
+        return startingTime;
+    }
+
+    private Calendar parseDate(String userCommand) {
         return null;
     }
 
-    private Date parseEndTime(String userCommand) {
-        return null;
-    }
-
-    private Date parseDate(String userCommand) {
-        return null;
+    private void parseTime() {
+        determineMonth
     }
 
     private void parseLocation(ArrayList<String> location) {
@@ -162,6 +193,43 @@ public class Parser {
             return FrequencyType.MONTH;
         } else if (frequency.equalsIgnoreCase("year")) {
             return FrequencyType.YEAR;
+        } else {
+            return FrequencyType.NULL;
+        }
+    }
+
+    private int determineMonth(String month) throws Error {
+        if (month == null) {
+            throw new Error("command type string cannot be null!");
+        }
+
+        if (month.equalsIgnoreCase("Jan") || Integer.valueOf(month) == 1) {
+            return 1;
+        } else if (month.equalsIgnoreCase("Feb") || Integer.valueOf(month) == 2) {
+            return 2;
+        } else if (month.equalsIgnoreCase("Mar") || Integer.valueOf(month) == 3) {
+            return 3;
+        } else if (month.equalsIgnoreCase("Apr") || Integer.valueOf(month) == 4) {
+            return 4;
+        } else if (month.equalsIgnoreCase("May") || Integer.valueOf(month) == 5) {
+            return 5;
+        } else if (month.equalsIgnoreCase("Jun") || Integer.valueOf(month) == 6) {
+            return 6;
+        } else if (month.equalsIgnoreCase("Jul") || Integer.valueOf(month) == 7) {
+            return 7;
+        } else if (month.equalsIgnoreCase("Aug") || Integer.valueOf(month) == 8) {
+            return 8;
+        } else if (month.equalsIgnoreCase("Sep") || Integer.valueOf(month) == 9) {
+            return 9;
+        } else if (month.equalsIgnoreCase("Oct")
+                || Integer.valueOf(month) == 10) {
+            return 10;
+        } else if (month.equalsIgnoreCase("Nov")
+                || Integer.valueOf(month) == 11) {
+            return 11;
+        } else if (month.equalsIgnoreCase("Dec")
+                || Integer.valueOf(month) == 12) {
+            return 12;
         } else {
             return FrequencyType.NULL;
         }
