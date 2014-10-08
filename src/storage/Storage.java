@@ -24,6 +24,13 @@ public class Storage {
 	public Storage(String fileName) {
 		this.fileName = fileName;
 		this.cacheName = "." + fileName;
+		initialize_arraylist();
+		try{
+			initialize_fromFile();
+		}
+		catch(Exception e){
+			System.out.println("File Cannot be Initialized - Not Found");
+		}
 	}
 	
 	private void initialize_arraylist(){
@@ -33,11 +40,62 @@ public class Storage {
 		}
 	}
 	
-	private void add(Task temp){
-		
+	public void add(Task task){
+		int start_date = calculate_days(task.getStartTime().getMonth(),task.getStartTime().getDate());
+		int end_date = calculate_days(task.getEndTime().getMonth(),task.getEndTime().getDate());
+		if(start_date == end_date){
+			Task[] tp = days.get(start_date-1);
+			for(int i=task.getStartTime().getHours() - 1; i<task.getEndTime().getHours();i++){
+				tp[i] = task;
+			}
+		}else{
+			for(int i=start_date-1 ; i<end_date; i++){
+				Task[] tp = days.get(i);
+				if(i == end_date - 1){
+					for(int j=0;j<task.getEndTime().getHours();j++){
+						tp[j] = task;
+					}
+				}else{
+					for(int j=task.getStartTime().getHours();j<24;j++){
+						tp[j] = task;
+					}
+				}
+			}
+		}
 	}
 
-	private void query(){
+	public boolean query(Task task){
+		int start_date = calculate_days(task.getStartTime().getMonth(), task.getStartTime().getDate());
+		int end_date = calculate_days(task.getEndTime().getMonth(), task.getStartTime().getDate());
+		if(start_date == end_date){
+			Task[] tp = days.get(start_date-1);
+			for(int i=task.getStartTime().getHours() - 1; i<task.getEndTime().getHours();i++){
+				if(!tp[i].equals(null)){
+					return false;
+				}
+			}
+		}else{
+			for(int i=start_date-1 ; i<end_date; i++){
+				Task[] tp = days.get(i);
+				if(i == end_date - 1){
+					for(int j=0;j<task.getEndTime().getHours();j++){
+						if(!tp[j].equals(null)){
+							return false;
+						}
+					}
+				}else{
+					for(int j=task.getStartTime().getHours();j<24;j++){
+						if(!tp[j].equals(null)){
+							return false;
+						}
+					}
+				}
+			}
+		}
+		return true;
+	}
+	
+	public void delete(){
 		
 	}
 	
@@ -60,27 +118,7 @@ public class Storage {
 			task.setLocation(temp[2]);
 			task.setStartTime(start);
 			task.setEndTime(end);
-			int start_date = calculate_days(task.getStartTime().getMonth(),task.getStartTime().getDate());
-			int end_date = calculate_days(task.getEndTime().getMonth(),task.getEndTime().getDate());
-			if(start_date == end_date){
-				Task[] tp = days.get(start_date-1);
-				for(int i=task.getStartTime().getHours() - 1; i<task.getEndTime().getHours();i++){
-					tp[i] = task;
-				}
-			}else{
-				for(int i=start_date-1 ; i<end_date; i++){
-					Task[] tp = days.get(i);
-					if(i == end_date - 1){
-						for(int j=0;j<task.getEndTime().getHours();j++){
-							tp[j] = task;
-						}
-					}else{
-						for(int j=task.getStartTime().getHours();j<24;j++){
-							tp[j] = task;
-						}
-					}
-				}
-			}
+			add(task);
 		}
 		br.close();
 	}
