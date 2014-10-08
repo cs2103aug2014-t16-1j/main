@@ -22,6 +22,7 @@ public class Parser {
     private int[] startTime;
     private int[] endTime;
     private int[] date;
+    private boolean isEdit;
 
     public UserInput format(String userCommand) {
         task = new Task();
@@ -34,6 +35,9 @@ public class Parser {
         parseAll(userInputArray);
         parseTime();
         task.setState(StateType.PENDING);
+        if (isEdit) {
+            userInput.setEditedTask(task);
+        }
         return userInput;
     }
 
@@ -87,6 +91,8 @@ public class Parser {
             return CommandKey.AT;
         } else if (commandKeyString.equalsIgnoreCase("-o")) {
             return CommandKey.ON;
+        } else if (commandKeyString.equalsIgnoreCase("-c")) {
+            return CommandKey.EDIT;
         } else {
             return CommandKey.EVERY;
         }
@@ -108,6 +114,8 @@ public class Parser {
             return parseLocation(word);
         case EVERY:
             return parseFrequency(word);
+        case EDIT:
+            return changeTaskObject(word);
         default:
             throw new Error("Unrecognized command key: " + commandKey);
         }
@@ -149,8 +157,12 @@ public class Parser {
             requiredTime[1] = Float.valueOf(minuteValue * 100).intValue();
             if (newTime.contains("a")) {
                 requiredTime[0] = timeValue.intValue();
-            } else if (newTime.contains("p")) {
+            } else if (newTime.contains("a") && timeValue == 12) {
+                requiredTime[0] = timeValue.intValue() - 12;
+            } else if (newTime.contains("p") && timeValue != 12) {
                 requiredTime[0] = timeValue.intValue() + 12;
+            } else {
+                requiredTime[0] = timeValue.intValue();
             }
         }
         return requiredTime;
@@ -224,14 +236,28 @@ public class Parser {
         }
     }
 
+    private boolean changeTaskObject(ArrayList<String> word) {
+        parseTime();
+        task.setState(StateType.PENDING);
+        task = new Task();
+        executeCmdKey(word, determineCommandKey("-d"));
+        isEdit = true;
+        return true;
+    }
+
     private void parseTime() {
-        Calendar startingTime = Calendar.getInstance();
-        startingTime.set(date[2], date[1], date[0], startTime[0], startTime[1],
-                0);
-        task.setStartTime(startingTime);
-        Calendar endingTime = Calendar.getInstance();
-        endingTime.set(date[2], date[1], date[0], endTime[0], endTime[1], 0);
-        task.setEndTime(endingTime);
+        if (startTime.length != 0) {
+            Calendar startingTime = Calendar.getInstance();
+            startingTime.set(date[2], date[1], date[0], startTime[0],
+                    startTime[1], 0);
+            task.setStartTime(startingTime);
+        }
+        if (endTime.length != 0) {
+            Calendar endingTime = Calendar.getInstance();
+            endingTime
+                    .set(date[2], date[1], date[0], endTime[0], endTime[1], 0);
+            task.setEndTime(endingTime);
+        }
     }
 
 }
