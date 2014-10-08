@@ -4,8 +4,10 @@ import java.util.ArrayList;
 import java.util.Date;
 
 import storage.Storage;
+import tkLibrary.Constants;
 import tkLibrary.StateType;
 import tkLibrary.Task;
+
 
 /*
  * Basically the logic functions should be very clear and simple.
@@ -23,30 +25,46 @@ public class Logic {
 		storage = new Storage(fileName);
 	}
 	
-	public String add(Task task) {
-	/** public String add(Task task){
-	 * 		differentiate different types of adding using switch
-	 * 		then add accordingly to storage
-	 * 		using API of Task class to get start, end timing, location, date, frequency
-	 * 
-	 */
-		return null;
+	public String add(Task task) throws Exception {
+		if(storage.queryFreeSlot(task.getStartTime()) || storage.queryFreeSlot(task.getEndTime())){
+			try{
+				storage.store(task);
+			} catch (Exception e){
+					throw new Exception("Unable to add to TasKoord.");
+			}
+		}
+		else{
+			return Constants.MESSAGE_CLASHING_TIMESLOTS;
+		}
+		return Constants.MESSAGE_TASK_ADDED;
 	}
 	
-	public String edit(int lineNum) {
-		return null;
+	public String edit(Task taskToBeEdited, Task editedTask) {
+		try{
+			delete(taskToBeEdited);
+			add(editedTask);
+			return Constants.MESSAGE_TASK_EDITED;
+		} catch (Exception e){
+			return ("Unable to edit!");
+		}
 	}
 
 	public String undo() {
 		return null;
 	}
-	
-	public String delete(int lineNum) {
-	/**public String delete(Task task){
-	 * 		find description [using task.getDescription()] in storage, then delete it
-	 * }
-	 */
-		return null;
+
+	public String delete(Task task) throws Exception{
+		if(storage.queryTask(task.getDescription())){
+			try{
+				storage.delete(task);
+			} catch (Exception e){
+				throw new Exception("Unable to delete from TasKoord.");
+			}
+		}
+		else{
+			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
+		}
+		return Constants.MESSAGE_TASK_DELETED;
 	}
 	
 	
@@ -73,6 +91,7 @@ public class Logic {
 	
 	public void storeCommand() {
 	    // store the last command in the storage for the method Undo
+		
 	}
 	
 	// this logic function is to sort an array of tasks, helpful when printing
