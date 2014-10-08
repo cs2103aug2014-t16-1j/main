@@ -95,8 +95,28 @@ public class Storage {
 		return true;
 	}
 	
-	public void delete(){
-		
+	public void delete(Task task){
+		int start_date = calculate_days(task.getStartTime().getMonth(),task.getStartTime().getDate());
+		int end_date = calculate_days(task.getEndTime().getMonth(),task.getEndTime().getDate());
+		if(start_date == end_date){
+			Task[] tp = days.get(start_date-1);
+			for(int i=task.getStartTime().getHours() - 1; i<task.getEndTime().getHours();i++){
+				tp[i] = null;
+			}
+		}else{
+			for(int i=start_date-1 ; i<end_date; i++){
+				Task[] tp = days.get(i);
+				if(i == end_date - 1){
+					for(int j=0;j<task.getEndTime().getHours();j++){
+						tp[j] = null;
+					}
+				}else{
+					for(int j=task.getStartTime().getHours();j<24;j++){
+						tp[j] = null;
+					}
+				}
+			}
+		}
 	}
 	
 	private void initialize_fromFile()throws IOException{
