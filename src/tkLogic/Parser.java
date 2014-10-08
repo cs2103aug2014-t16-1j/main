@@ -114,7 +114,13 @@ public class Parser {
     }
 
     private boolean parseDescription(ArrayList<String> description) {
-        task.setDescription(description.toString());
+        String completeDescription = description.get(0);
+        if (description.size() > 1) {
+            for (int i = 1; i < description.size(); i++) {
+                completeDescription += " " + description.get(i);
+            }
+        }
+        task.setDescription(completeDescription);
         return true;
     }
 
@@ -159,38 +165,42 @@ public class Parser {
 
     private int determineMonth(String month) throws Error {
         if (month.length() != 3) {
-            return Integer.valueOf(month);
+            return Integer.valueOf(month) - 1;
         } else if (month.equalsIgnoreCase("Jan")) {
-            return 1;
-        } else if (month.equalsIgnoreCase("Feb")) {
-            return 2;
-        } else if (month.equalsIgnoreCase("Mar")) {
-            return 3;
-        } else if (month.equalsIgnoreCase("Apr")) {
-            return 4;
-        } else if (month.equalsIgnoreCase("May")) {
-            return 5;
-        } else if (month.equalsIgnoreCase("Jun")) {
-            return 6;
-        } else if (month.equalsIgnoreCase("Jul")) {
-            return 7;
-        } else if (month.equalsIgnoreCase("Aug")) {
-            return 8;
-        } else if (month.equalsIgnoreCase("Sep")) {
-            return 9;
-        } else if (month.equalsIgnoreCase("Oct")) {
-            return 10;
-        } else if (month.equalsIgnoreCase("Nov")) {
-            return 11;
-        } else if (month.equalsIgnoreCase("Dec")) {
-            return 12;
-        } else {
             return 0;
+        } else if (month.equalsIgnoreCase("Feb")) {
+            return 1;
+        } else if (month.equalsIgnoreCase("Mar")) {
+            return 2;
+        } else if (month.equalsIgnoreCase("Apr")) {
+            return 3;
+        } else if (month.equalsIgnoreCase("May")) {
+            return 4;
+        } else if (month.equalsIgnoreCase("Jun")) {
+            return 5;
+        } else if (month.equalsIgnoreCase("Jul")) {
+            return 6;
+        } else if (month.equalsIgnoreCase("Aug")) {
+            return 7;
+        } else if (month.equalsIgnoreCase("Sep")) {
+            return 8;
+        } else if (month.equalsIgnoreCase("Oct")) {
+            return 9;
+        } else if (month.equalsIgnoreCase("Nov")) {
+            return 10;
+        } else {
+            return 11;
         }
     }
 
     private boolean parseLocation(ArrayList<String> location) {
-        task.setLocation(location.toString());
+        String completeLocation = location.get(0);
+        if (location.size() > 1) {
+            for (int i = 1; i < location.size(); i++) {
+                completeLocation += " " + location.get(i);
+            }
+        }
+        task.setLocation(completeLocation);
         return true;
     }
 
@@ -215,11 +225,12 @@ public class Parser {
     }
 
     private void parseTime() {
-        Calendar time = Calendar.getInstance();
-        time.set(date[2], date[1], date[0], startTime[0], startTime[1], 0);
-        task.setStartTime(time);
-        time.set(date[2], date[1], date[0], endTime[0], endTime[1], 0);
-        task.setEndTime(time);
+        Calendar startingTime = Calendar.getInstance();
+        startingTime.set(date[2], date[1], date[0], startTime[0], startTime[1], 0);
+        task.setStartTime(startingTime);
+        Calendar endingTime = Calendar.getInstance();
+        endingTime.set(date[2], date[1], date[0], endTime[0], endTime[1], 0);
+        task.setEndTime(endingTime);
     }
 
 }
