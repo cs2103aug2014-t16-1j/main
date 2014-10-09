@@ -28,7 +28,7 @@ public class Task {
 	
 	public void setStartTime(String time) {
 		Calendar cal = Calendar.getInstance();
-	    SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT);
+	    SimpleDateFormat sdf = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);
 	    try {
 			cal.setTime(sdf.parse(time));
 		} catch (ParseException e) {
@@ -43,7 +43,7 @@ public class Task {
 	
 	public void setEndTime(String time) {
 		Calendar cal = Calendar.getInstance();
-	    SimpleDateFormat sdf = new SimpleDateFormat(Constants.DATE_FORMAT);
+	    SimpleDateFormat sdf = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);
 	    try {
 			cal.setTime(sdf.parse(time));
 		} catch (ParseException e) {

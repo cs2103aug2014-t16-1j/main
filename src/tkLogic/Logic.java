@@ -3,11 +3,8 @@ package tkLogic;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
-
 import storage.Storage;
 import tkLibrary.Constants;
-import tkLibrary.StateType;
 import tkLibrary.Task;
 
 
@@ -23,9 +20,9 @@ public class Logic {
 		storage = new Storage(fileName);
 	}
 	
-	public String add(Task task) throws Exception {
+	public String add(Task task) {
 		if (isFreeTimeslots(task)) {
-			storage.store(task);
+			storage.add(task);
 		} else {
 			return Constants.MESSAGE_CLASHING_TIMESLOTS;
 		}
@@ -33,7 +30,7 @@ public class Logic {
 	}
 	
 	public String delete(Task task) throws Exception{
-		if(isExistingTask(task)){
+		if(isExistingTask(task)) {
 			storage.delete(task);
 		} else {
 			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
@@ -63,69 +60,81 @@ public class Logic {
 		ArrayList<Task> res = new ArrayList<Task>();
 		ArrayList<Task> list = storage.load();
 		
-		for (Task item : list) {
-			if (isIncluded(task, item)) 
-				res.add(item);
+		boolean isDeadline = false, isEvent = false, isFloating = false;
+		if (task.getDescription()!=null) {
+			isDeadline = task.getDescription().toLowerCase().contains("deadline");
+			isEvent = task.getDescription().toLowerCase().contains("event");
+			isFloating = task.getDescription().toLowerCase().contains("floating");
+		}
+		if (!isDeadline && !isEvent && !isFloating) {
+			isDeadline = isEvent = isFloating = true;
 		}
 		
+		for (Task item : list) {
+			if (isIncluded(task, item)) {
+				if (isDeadline && item.getStartTime() != null && item.getEndTime() == null) {
+					res.add(item);
+				} else if (isEvent && item.getStartTime() != null && item.getEndTime() != null) {
+					res.add(item);
+				} else if (isFloating && item.getStartTime() == null && item.getEndTime() == null) {
+					res.add(item);
+				} 
+			}
+		}
 		return res;
 	}
 	
 	private boolean isIncluded(Task feature, Task task) {
 		if (feature.getStartTime() != null) {
-			if (!convertCalendarToString(feature.getStartTime()).equals(convertCalendarToString(task.getStartTime())))
+			String featureTime = convertCalendarToString(feature.getStartTime(), Constants.FORMAT_DATE);
+			String startTime = convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE);
+			String endTime = convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE);
+			System.out.println(featureTime + startTime + endTime);
+			if (startTime == null && endTime == null) {
+				return false;
+			} else if (startTime != null && endTime !=null) {
+				if (startTime.compareTo(featureTime) > 0 
+						|| featureTime.compareTo(endTime) > 0) {
+					return false;
+				}
+			} else if (!featureTime.equals(startTime) && !featureTime.equals(endTime)) {
+				return false;
+			}
+		}
+		
+		if (feature.getFrequencyType() != null
+				&& feature.getFrequencyType()!=task.getFrequencyType()) {
 			return false;
 		}
 		
-		if (feature.getEndTime() != null) {
-			if (!convertCalendarToString(feature.getEndTime()).equals(convertCalendarToString(task.getEndTime())))
-			return false;
-		}
-		
-		if (feature.getLocation() != null
-				&& !feature.getLocation().equals(task.getLocation())) {
-			return false;
-		}
-		
-		if (feature.getDescription() != null
-				&& !feature.getDescription().equals(task.getDescription())) {
+		if (feature.getState() != null
+				&& feature.getState()!=task.getState()) {
 			return false;
 		}
 		
 		return true;
 	}
 	
-	private String convertCalendarToString(Calendar time) {
+	private String convertCalendarToString(Calendar time, String FORMAT) {
 		if (time == null) {
 			return null;
 		}
-		SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATE_FORMAT);     
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);     
 		return formatter.format(time.getTime());
 	}
 
 	public String undo() {
-		return null;
+		storage.undo();
+		return "Undo done!";
 	}
 	
-	public ArrayList<Task> list(StateType state) {
-		return null;
-	}
-
-	public ArrayList<Task> list(Date date) {
-		return null;
-	}
-
-	public ArrayList<Task> listUpcomingTasks() {
-		return null;
+	public String clear() {
+		storage.clear();
+		return Constants.MESSAGE_TASK_CLEARED;
 	}
 
 	public ArrayList<Task> search(String keyword) {
 		return null;
-
-	}
-
-	public void storeCommand() {
-		// store the last command in the storage for the method Undo
 	}
 
 	// this logic function is to sort an array of tasks, helpful when printing

@@ -59,15 +59,15 @@ public class Gui {
         );
     }
 
-    public void displayFailed(String text) {
+    public void displayWarning(String text, boolean isAppended) {
     	displayBox.append(text+"\n");
     }
     
-    public void displayDone(String text) {
+    public void displayDone(String text, boolean isAppended) {
     	displayBox.append(text+"\n");
     }
 
-    public void display(Task task) {
+    public void display(Task task, boolean isAppended) {
     	String res = "";
     	if (task.getStartTime() != null) {
     		res += task.getStartTime().getTime();
@@ -91,10 +91,10 @@ public class Gui {
     	displayBox.append("\n" + res);
     }
     
-    public void display(ArrayList<Task> lists) {
+    public void display(ArrayList<Task> lists, boolean isAppended) {
     	displayBox.setText("");
     	for (Task task : lists) {
-    		display(task);
+    		display(task, true);
     	}
     }
  

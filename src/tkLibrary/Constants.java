@@ -5,7 +5,8 @@ public final class Constants {
 	public static final String FAILED = "failed";
 	
 	// date format
-	public static final String DATE_FORMAT = "MMM dd yyyy HH:mm:ss";
+	public static final String FORMAT_DATE_HOUR = "MMM dd yyyy HH:mm:ss";
+	public static final String FORMAT_DATE = "yyyyMMdd";
 	
 	// logic constants
 	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, unable to add to specified timeslot.";
@@ -15,7 +16,7 @@ public final class Constants {
 	public static final String MESSAGE_TASK_EDITED = "Task edited!";
 	public static final String MESSAGE_EDIT_TASK_DOES_NOT_EXIST = "Cannot edit because task does not exist.";
 	public static final String MESSAGE_EDIT_TASK_CLASHES = "Cannot edit because task clashes with other tasks.";
-	public static final String MESSAGE_TASK_CLEARED = "All tasks was deleted";
+	public static final String MESSAGE_TASK_CLEARED = "All tasks was deleted.";
 	
 	// logic exceptions constants
 	public static final String EXCEPTIONS_ADD_FAIL = "Unable to add to TasKoord.";

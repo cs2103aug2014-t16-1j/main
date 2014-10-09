@@ -18,6 +18,7 @@ public class Storage {
 	private PrintWriter out;
 	private Scanner in;
 	
+	private ArrayList<Task> oldTasks;
 	private ArrayList<Task> listOfTasks;
 	
 	public Storage(String fileName) {
@@ -25,6 +26,7 @@ public class Storage {
 		openFileToWrite();
 		closeFileToWrite();
 		this.listOfTasks = loadFromFile();
+		this.oldTasks = this.listOfTasks;
 	}
 	
 	public ArrayList<Task> load() {
@@ -61,6 +63,11 @@ public class Storage {
 		
 		closeFileToRead();
 		return list;
+	}
+	
+	public void add(Task task) {
+		oldTasks = new ArrayList<Task> (listOfTasks);
+		store(task);
 	}
 	
 	public void store(Task task) {
@@ -144,8 +151,23 @@ public class Storage {
 		}
 		
 		deleteFile();
+		oldTasks = new ArrayList<Task> (listOfTasks);
 		listOfTasks.clear();
 		store(list);
+	}
+	
+	public void clear() {
+		oldTasks = new ArrayList<Task> (listOfTasks);
+		listOfTasks.clear();
+		deleteFile();
+		openFileToWrite();
+		closeFileToWrite();
+	}
+	
+	public void undo() {
+		deleteFile();
+		listOfTasks.clear();
+		store(oldTasks);
 	}
 	
 	private boolean isIncluded(Task feature, Task task) {
@@ -176,7 +198,7 @@ public class Storage {
 		if (time == null) {
 			return null;
 		}
-		SimpleDateFormat formatter = new SimpleDateFormat(Constants.DATE_FORMAT);     
+		SimpleDateFormat formatter = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);     
 		return formatter.format(time.getTime());
 	}
 	

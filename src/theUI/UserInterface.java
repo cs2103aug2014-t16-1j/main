@@ -36,7 +36,7 @@ public class UserInterface {
 					executeCommands(userCommand);
 					gui.setUserCommand(NO_COMMAND);
 				} catch (Exception e) {
-					gui.displayFailed(e.getMessage());
+					System.out.println(e.getMessage());
 				}
 			}
 		}
@@ -52,14 +52,10 @@ public class UserInterface {
 			command = userInput.getCommand();
 			task = userInput.getTask();
 		} catch (Exception e) {
-			gui.displayFailed(e.getMessage());
+			System.out.println(e.getMessage());
 			return;
 		}
-				
-		//gui.display(task1);
-		//System.out.println(task1.getLocation());
-		//System.out.println(task1.getStartTime().getTime());
-		
+	
 		switch (command) {
 			case ADD:
 				add(task);
@@ -81,76 +77,76 @@ public class UserInterface {
 				list(task); 
 				break;
 			default:
-				gui.displayFailed("informat command");
+				gui.displayWarning("Informat command", false);
 				break;
 		}
 	}
 	
 	private void add(Task task) {
-		String feedback;
-		
 		try {
-			feedback = logic.add(task);
+			String feedback = logic.add(task);
+			if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
+				gui.displayDone(feedback, false);
+				Task newTask = new Task();
+				newTask.setStartTime(task.getStartTime());
+				gui.display(logic.list(newTask), true);
+			} else {
+				gui.displayWarning(feedback, false);
+			}
 		} catch (Exception e){
-			feedback = e.getMessage();
-		}
-	
-		if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
-			gui.displayDone(feedback);
-		} else {
-			gui.displayFailed(feedback);
+			System.out.println(e.getMessage());
 		}
 	}
 
 	private void list(Task task) {
-		ArrayList<Task> lists = logic.list(task);
-		//lists = logic.sort(lists);
-		gui.display(lists);
+		try {
+			ArrayList<Task> lists = logic.list(task);
+			gui.display(lists, false);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+		}
 	}
 	
 	private void delete(Task task) {
-		String feedback;
 		try {
-			feedback = logic.delete(task);
+			String feedback = logic.delete(task);
+			if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
+				gui.displayDone(feedback, false);
+			} else {
+				gui.displayWarning(feedback, false);
+			}
 		} catch (Exception e) {
-			feedback = e.getMessage();
-		}
-		
-		if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
-			gui.displayDone(feedback);
-		} else {
-			gui.displayFailed(feedback);
+			System.out.println(e.getMessage());
 		}
 	}
 	
 	private void edit(Task taskToBeEdited, Task newTask) {
-		String feedback;
 		try {
-			feedback = logic.edit(taskToBeEdited, newTask);
+			String feedback = logic.edit(taskToBeEdited, newTask);
+			if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
+				gui.displayDone(feedback, false);
+			} else {
+				gui.displayWarning(feedback, false);
+			}
+			//gui.display(logic.search(newTask), false);
 		} catch (Exception e) {
-			feedback = e.getMessage();
-		}
-		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
-			gui.displayDone(feedback);
-		} else {
-			gui.displayFailed(feedback);
+			System.out.println(e.getMessage());
 		}
 	}
 
-	private void clear() {
-		String feedback; 
+	private void clear() { 
 		try {
-			//feedback = logic.clear();
+			String feedback = logic.clear();
 			feedback = "test";
+			if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
+				gui.displayDone(feedback, false);
+			} else {
+				gui.displayWarning(feedback, false);
+			}
 		} catch (Exception e) {
-			feedback = e.getMessage();
+			System.out.println(e.getMessage());
 		}
 		
-		if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
-			gui.displayDone(feedback);
-		} else {
-			gui.displayFailed(feedback);
-		}
 	}
 
 	private void undo() {

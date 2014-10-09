@@ -245,8 +245,7 @@ public class Parser {
     private void parseTime() {
         if (startTime.length != 0) {
             Calendar startingTime = Calendar.getInstance();
-            startingTime.set(date[2], date[1], date[0], startTime[0], startTime[1],
-                    0);
+            startingTime.set(date[2], date[1], date[0], startTime[0], startTime[1], 0);
             task.setStartTime(startingTime);
         }
         if (endTime.length != 0) {
