@@ -11,7 +11,7 @@ public class ParserTest {
     @Test
     public void testParserAdd() {
         Parser parser = Parser.getInstance();
-        String input = "add Meeting -f 9am -t 10am -o 12 Sep 2014 -@ Boardroom";
+        String input = "add Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
         UserInput userInput = parser.format(input);
         CommandType command = userInput.getCommand();
         assertEquals("Test that method format works correctly", CommandType.ADD,
@@ -37,7 +37,7 @@ public class ParserTest {
     @Test
     public void testParserAddDeadline() {
         Parser parser = Parser.getInstance();
-        String input = "add Submit audit report -b 9am -o 12 Sep 2014";
+        String input = "add Submit audit report by 9am on 12 Sep 2014";
         UserInput userInput = parser.format(input);
         CommandType command = userInput.getCommand();
         assertEquals("Test that method format works correctly", CommandType.ADD,
@@ -112,8 +112,8 @@ public class ParserTest {
     public void testParserEdit() {
         Parser parser = Parser.getInstance();
         String input =
-                "edit Meeting -f 9am -t 10am -o 12 Sep 2014 -@ Boardroom"
-                        + " -c Board Meeting -f 9pm -t 11pm -o 12 Dec 2014 -@ Home";
+                "edit Meeting from 9am to 10am on 12 Sep 2014 at Boardroom"
+                        + " correct Board Meeting from 9pm to 11pm on 12 Dec 2014 at Home";
         UserInput userInput = parser.format(input);
         CommandType command = userInput.getCommand();
         assertEquals("Test that method format works correctly", CommandType.EDIT,

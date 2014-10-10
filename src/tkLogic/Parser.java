@@ -81,10 +81,12 @@ public class Parser {
     private void parseAll(String[] userInputArray) {
         ArrayList<String> word = new ArrayList<String>();
         String newWord;
-        CommandKey commandKey = determineCommandKey("-d");
+        CommandKey newCommandKey;
+        CommandKey commandKey = determineCommandKey("description");
         for (int i = 1; i < userInputArray.length; i++) {
             newWord = userInputArray[i];
-            if (newWord.substring(0, 1).equals("-")) {
+            newCommandKey = determineCommandKey(newWord);
+            if (newCommandKey != null) {
                 executeCmdKey(word, commandKey);
                 commandKey = determineCommandKey(newWord);
                 word = new ArrayList<String>();
@@ -96,21 +98,23 @@ public class Parser {
     }
 
     private CommandKey determineCommandKey(String commandKeyString) {
-        if (commandKeyString.equalsIgnoreCase("-d")) {
+        if (commandKeyString.equalsIgnoreCase("description")) {
             return CommandKey.DESCRIPTION;
-        } else if (commandKeyString.equalsIgnoreCase("-f")) {
+        } else if (commandKeyString.equalsIgnoreCase("from")) {
             return CommandKey.FROM;
-        } else if (commandKeyString.equalsIgnoreCase("-t")
-                || commandKeyString.equalsIgnoreCase("-b")) {
+        } else if (commandKeyString.equalsIgnoreCase("to")
+                || commandKeyString.equalsIgnoreCase("by")) {
             return CommandKey.TO;
-        } else if (commandKeyString.equalsIgnoreCase("-@")) {
+        } else if (commandKeyString.equalsIgnoreCase("at")) {
             return CommandKey.AT;
-        } else if (commandKeyString.equalsIgnoreCase("-o")) {
+        } else if (commandKeyString.equalsIgnoreCase("on")) {
             return CommandKey.ON;
-        } else if (commandKeyString.equalsIgnoreCase("-c")) {
+        } else if (commandKeyString.equalsIgnoreCase("correct")) {
             return CommandKey.EDIT;
-        } else {
+        } else if (commandKeyString.equalsIgnoreCase("every")) {
             return CommandKey.EVERY;
+        } else {
+            return null;
         }
     }
 
@@ -254,7 +258,7 @@ public class Parser {
         parseTime();
         task.setState(StateType.PENDING);
         task = new Task();
-        executeCmdKey(word, determineCommandKey("-d"));
+        executeCmdKey(word, determineCommandKey("description"));
         isEdit = true;
         return true;
     }
