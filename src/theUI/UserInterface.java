@@ -18,7 +18,7 @@ public class UserInterface {
 	private Gui gui;
 	
 	public void run(String fileName) {
-		parser = new Parser();
+		parser = Parser.getInstance();
 		logic = new Logic(fileName);
 		//storage = new Storage(fileName);
 		gui = new Gui();

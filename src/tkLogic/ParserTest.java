@@ -10,7 +10,7 @@ import tkLibrary.UserInput;
 public class ParserTest {
     @Test
     public void testParserAdd() {
-        Parser parser = new Parser();
+        Parser parser = Parser.getInstance();
         String input = "add Meeting -f 9am -t 10am -o 12 Sep 2014 -@ Boardroom";
         UserInput userInput = parser.format(input);
         CommandType command = userInput.getCommand();
@@ -36,7 +36,7 @@ public class ParserTest {
 
     @Test
     public void testParserAddDeadline() {
-        Parser parser = new Parser();
+        Parser parser = Parser.getInstance();
         String input = "add Submit audit report -b 9am -o 12 Sep 2014";
         UserInput userInput = parser.format(input);
         CommandType command = userInput.getCommand();
@@ -61,7 +61,7 @@ public class ParserTest {
 
     @Test
     public void testParserAddGoodToDo() {
-        Parser parser = new Parser();
+        Parser parser = Parser.getInstance();
         String input = "add Read The Lord of the Rings: The Return of the King";
         UserInput userInput = parser.format(input);
         CommandType command = userInput.getCommand();
@@ -86,7 +86,7 @@ public class ParserTest {
 
     @Test
     public void testParserDelete() {
-        Parser parser = new Parser();
+        Parser parser = Parser.getInstance();
         String input = "delete Meeting";
         UserInput userInput = parser.format(input);
         CommandType command = userInput.getCommand();
@@ -110,7 +110,7 @@ public class ParserTest {
 
     @Test
     public void testParserEdit() {
-        Parser parser = new Parser();
+        Parser parser = Parser.getInstance();
         String input =
                 "edit Meeting -f 9am -t 10am -o 12 Sep 2014 -@ Boardroom"
                         + " -c Board Meeting -f 9pm -t 11pm -o 12 Dec 2014 -@ Home";
@@ -155,7 +155,7 @@ public class ParserTest {
 
     @Test
     public void testParserUndo() {
-        Parser parser = new Parser();
+        Parser parser = Parser.getInstance();
         String input = "undo";
         UserInput userInput = parser.format(input);
         CommandType command = userInput.getCommand();

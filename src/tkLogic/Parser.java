@@ -15,6 +15,7 @@ import tkLibrary.CommandKey;
  * The string is all information of the command, except the command type.
  */
 public class Parser {
+    private static Parser theOneParser;
     private UserInput userInput;
     private Task task;
     private int[] startTime;
@@ -22,11 +23,22 @@ public class Parser {
     private int[] date;
     private boolean isEdit;
 
-    public UserInput format(String userCommand) {
+    private Parser() {
         task = new Task();
         startTime = new int[0];
         endTime = new int[0];
         date = new int[3];
+        isEdit = false;
+    }
+
+    public static Parser getInstance() {
+        if (theOneParser == null) {
+            theOneParser = new Parser();
+        }
+        return theOneParser;
+    }
+
+    public UserInput format(String userCommand) {
         String[] userInputArray = splitUserInput(userCommand);
         userInput = new UserInput(determineCommandType(userInputArray[0]), task);
 
@@ -38,6 +50,11 @@ public class Parser {
                 userInput.setEditedTask(task);
             }
         }
+        task = new Task();
+        startTime = new int[0];
+        endTime = new int[0];
+        date = new int[3];
+        isEdit = false;
         return userInput;
     }
 
