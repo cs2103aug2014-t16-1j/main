@@ -7,7 +7,8 @@ public final class Constants {
 	// date format
 	public static final String FORMAT_DATE_HOUR = "MMM dd yyyy HH:mm:ss";
 	public static final String FORMAT_DATE = "yyyyMMdd";
-	public static final String FORMAT_EEE = "EEE,dd MMM yyyy";
+	public static final String FORMAT_EEE = "EEE, dd MMM yyyy";
+	public static final String FORMAT_HOUR = "HH:mm:ss";
 	
 	// logic constants
 	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, unable to add to specified timeslot.";

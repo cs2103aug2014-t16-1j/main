@@ -89,7 +89,7 @@ public class Logic {
 			String featureTime = convertCalendarToString(feature.getStartTime(), Constants.FORMAT_DATE);
 			String startTime = convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE);
 			String endTime = convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE);
-			System.out.println(featureTime + startTime + endTime);
+			//System.out.println(featureTime + startTime + endTime);
 			if (startTime == null && endTime == null) {
 				return false;
 			} else if (startTime != null && endTime !=null) {

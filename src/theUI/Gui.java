@@ -14,35 +14,48 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 public class Gui {
+    private final Color COLOR_BACKGROUND = new Color(0x272822);
+    private final Color COLOR_FOREGROUND = new Color(0xF8F8F0);
+    private final String COLOR_DONE = "#A6E22E";
+    private final String COLOR_WARNING = "#F92672";
+    private final String COLOR_HOUR = "#E6DB74";
+    private final String COLOR_DESCRIPTION = "#66D9EF";
+    private final String COLOR_LOCATION = "#F8F8F0";
+    private final String COLOR_DATE = "#FD971F";
+    
+    private final int SPACE_BEFORE_LOCATION = 20;
+    
+    private final String STYLE = "<head><style>"
+							+ "p  { font-family:consolas; font-size:100%; }"
+							+ "</style></head>";
+    private final Font COMMAND_FONT = new Font("consolas", Font.TRUETYPE_FONT, 19);
+	
+	
     private String NO_COMMAND = "";
-    private JFrame frame = new JFrame();
-    private JTextField commandBox = new JTextField();//new HintTextField("Enter Command here");
+    private JFrame frame = new JFrame("TasKoord");
+    private JTextField commandBox = new JTextField();
     private JTextArea historyBox = new JTextArea();
     private JTextPane displayBox = new JTextPane();
     private String displayText = "";
-    private String userCommand = NO_COMMAND;
-    
-    private final Color COLOR_BACKGROUND = Color.darkGray;
-    private final Color COLOR_FOREGROUND = Color.white;
-    private final String COLOR_DONE = "green";
-    private final String COLOR_WARNING = "red";
-    
+    private String userCommand = NO_COMMAND; 
     
     public Gui() {
-        initilize();
+        initialize();
         listenToUserCommand();
         addToFrame();
     }
-
-    public void initilize() {
+    
+    public void initialize() {
         historyBox.setEditable(true);
         commandBox.setEditable(true);
         displayBox.setEditable(false);
 
-        commandBox.setPreferredSize( new Dimension(400, 30 ) );
-        displayBox.setPreferredSize( new Dimension(400, 400) );
+        commandBox.setPreferredSize( new Dimension(450, 30 ) );
+        displayBox.setPreferredSize( new Dimension(450, 600) );
         
         displayBox.setContentType("text/html");
+        commandBox.setFont(COMMAND_FONT);
+        commandBox.setCaretColor(Color.white);
         
         commandBox.setBackground(COLOR_BACKGROUND);
         displayBox.setBackground(COLOR_BACKGROUND);
@@ -50,17 +63,19 @@ public class Gui {
         displayBox.setForeground(COLOR_FOREGROUND);
         
         JFrame.setDefaultLookAndFeelDecorated(true);
-        BoxLayout boxLayout = new BoxLayout(frame.getContentPane(), BoxLayout.Y_AXIS);
-        frame.setLayout(boxLayout);
         frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
     }
 
     public void addToFrame() {
-        frame.add(displayBox);
-        frame.add(commandBox);
+    	Container content = frame.getContentPane(); 
+    	BorderLayout border = new BorderLayout();
+        content.setLayout(border);
+        
+        content.add(commandBox, BorderLayout.SOUTH);
+        frame.add(new JScrollPane(displayBox));
+        
         frame.pack();
         frame.setVisible(true);
-        displayBox.setText("haha + hehe");
     }
 
     public void listenToUserCommand() {
@@ -76,63 +91,105 @@ public class Gui {
 
     public void displayWarning(String text, boolean isAppended) {
     	if (isAppended) {
-    		displayText += format(text, COLOR_WARNING);
+    		displayText += formatWithNewLine(text, COLOR_WARNING);
     	} else {
-    		displayText = format(text, COLOR_WARNING);
+    		displayText = formatWithNewLine(text, COLOR_WARNING);
     	}
-    	displayBox.setText(displayText);
+    	setDisplayBox();
     }
     
     public void displayDone(String text, boolean isAppended) {
     	if (isAppended) {
-    		displayText += format(text, COLOR_DONE);
+    		displayText += formatWithNewLine(text, COLOR_DONE);
     	} else {
-    		displayText = format(text, COLOR_DONE);
+    		displayText = formatWithNewLine(text, COLOR_DONE);
     	}
-    	displayBox.setText(displayText);
+    	setDisplayBox();
     }
-
-    public void display(Task task, boolean isAppended) {
+    
+    private void display(Task task) {
     	String res = "";
     	if (task.getStartTime() != null) {
-    		res += "Time: " + convertCalendarToString(task.getStartTime(), Constants.FORMAT_EEE);
+    		res += 	format("[" + convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR), COLOR_HOUR);
     	}
     	if (task.getEndTime() != null) {
-    		res += " - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_EEE);
-    	}
-    	
-    	if (!res.equals("")) {
-    		res += "<br>";
+    		res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_HOUR) + "] ", COLOR_HOUR);
+    	} else {
+    		res += format("           ] ", COLOR_HOUR);
     	}
     	
     	if (task.getDescription() != null) {
-    		res += "Description: " + task.getDescription() + "<br>";
+    		res += formatWithNewLine(task.getDescription(), COLOR_DESCRIPTION);
     	}
     	
     	if (task.getLocation() != null) {
-    		res += "Location: " + task.getLocation() + "<br>";
+    		String rr = "";
+    		for(int i = 1; i <= SPACE_BEFORE_LOCATION; i ++) {
+    			rr += "&nbsp";
+    		}
+    		res += formatWithNewLine(rr + "@ " + task.getLocation(), COLOR_LOCATION);
     	}
     	
-    	if (isAppended) {
-    		displayText += res;
-    	} else {
-    		displayText = res;
-    	}
-    	displayBox.setText(displayText);
+    	displayText += res;
     }
     
     public void display(ArrayList<Task> lists, boolean isAppended) {
-    	clearDisplayBox();
-    	for (Task task : lists) {
-    		display(task, true);
+    	if (!isAppended) {
+    		displayText = "";
     	}
-    }
- 
-    public void clearDisplayBox() {
-    	displayText = "";
-        displayBox.setText(displayText);
+    	
+    	Task preTask = null, curTask;
+    	for (int i = 0; i < lists.size(); i ++) {
+    		if (!checkFloatingTask(lists.get(i))) {
+    			curTask = lists.get(i);
+    			if (preTask == null || !convertCalendarToString(preTask.getStartTime(), Constants.FORMAT_EEE)
+    					 .equals(convertCalendarToString(curTask.getStartTime(), Constants.FORMAT_EEE))) {
+    				displayText += "<br>" 
+    					+ format("======", COLOR_DATE)
+    					+ format("["+convertCalendarToString(curTask.getStartTime(), Constants.FORMAT_EEE)+"]", COLOR_DATE)
+    					+ format("======", COLOR_DATE)
+    					+ "<br><br>";
+    			}
+    			display(curTask);
+    			preTask = curTask;
+    		}
+    	}
+    	
+    	boolean flag = true;
+    	for (int i = 0; i < lists.size(); i ++) {
+    		if (checkFloatingTask(lists.get(i))) {
+    			if (flag) {
+    				displayText += "<br>" + formatWithNewLine("===GOOD-TO-DO TASKS===", COLOR_DATE) + "<br>";
+    				flag = false;
+    			}
+    			displayText += format(lists.get(i).getDescription(), COLOR_DESCRIPTION);
+    			if (lists.get(i).getLocation() != null) {
+    				displayText += format(" @ " + lists.get(i).getDescription(), COLOR_LOCATION);
+    			} else {
+    				displayText += "<br>";
+    			}
+    		}
+    	}
+    
+    	setDisplayBox();
     }
 
+    private boolean checkFloatingTask(Task task) {
+    	return (task.getStartTime() == null);
+    }
+
+	private void setDisplayBox() {
+		displayBox.setText(STYLE + "<p>" + displayText);
+	}
+    
+    public void clearDisplayBox() {
+    	displayText = "";
+        setDisplayBox();
+    }
+
+    private void clearCommandBox() {
+        commandBox.setText(NO_COMMAND);
+    }
 
     public String getUserCommand() {
         return userCommand;
@@ -142,10 +199,6 @@ public class Gui {
         userCommand = command;
     }
 
-    private void clearCommandBox() {
-        commandBox.setText(NO_COMMAND);
-    }
-    
 	private String convertCalendarToString(Calendar time, String FORMAT) {
 		if (time == null) {
 			return null;
@@ -155,6 +208,10 @@ public class Gui {
 	}
 	
 	private String format(String text, String color) {
+		return "<font color = " + color + ">" + text + "</font>";
+	}
+	
+	private String formatWithNewLine(String text, String color) {
 		return "<font color = " + color + ">" + text + "</font><br>";
 	}
 }

@@ -14,7 +14,6 @@ public class UserInterface {
 	private String NO_COMMAND = "";
 	private Logic logic;
 	private Parser parser;
-	//private Storage storage;
 	private Gui gui;
 	
 	public void run(String fileName) {
