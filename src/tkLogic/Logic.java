@@ -134,7 +134,15 @@ public class Logic {
 	}
 
 	public ArrayList<Task> search(String keyword) {
-		return null;
+		ArrayList<Task> list = storage.load();
+		ArrayList<Task> searchResults = new ArrayList<Task>();
+		
+		for(int listCounter = 0; listCounter < list.size(); listCounter++){
+			if (list.get(listCounter).getDescription().contains(keyword)){
+				searchResults.add(list.get(listCounter));
+			}
+		}
+		return searchResults;
 	}
 
 	// this logic function is to sort an array of tasks, helpful when printing
