@@ -9,6 +9,8 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import tkLibrary.Constants;
 import tkLibrary.Task;
@@ -21,8 +23,11 @@ public class Storage {
 	private ArrayList<Task> oldTasks;
 	private ArrayList<Task> listOfTasks;
 	
+	private Logger logger;
+	
 	public Storage(String fileName) {
 		this.fileName = fileName;
+		logger = Logger.getLogger("log" + fileName);
 		openFileToWrite();
 		closeFileToWrite();
 		this.listOfTasks = loadFromFile();
@@ -207,6 +212,7 @@ public class Storage {
 			out = new PrintWriter(new FileWriter(fileName, true));
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
+			logger.log(Level.WARNING, "File Not Found", e);
 		}
 	}
 	
@@ -219,6 +225,7 @@ public class Storage {
 			in = new Scanner(new File(fileName));
 		} catch (FileNotFoundException e) {
 			System.out.println(e.getMessage());
+			
 		}
 	}
 	
