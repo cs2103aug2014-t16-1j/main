@@ -115,10 +115,10 @@ public class Logic {
 	 * mention the description and the location
 	 */
 	public ArrayList<Task> search(String keyword) {
-		ArrayList<Task> list = storage.load();
+		ArrayList<Task> allTasks = storage.load();
 		ArrayList<Task> searchResults = new ArrayList<Task>();
 		
-		for(Task item : list){
+		for(Task item : allTasks){
 			if (item.getDescription().toLowerCase().contains(keyword.toLowerCase()) ||
 			   (item.getLocation() != null && item.getLocation().toLowerCase().contains(keyword.toLowerCase()))){
 				searchResults.add(item);
