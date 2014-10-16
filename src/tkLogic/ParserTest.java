@@ -38,7 +38,9 @@ public class ParserTest {
             assertEquals("Test that the frequency is as default", null,
                     task.getFrequencyType());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("testParserAdd: ");
+            System.out.println(e);
+            assert (false);
         }
     }
 
@@ -57,6 +59,7 @@ public class ParserTest {
             assertEquals("Test that the Start Time is correctly recorded",
                     "Fri Sep 12 09:00:00 SGT 2014", task.getStartTime().getTime()
                             .toString());
+            System.out.println(task.getStartTime().getTime().toString());
             assertEquals("Test that the End Time is correctly recorded", null,
                     task.getEndTime());
             assertEquals("Test that the Location is correctly recorded", null,
@@ -68,7 +71,9 @@ public class ParserTest {
             assertEquals("Test that the frequency is as default", null,
                     task.getFrequencyType());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("testParserAddDeadline: ");
+            System.out.println(e);
+            assert (false);
         }
     }
 
@@ -98,7 +103,9 @@ public class ParserTest {
             assertEquals("Test that the frequency is as default", null,
                     task.getFrequencyType());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("testParserAddGoodToDo: ");
+            System.out.println(e);
+            assert (false);
         }
     }
 
@@ -127,7 +134,9 @@ public class ParserTest {
             assertEquals("Test that the frequency is as default", null,
                     task.getFrequencyType());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("testParserDelete: ");
+            System.out.println(e);
+            assert (false);
         }
     }
 
@@ -177,7 +186,9 @@ public class ParserTest {
             assertEquals("Test that the frequency is as default", null,
                     editedTask.getFrequencyType());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("testParserEdit: ");
+            System.out.println(e);
+            assert (false);
         }
     }
 
@@ -206,7 +217,9 @@ public class ParserTest {
             assertEquals("Test that the frequency is as default", null,
                     task.getFrequencyType());
         } catch (Exception e) {
-            System.out.println(e.getMessage());
+            System.out.println("testParserUndo: ");
+            System.out.println(e);
+            assert (false);
         }
     }
 }
