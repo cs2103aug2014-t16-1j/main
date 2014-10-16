@@ -2,6 +2,7 @@ package tkLogic;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+
 import tkLibrary.CommandType;
 import tkLibrary.FrequencyType;
 import tkLibrary.StateType;
@@ -38,8 +39,9 @@ public class Parser {
         return theOneParser;
     }
 
-    public UserInput format(String userCommand) {
+    public UserInput format(String userCommand) throws Exception {
         String[] userInputArray = splitUserInput(userCommand);
+        
         userInput = new UserInput(determineCommandType(userInputArray[0]), task);
 
         if (userInputArray.length > 1) {
@@ -62,7 +64,7 @@ public class Parser {
         return userCommand.trim().split("\\s+");
     }
 
-    private CommandType determineCommandType(String commandTypeString) {
+    private CommandType determineCommandType(String commandTypeString) throws Exception {
         if (commandTypeString.equalsIgnoreCase("add")) {
             return CommandType.ADD;
         } else if (commandTypeString.equalsIgnoreCase("delete")) {
@@ -75,8 +77,10 @@ public class Parser {
             return CommandType.CLEAR;
         } else if (commandTypeString.equalsIgnoreCase("search")) {
         	return CommandType.SEARCH;
-        } else {
+        } else if (commandTypeString.equalsIgnoreCase("list")) {
             return CommandType.LIST;
+        } else {
+            throw new Exception("invalid command: " + commandTypeString);
         }
     }
 
