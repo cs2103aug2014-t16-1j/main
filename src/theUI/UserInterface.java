@@ -172,7 +172,6 @@ public class UserInterface {
 	private void clear() { 
 		try {
 			String feedback = logic.clear();
-			feedback = "test";
 			if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
 				gui.displayDone(feedback, false);
 			} else {
