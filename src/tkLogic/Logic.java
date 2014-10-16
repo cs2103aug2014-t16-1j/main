@@ -31,7 +31,7 @@ public class Logic {
 		return Constants.MESSAGE_TASK_ADDED;
 	}
 	
-	public String delete(Task task) throws Exception{
+	public String delete(Task task){
 		if(isExistingTask(task)) {
 			storage.delete(task);
 		} else {
