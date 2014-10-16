@@ -1,5 +1,6 @@
 package tkLogic;
 
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -7,6 +8,8 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import java.util.logging.FileHandler;
+import java.util.logging.SimpleFormatter;
 
 import storage.Storage;
 import tkLibrary.Constants;
@@ -24,6 +27,24 @@ public class Logic {
 	public Logic(String fileName) {
 		storage = new Storage(fileName);
 		logger = Logger.getLogger("log" + fileName);
+		try {  
+
+	        // This block configure the logger with handler and formatter  
+	        FileHandler fh = new FileHandler("C:/temp/test/MyLogFile.log");  
+	        logger.addHandler(fh);
+	        SimpleFormatter formatter = new SimpleFormatter();  
+	        fh.setFormatter(formatter);  
+
+	        // the following statement is used to log any messages  
+	        logger.info("My first log");  
+
+	    } catch (SecurityException e) {  
+	        e.printStackTrace();  
+	    } catch (IOException e) {  
+	        e.printStackTrace();  
+	    }  
+	    logger.info("Hi How r u?");  
+
 	}
 	
 	public String add(Task task) {
