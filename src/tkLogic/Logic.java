@@ -5,6 +5,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import storage.Storage;
 import tkLibrary.Constants;
@@ -17,9 +19,11 @@ import tkLibrary.Task;
  */
 public class Logic {
 	private Storage storage;
-
+	private Logger logger;
+	
 	public Logic(String fileName) {
 		storage = new Storage(fileName);
+		logger = Logger.getLogger("log" + fileName);
 	}
 	
 	public String add(Task task) {
@@ -28,6 +32,7 @@ public class Logic {
 		} else {
 			return Constants.MESSAGE_CLASHING_TIMESLOTS;
 		}
+		logger.log(Level.INFO, "Task added.");
 		return Constants.MESSAGE_TASK_ADDED;
 	}
 	
@@ -37,6 +42,7 @@ public class Logic {
 		} else {
 			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
 		}
+		logger.log(Level.INFO, "Task deleted.");
 		return Constants.MESSAGE_TASK_DELETED;
 	}
 
@@ -55,6 +61,7 @@ public class Logic {
 		if (add(editedTask).equals(Constants.MESSAGE_CLASHING_TIMESLOTS)) {
 			return Constants.MESSAGE_EDIT_TASK_CLASHES;
 		}
+		logger.log(Level.INFO, "Task edited.");
 		return Constants.MESSAGE_TASK_EDITED;
 	}
 	
@@ -87,16 +94,19 @@ public class Logic {
 			}
 		}
 		res = sort(res);
+		logger.log(Level.INFO, "Tasks acquired to be displayed.");
 		return res;
 	}
 
 	public String undo() {
 		storage.undo();
+		logger.log(Level.INFO, "Last command undone.");
 		return Constants.MESSAGE_UNDO_DONE;
 	}
 	
 	public String clear() {
 		storage.clear();
+		logger.log(Level.INFO, "Tasks cleared from TasKoord.");
 		return Constants.MESSAGE_TASK_CLEARED;
 	}
 
@@ -115,6 +125,7 @@ public class Logic {
 			}
 		}
 		searchResults = sort(searchResults);
+		logger.log(Level.INFO, "Tasks with keyword found.");
 		return searchResults;
 	}
 
@@ -135,6 +146,7 @@ public class Logic {
 	            return t1.compareTo(t2);
 	        }
 	    });
+		logger.log(Level.INFO, "Tasks sorted.");
 		return list;
 	}
 	
