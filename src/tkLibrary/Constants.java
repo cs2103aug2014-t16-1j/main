@@ -7,6 +7,7 @@ public final class Constants {
 	// date format
 	public static final String FORMAT_DATE_HOUR = "MMM dd yyyy HH:mm:ss";
 	public static final String FORMAT_DATE = "yyyyMMdd";
+	public static final String FORMAT_DATE_CMP = "yyyyMMddHHmmss";
 	public static final String FORMAT_EEE = "EEE, dd MMM yyyy";
 	public static final String FORMAT_HOUR = "HH:mm:ss";
 	
@@ -19,6 +20,7 @@ public final class Constants {
 	public static final String MESSAGE_EDIT_TASK_DOES_NOT_EXIST = "Cannot edit because task does not exist.";
 	public static final String MESSAGE_EDIT_TASK_CLASHES = "Cannot edit because task clashes with other tasks.";
 	public static final String MESSAGE_TASK_CLEARED = "All tasks was deleted.";
+	public static final String MESSAGE_UNDO_DONE = "The command was undone.";
 	
 	// logic exceptions constants
 	public static final String EXCEPTIONS_ADD_FAIL = "Unable to add to TasKoord.";

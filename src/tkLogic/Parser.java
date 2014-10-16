@@ -73,6 +73,8 @@ public class Parser {
             return CommandType.EDIT;
         } else if (commandTypeString.equalsIgnoreCase("clear")) {
             return CommandType.CLEAR;
+        } else if (commandTypeString.equalsIgnoreCase("search")) {
+        	return CommandType.SEARCH;
         } else {
             return CommandType.LIST;
         }

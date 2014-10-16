@@ -31,7 +31,7 @@ public class Storage {
 		openFileToWrite();
 		closeFileToWrite();
 		this.listOfTasks = loadFromFile();
-		this.oldTasks = this.listOfTasks;
+		this.oldTasks = new ArrayList<Task> (this.listOfTasks);
 	}
 	
 	public ArrayList<Task> load() {

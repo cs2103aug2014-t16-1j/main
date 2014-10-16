@@ -3,10 +3,12 @@ package tkLogic;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Collections;
+import java.util.Comparator;
+
 import storage.Storage;
 import tkLibrary.Constants;
 import tkLibrary.Task;
-
 
 /*
  * Basically the logic functions should be very clear and simple.
@@ -56,6 +58,9 @@ public class Logic {
 		return Constants.MESSAGE_TASK_EDITED;
 	}
 	
+	/*
+	 * for listing, only mention the time, the frequency and the state.
+	 */
 	public ArrayList<Task> list(Task task) {
 		ArrayList<Task> res = new ArrayList<Task>();
 		ArrayList<Task> list = storage.load();
@@ -81,7 +86,56 @@ public class Logic {
 				} 
 			}
 		}
+		res = sort(res);
 		return res;
+	}
+
+	public String undo() {
+		storage.undo();
+		return Constants.MESSAGE_UNDO_DONE;
+	}
+	
+	public String clear() {
+		storage.clear();
+		return Constants.MESSAGE_TASK_CLEARED;
+	}
+
+	/*
+	 * searching a task by keyword
+	 * mention the description and the location
+	 */
+	public ArrayList<Task> search(String keyword) {
+		ArrayList<Task> list = storage.load();
+		ArrayList<Task> searchResults = new ArrayList<Task>();
+		
+		for(Task item : list){
+			if (item.getDescription().toLowerCase().contains(keyword.toLowerCase()) ||
+			   (item.getLocation() != null && item.getLocation().toLowerCase().contains(keyword.toLowerCase()))){
+				searchResults.add(item);
+			}
+		}
+		searchResults = sort(searchResults);
+		return searchResults;
+	}
+
+	private ArrayList<Task> sort(ArrayList<Task> list) {
+		Collections.sort(list, new Comparator<Task>() {
+	        @Override
+	        public int compare(Task  task1, Task  task2) {
+	        	String t1 = convertCalendarToString(task1.getStartTime(), Constants.FORMAT_DATE_CMP);
+	        	String t2 = convertCalendarToString(task2.getStartTime(), Constants.FORMAT_DATE_CMP);
+	        	
+	            if (t1 == null && t2 != null ) {
+	            	return 1;
+	            } else if (t1 != null && t2 == null ) {
+	            	return -1;
+	            } else if (t1 == null && t2 == null ) {
+	            	return 0;
+	            } 
+	            return t1.compareTo(t2);
+	        }
+	    });
+		return list;
 	}
 	
 	private boolean isIncluded(Task feature, Task task) {
@@ -89,7 +143,6 @@ public class Logic {
 			String featureTime = convertCalendarToString(feature.getStartTime(), Constants.FORMAT_DATE);
 			String startTime = convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE);
 			String endTime = convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE);
-			//System.out.println(featureTime + startTime + endTime);
 			if (startTime == null && endTime == null) {
 				return false;
 			} else if (startTime != null && endTime !=null) {
@@ -121,32 +174,5 @@ public class Logic {
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);     
 		return formatter.format(time.getTime());
-	}
-
-	public String undo() {
-		storage.undo();
-		return "Undo done!";
-	}
-	
-	public String clear() {
-		storage.clear();
-		return Constants.MESSAGE_TASK_CLEARED;
-	}
-
-	public ArrayList<Task> search(String keyword) {
-		ArrayList<Task> list = storage.load();
-		ArrayList<Task> searchResults = new ArrayList<Task>();
-		
-		for(int listCounter = 0; listCounter < list.size(); listCounter++){
-			if (list.get(listCounter).getDescription().contains(keyword)){
-				searchResults.add(list.get(listCounter));
-			}
-		}
-		return searchResults;
-	}
-
-	// this logic function is to sort an array of tasks, helpful when printing
-	public ArrayList<Task> sort(ArrayList<Task> tasks) {
-		return null;
 	}
 }

@@ -26,8 +26,8 @@ public class Gui {
     private final int SPACE_BEFORE_LOCATION = 20;
     
     private final String STYLE = "<head><style>"
-							+ "p  { font-family:consolas; font-size:100%; }"
-							+ "</style></head>";
+							   + "p  { font-family:consolas; font-size:100%; }"
+							   + "</style></head>";
     private final Font COMMAND_FONT = new Font("consolas", Font.TRUETYPE_FONT, 19);
 	
 	

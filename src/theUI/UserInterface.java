@@ -3,6 +3,7 @@ package theUI;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import tkLibrary.CommandType;
 import tkLibrary.Constants;
 import tkLibrary.Task;
@@ -11,6 +12,11 @@ import tkLogic.Logic;
 import tkLogic.Parser;
 
 public class UserInterface {
+    final String MESSAGE_NO_RESULT = "There is no such task.";
+	final String MESSAGE_NO_SEARCH_INFO = "Please specify the keyword!";
+	final String MESSAGE_NO_ADD_INFO = "Please specify the task you want to add!";
+	final String MESSAGE_NO_DELETE_INFO = "Please specify the task you want to delete!";
+	
 	private String NO_COMMAND = "";
 	private Logic logic;
 	private Parser parser;
@@ -78,6 +84,9 @@ public class UserInterface {
 			case LIST:
 				list(task); 
 				break;
+			case SEARCH:
+				search(task);
+				break;
 			default:
 				gui.displayWarning("Informat command", false);
 				break;
@@ -87,6 +96,11 @@ public class UserInterface {
 	}
 	
 	private void add(Task task) {
+		if (task.getDescription() == null) {
+			gui.displayWarning(MESSAGE_NO_ADD_INFO, false);
+			return;
+		}
+		
 		try {
 			String feedback = logic.add(task);
 			
@@ -118,6 +132,11 @@ public class UserInterface {
 	}
 	
 	private void delete(Task task) {
+		if (task.getDescription() == null) {
+			gui.displayWarning(MESSAGE_NO_DELETE_INFO, false);
+			return;
+		}
+		
 		try {
 			String feedback = logic.delete(task);		
 			
@@ -163,10 +182,33 @@ public class UserInterface {
 			System.out.println(e.getMessage());
 			logger.log(Level.WARNING, "processing error", e);
 		}
-		
 	}
 
 	private void undo() {
-		
+		try {
+			String feedback = logic.undo();
+			gui.displayDone(feedback, false);
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			logger.log(Level.WARNING, "processing error", e);
+		}
+	}
+	
+	private void search(Task task) {
+		if (task.getDescription() == null) {
+			gui.displayWarning(MESSAGE_NO_SEARCH_INFO, false);
+			return;
+		}
+		try {
+			ArrayList<Task> result = logic.search(task.getDescription());
+			if (result.size() == 0) {
+				gui.displayDone(MESSAGE_NO_RESULT, false);
+			} else {
+				gui.display(result, false);
+			}
+		} catch (Exception e) {
+			System.out.println(e.getMessage());
+			logger.log(Level.WARNING, "processing error", e);
+		}
 	}
 }
