@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 
 import tkLibrary.CommandType;
+import tkLibrary.Constants;
 import tkLibrary.FrequencyType;
 import tkLibrary.StateType;
 import tkLibrary.Task;
@@ -247,13 +248,13 @@ public class Parser {
     }
 
     private FrequencyType determineFrequencyType(String frequency) {
-        if (frequency.equalsIgnoreCase("day")) {
+        if (frequency.equalsIgnoreCase(Constants.FREQUENCY_DAY)) {
             return FrequencyType.DAY;
-        } else if (frequency.equalsIgnoreCase("week")) {
+        } else if (frequency.equalsIgnoreCase(Constants.FREQUENCY_WEEK)) {
             return FrequencyType.WEEK;
-        } else if (frequency.equalsIgnoreCase("month")) {
+        } else if (frequency.equalsIgnoreCase(Constants.FREQUENCY_MONTH)) {
             return FrequencyType.MONTH;
-        } else if (frequency.equalsIgnoreCase("year")) {
+        } else if (frequency.equalsIgnoreCase(Constants.FREQUENCY_YEAR)) {
             return FrequencyType.YEAR;
         } else {
             return null;
