@@ -123,8 +123,12 @@ public class UserInterface {
 
 	private void list(Task task) {
 		try {
-			ArrayList<Task> lists = logic.list(task);
-			gui.display(lists, false);
+			ArrayList<Task> result = logic.list(task);
+			if (result.size() == 0) {
+				gui.displayDone(MESSAGE_NO_RESULT, false);
+			} else {
+				gui.display(result, false);
+			}
 		} catch (Exception e) {
 			System.out.println(e.getMessage());
 			logger.log(Level.WARNING, "processing error", e);
