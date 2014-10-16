@@ -20,16 +20,32 @@ public class Parser {
     private static Parser theOneParser;
     private UserInput userInput;
     private Task task;
+    private String completeDescription;
+    private String completeLocation;
+    private FrequencyType frequencyType;
+    private int frequencyValue;
     private int[] startTime;
     private int[] endTime;
     private int[] date;
+    private Calendar startingTime;
+    private Calendar endingTime;
     private boolean isEdit;
 
     private Parser() {
+        resetParser();
+    }
+
+    private void resetParser() {
         task = new Task();
+        completeDescription = null;
+        completeLocation = null;
+        frequencyType = null;
+        frequencyValue = 0;
         startTime = new int[0];
         endTime = new int[0];
         date = new int[3];
+        startingTime = null;
+        endingTime = null;
         isEdit = false;
     }
 
@@ -42,22 +58,17 @@ public class Parser {
 
     public UserInput format(String userCommand) throws Exception {
         String[] userInputArray = splitUserInput(userCommand);
-        
+
         userInput = new UserInput(determineCommandType(userInputArray[0]), task);
 
         if (userInputArray.length > 1) {
             parseAll(userInputArray);
             parseTime();
-            task.setState(StateType.PENDING);
             if (isEdit) {
                 userInput.setEditedTask(task);
             }
         }
-        task = new Task();
-        startTime = new int[0];
-        endTime = new int[0];
-        date = new int[3];
-        isEdit = false;
+        resetParser();
         return userInput;
     }
 
@@ -65,7 +76,8 @@ public class Parser {
         return userCommand.trim().split("\\s+");
     }
 
-    private CommandType determineCommandType(String commandTypeString) throws Exception {
+    private CommandType determineCommandType(String commandTypeString)
+            throws Exception {
         if (commandTypeString.equalsIgnoreCase("add")) {
             return CommandType.ADD;
         } else if (commandTypeString.equalsIgnoreCase("delete")) {
@@ -77,7 +89,7 @@ public class Parser {
         } else if (commandTypeString.equalsIgnoreCase("clear")) {
             return CommandType.CLEAR;
         } else if (commandTypeString.equalsIgnoreCase("search")) {
-        	return CommandType.SEARCH;
+            return CommandType.SEARCH;
         } else if (commandTypeString.equalsIgnoreCase("list")) {
             return CommandType.LIST;
         } else {
@@ -102,15 +114,23 @@ public class Parser {
             }
         }
         executeCmdKey(word, commandKey);
+        setTaskFields();
+    }
+
+    private void setTaskFields() {
+        task.setDescription(completeDescription);
+        task.setLocation(completeLocation);
+        task.setFrequency(frequencyValue, frequencyType);
+        task.setState(StateType.PENDING);
     }
 
     private CommandKey determineCommandKey(String commandKeyString) {
         if (commandKeyString.equalsIgnoreCase("description")) {
             return CommandKey.DESCRIPTION;
-        } else if (commandKeyString.equalsIgnoreCase("from")) {
-            return CommandKey.FROM;
-        } else if (commandKeyString.equalsIgnoreCase("to")
+        } else if (commandKeyString.equalsIgnoreCase("from")
                 || commandKeyString.equalsIgnoreCase("by")) {
+            return CommandKey.FROM;
+        } else if (commandKeyString.equalsIgnoreCase("to")) {
             return CommandKey.TO;
         } else if (commandKeyString.equalsIgnoreCase("at")) {
             return CommandKey.AT;
@@ -148,13 +168,10 @@ public class Parser {
     }
 
     private boolean parseDescription(ArrayList<String> description) {
-        String completeDescription = description.get(0);
-        if (description.size() > 1) {
-            for (int i = 1; i < description.size(); i++) {
-                completeDescription += " " + description.get(i);
-            }
+        completeDescription = description.get(0);
+        for (int i = 1; i < description.size(); i++) {
+            completeDescription += " " + description.get(i);
         }
-        task.setDescription(completeDescription);
         return true;
     }
 
@@ -231,19 +248,16 @@ public class Parser {
     }
 
     private boolean parseLocation(ArrayList<String> location) {
-        String completeLocation = location.get(0);
-        if (location.size() > 1) {
-            for (int i = 1; i < location.size(); i++) {
-                completeLocation += " " + location.get(i);
-            }
+        completeLocation = location.get(0);
+        for (int i = 1; i < location.size(); i++) {
+            completeLocation += " " + location.get(i);
         }
-        task.setLocation(completeLocation);
         return true;
     }
 
     private boolean parseFrequency(ArrayList<String> frequency) {
-        FrequencyType frequencyType = determineFrequencyType(frequency.get(1));
-        task.setFrequency(Integer.valueOf(frequency.get(0)), frequencyType);
+        frequencyType = determineFrequencyType(frequency.get(1));
+        frequencyValue = Integer.valueOf(frequency.get(0));
         return true;
     }
 
@@ -263,7 +277,7 @@ public class Parser {
 
     private boolean changeTaskObject(ArrayList<String> word) {
         parseTime();
-        task.setState(StateType.PENDING);
+        setTaskFields();
         task = new Task();
         executeCmdKey(word, determineCommandKey("description"));
         isEdit = true;
@@ -272,12 +286,14 @@ public class Parser {
 
     private void parseTime() {
         if (startTime.length != 0) {
-            Calendar startingTime = Calendar.getInstance();
-            startingTime.set(date[2], date[1], date[0], startTime[0], startTime[1], 0);
+            startingTime = Calendar.getInstance();
+            startingTime.set(date[2], date[1], date[0], startTime[0], startTime[1],
+                    0);
             task.setStartTime(startingTime);
+
         }
         if (endTime.length != 0) {
-            Calendar endingTime = Calendar.getInstance();
+            endingTime = Calendar.getInstance();
             endingTime.set(date[2], date[1], date[0], endTime[0], endTime[1], 0);
             task.setEndTime(endingTime);
         }
