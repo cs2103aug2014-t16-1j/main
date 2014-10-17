@@ -58,16 +58,13 @@ public class Parser {
     public UserInput format(String userCommand) throws Exception {
         resetParser();
         String[] userInputArray = splitUserInput(userCommand);
-
         userInput = new UserInput(determineCommandType(userInputArray[0]), task);
-
         if (userInputArray.length > 1) {
             parseAll(userInputArray);
             if (isEdit) {
                 userInput.setEditedTask(task);
             }
         }
-
         return userInput;
     }
 
@@ -173,8 +170,6 @@ public class Parser {
             case EDIT:
                 changeTaskObject(word);
                 break;
-            default:
-                throw new Exception("Unrecognized command key: " + commandKey);
         }
     }
 
@@ -201,34 +196,41 @@ public class Parser {
             requiredTime[0] = newTime.substring(0, 2);
             requiredTime[1] = newTime.substring(2, 4);
         } else {
-
             Float timeValue =
                     Float.valueOf(newTime.substring(0, newTime.length() - 2));
             Float minuteValue = timeValue - Float.valueOf(timeValue.intValue() + "");
-            int hour;
-            int minute;
-            minute = Float.valueOf(minuteValue * 100).intValue();
-            if (minute < 10) {
-                requiredTime[1] = "0" + minute;
-            } else {
-                requiredTime[1] = "" + minute;
-            }
-            if (newTime.contains("a") && timeValue == 12) {
-                hour = (timeValue.intValue() - 12);
-            } else if (newTime.contains("a")) {
-                hour = timeValue.intValue();
-            } else if (newTime.contains("p") && timeValue != 12) {
-                hour = (timeValue.intValue() + 12);
-            } else {
-                hour = timeValue.intValue();
-            }
-            if (hour < 10) {
-                requiredTime[0] = "0" + hour;
-            } else {
-                requiredTime[0] = "" + hour;
-            }
+            getMinute(requiredTime, minuteValue);
+            getHour(requiredTime, newTime, timeValue);
         }
         return requiredTime;
+    }
+
+    private void getMinute(String[] requiredTime, Float minuteValue) {
+        int minute;
+        minute = Float.valueOf(minuteValue * 100).intValue();
+        if (minute < 10) {
+            requiredTime[1] = "0" + minute;
+        } else {
+            requiredTime[1] = "" + minute;
+        }
+    }
+
+    private void getHour(String[] requiredTime, String newTime, Float timeValue) {
+        int hour;
+        if (newTime.contains("a") && timeValue == 12) {
+            hour = (timeValue.intValue() - 12);
+        } else if (newTime.contains("a")) {
+            hour = timeValue.intValue();
+        } else if (newTime.contains("p") && timeValue != 12) {
+            hour = (timeValue.intValue() + 12);
+        } else {
+            hour = timeValue.intValue();
+        }
+        if (hour < 10) {
+            requiredTime[0] = "0" + hour;
+        } else {
+            requiredTime[0] = "" + hour;
+        }
     }
 
     private void parseDate(ArrayList<String> day) {
@@ -289,6 +291,16 @@ public class Parser {
     }
 
     private void parseTime() throws Exception {
+        if (startTime.length == 0 && endTimeAndDate != null) {
+            throw new Exception(
+                    "invalid time format, you have not entered the start time.");
+        } else if (startTime.length == 0 && endTime.length == 0 && date.length != 0) {
+            Calendar.getInstance();
+            String[] currentTime = new String[2];
+            currentTime[0] = "" + Calendar.HOUR;
+            currentTime[1] = "" + Calendar.MINUTE;
+            startTimeAndDate = getTime(startTime);
+        }
         if (date.length == 0) {
             Calendar.getInstance();
             date = new String[3];
@@ -302,16 +314,7 @@ public class Parser {
         if (startTime.length != 0 && startTimeAndDate == null) {
             startTimeAndDate = getTime(startTime);
         }
-       /* if (startTime.length == 0 && endTimeAndDate != null) {
-            throw new Exception(
-                    "invalid time format, you have not entered the start time.");
-        } else {
-            Calendar.getInstance();
-            String[] currentTime = new String[2];
-            currentTime[0] = "" + Calendar.HOUR;
-            currentTime[1] = "" + Calendar.MINUTE;
-            startTimeAndDate = getTime(startTime);
-        }*/
+
     }
 
     private String getTime(String[] time) {
