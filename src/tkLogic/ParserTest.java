@@ -45,6 +45,31 @@ public class ParserTest {
     }
 
     @Test
+    public void testParserAddTwoDates() {
+        Parser parser = Parser.getInstance();
+        String input =
+                "add Meeting from 9am on 11 Sep 2014 to 10am on 12 Sep 2014 at Boardroom";
+        UserInput userInput;
+        try {
+            userInput = parser.format(input);
+            CommandType command = userInput.getCommand();
+            assertEquals("Test that method format works correctly", CommandType.ADD,
+                    command);
+            Task task = userInput.getTask();
+            assertEquals("Test that the Start Time is correctly recorded",
+                    "Thu Sep 11 09:00:00 SGT 2014", task.getStartTime().getTime()
+                            .toString());
+            assertEquals("Test that the End Time is correctly recorded",
+                    "Fri Sep 12 10:00:00 SGT 2014", task.getEndTime().getTime()
+                            .toString());
+        } catch (Exception e) {
+            System.out.println("testParserAddTwoDates: ");
+            System.out.println(e);
+            assert (false);
+        }
+    }
+
+    @Test
     public void testParserAddDeadline() {
         Parser parser = Parser.getInstance();
         String input = "add Submit audit report by 9am on 12 Sep 2014";

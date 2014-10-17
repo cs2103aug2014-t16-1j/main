@@ -1,6 +1,7 @@
 package tkLogic;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 
 import tkLibrary.CommandType;
 import tkLibrary.Constants;
@@ -41,7 +42,7 @@ public class Parser {
         frequencyValue = 0;
         startTime = new String[0];
         endTime = new String[0];
-        date = new String[3];
+        date = new String[0];
         startTimeAndDate = null;
         endTimeAndDate = null;
         isEdit = false;
@@ -157,7 +158,8 @@ public class Parser {
             case TO:
                 return parseEndTime(word);
             case ON:
-                return parseDate(word);
+                parseDate(word);
+                return parseTime();
             case AT:
                 return parseLocation(word);
             case EVERY:
@@ -226,6 +228,7 @@ public class Parser {
     }
 
     private boolean parseDate(ArrayList<String> day) {
+        date = new String[3];
         date[0] = day.get(0);
         date[1] = determineMonth(day.get(1));
         date[2] = day.get(2);
@@ -285,16 +288,35 @@ public class Parser {
         return true;
     }
 
-    private void parseTime() {
-        if (startTime.length != 0) {
-            startTimeAndDate =
-                    date[1] + " " + date[0] + " " + date[2] + " " + startTime[0]
-                            + ":" + startTime[1] + ":00";
+    private boolean parseTime() {
+        if (date.length == 0) {
+            Calendar.getInstance();
+            date = new String[3];
+            date[0] = "" + Calendar.DATE;
+            date[1] = determineMonth("" + Calendar.MONTH);
+            date[2] = "" + Calendar.YEAR;            
         }
-        if (endTime.length != 0) {
-            endTimeAndDate =
-                    date[1] + " " + date[0] + " " + date[2] + " " + endTime[0] + ":"
-                            + endTime[1] + ":00";
+        if (endTime.length != 0 && endTimeAndDate == null) {
+            endTimeAndDate = getTime(endTime);
         }
+        if (startTime.length != 0 && startTimeAndDate == null) {
+            startTimeAndDate = getTime(startTime);
+        }
+      /*  if (startTime.length == 0 && endTimeAndDate != null) {
+            return new Exception("invalid time format, you have not entered the start time.") != null;
+        } else {
+            Calendar.getInstance();
+            String[] currentTime = new String[2];
+            currentTime[0] = "" + Calendar.HOUR;
+            currentTime[1] = "" + Calendar.MINUTE;
+            startTimeAndDate = getTime(startTime);
+        }*/
+
+        return true;
+    }
+
+    private String getTime(String[] time) {
+        return date[1] + " " + date[0] + " " + date[2] + " " + time[0] + ":"
+                + time[1] + ":00";
     }
 }
