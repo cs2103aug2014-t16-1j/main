@@ -39,7 +39,7 @@ public class ParserTest {
                     task.getFrequencyType());
         } catch (Exception e) {
             System.out.println("testParserAdd: ");
-            System.out.println(e);
+            e.printStackTrace();
             assert (false);
         }
     }
@@ -64,7 +64,7 @@ public class ParserTest {
                             .toString());
         } catch (Exception e) {
             System.out.println("testParserAddTwoDates: ");
-            System.out.println(e);
+            e.printStackTrace();
             assert (false);
         }
     }
@@ -84,7 +84,6 @@ public class ParserTest {
             assertEquals("Test that the Start Time is correctly recorded",
                     "Fri Sep 12 09:00:00 SGT 2014", task.getStartTime().getTime()
                             .toString());
-            System.out.println(task.getStartTime().getTime().toString());
             assertEquals("Test that the End Time is correctly recorded", null,
                     task.getEndTime());
             assertEquals("Test that the Location is correctly recorded", null,
@@ -97,7 +96,7 @@ public class ParserTest {
                     task.getFrequencyType());
         } catch (Exception e) {
             System.out.println("testParserAddDeadline: ");
-            System.out.println(e);
+            e.printStackTrace();
             assert (false);
         }
     }
@@ -129,7 +128,7 @@ public class ParserTest {
                     task.getFrequencyType());
         } catch (Exception e) {
             System.out.println("testParserAddGoodToDo: ");
-            System.out.println(e);
+            e.printStackTrace();
             assert (false);
         }
     }
@@ -160,7 +159,7 @@ public class ParserTest {
                     task.getFrequencyType());
         } catch (Exception e) {
             System.out.println("testParserDelete: ");
-            System.out.println(e);
+            e.printStackTrace();
             assert (false);
         }
     }
@@ -212,7 +211,7 @@ public class ParserTest {
                     editedTask.getFrequencyType());
         } catch (Exception e) {
             System.out.println("testParserEdit: ");
-            System.out.println(e);
+            e.printStackTrace();
             assert (false);
         }
     }
@@ -243,7 +242,7 @@ public class ParserTest {
                     task.getFrequencyType());
         } catch (Exception e) {
             System.out.println("testParserUndo: ");
-            System.out.println(e);
+            e.printStackTrace();
             assert (false);
         }
     }

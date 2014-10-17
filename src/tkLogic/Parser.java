@@ -96,7 +96,7 @@ public class Parser {
         }
     }
 
-    private void parseAll(String[] userInputArray) {
+    private void parseAll(String[] userInputArray) throws Exception {
         ArrayList<String> word = new ArrayList<String>();
         String newWord;
         CommandKey newCommandKey;
@@ -148,47 +148,51 @@ public class Parser {
         }
     }
 
-    private boolean executeCmdKey(ArrayList<String> word, CommandKey commandKey)
-            throws Error {
+    private void executeCmdKey(ArrayList<String> word, CommandKey commandKey)
+            throws Exception {
         switch (commandKey) {
             case DESCRIPTION:
-                return parseDescription(word);
+                parseDescription(word);
+                break;
             case FROM:
-                return parseStartTime(word);
+                parseStartTime(word);
+                break;
             case TO:
-                return parseEndTime(word);
+                parseEndTime(word);
+                break;
             case ON:
                 parseDate(word);
-                return parseTime();
+                parseTime();
+                break;
             case AT:
-                return parseLocation(word);
+                parseLocation(word);
+                break;
             case EVERY:
-                return parseFrequency(word);
+                parseFrequency(word);
+                break;
             case EDIT:
-                return changeTaskObject(word);
+                changeTaskObject(word);
+                break;
             default:
-                throw new Error("Unrecognized command key: " + commandKey);
+                throw new Exception("Unrecognized command key: " + commandKey);
         }
     }
 
-    private boolean parseDescription(ArrayList<String> description) {
+    private void parseDescription(ArrayList<String> description) {
         completeDescription = description.get(0);
         for (int i = 1; i < description.size(); i++) {
             completeDescription += " " + description.get(i);
         }
-        return true;
     }
 
-    private boolean parseStartTime(ArrayList<String> time) {
+    private void parseStartTime(ArrayList<String> time) {
         String[] startingTime = new String[2];
         startTime = updateTime(time, startingTime);
-        return true;
     }
 
-    private boolean parseEndTime(ArrayList<String> time) {
+    private void parseEndTime(ArrayList<String> time) {
         String[] endingTime = new String[2];
         endTime = updateTime(time, endingTime);
-        return true;
     }
 
     private String[] updateTime(ArrayList<String> time, String[] requiredTime) {
@@ -227,12 +231,11 @@ public class Parser {
         return requiredTime;
     }
 
-    private boolean parseDate(ArrayList<String> day) {
+    private void parseDate(ArrayList<String> day) {
         date = new String[3];
         date[0] = day.get(0);
         date[1] = determineMonth(day.get(1));
         date[2] = day.get(2);
-        return true;
     }
 
     private String determineMonth(String month) throws Error {
@@ -265,36 +268,33 @@ public class Parser {
         }
     }
 
-    private boolean parseLocation(ArrayList<String> location) {
+    private void parseLocation(ArrayList<String> location) {
         completeLocation = location.get(0);
         for (int i = 1; i < location.size(); i++) {
             completeLocation += " " + location.get(i);
         }
-        return true;
     }
 
-    private boolean parseFrequency(ArrayList<String> frequency) {
+    private void parseFrequency(ArrayList<String> frequency) {
         frequencyType = frequency.get(1);
         frequencyValue = Integer.valueOf(frequency.get(0));
-        return true;
     }
 
-    private boolean changeTaskObject(ArrayList<String> word) {
+    private void changeTaskObject(ArrayList<String> word) throws Exception {
         parseTime();
         setTaskFields();
         resetParser();
         executeCmdKey(word, determineCommandKey("description"));
         isEdit = true;
-        return true;
     }
 
-    private boolean parseTime() {
+    private void parseTime() throws Exception {
         if (date.length == 0) {
             Calendar.getInstance();
             date = new String[3];
             date[0] = "" + Calendar.DATE;
             date[1] = determineMonth("" + Calendar.MONTH);
-            date[2] = "" + Calendar.YEAR;            
+            date[2] = "" + Calendar.YEAR;
         }
         if (endTime.length != 0 && endTimeAndDate == null) {
             endTimeAndDate = getTime(endTime);
@@ -302,8 +302,9 @@ public class Parser {
         if (startTime.length != 0 && startTimeAndDate == null) {
             startTimeAndDate = getTime(startTime);
         }
-      /*  if (startTime.length == 0 && endTimeAndDate != null) {
-            return new Exception("invalid time format, you have not entered the start time.") != null;
+       /* if (startTime.length == 0 && endTimeAndDate != null) {
+            throw new Exception(
+                    "invalid time format, you have not entered the start time.");
         } else {
             Calendar.getInstance();
             String[] currentTime = new String[2];
@@ -311,8 +312,6 @@ public class Parser {
             currentTime[1] = "" + Calendar.MINUTE;
             startTimeAndDate = getTime(startTime);
         }*/
-
-        return true;
     }
 
     private String getTime(String[] time) {
