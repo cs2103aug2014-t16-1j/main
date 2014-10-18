@@ -72,7 +72,7 @@ public class Logic {
 	}
 	
 	private boolean isExistingTask(Task task){
-		return (storage.queryTask(task));
+		return (queryTask(task));
 	}
 
 	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
@@ -210,8 +210,18 @@ public class Logic {
 	}
 	
 	public String setPriorityLevel(Task task, int priorityLevel){
-		storage.queryTask(task);
+		queryTask(task);
 		task.setPriority(priorityLevel);
 		return Constants.MESSAGE_PRIORITY_SET;
+	}
+	
+	private boolean queryTask(Task task){
+		ArrayList<Task> queryList = search(task.getDescription());
+		
+		if(!queryList.isEmpty()){
+			return true;
+		}
+		
+		return false;
 	}
 }
