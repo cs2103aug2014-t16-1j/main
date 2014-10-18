@@ -21,6 +21,7 @@ public final class Constants {
 	public static final String MESSAGE_EDIT_TASK_CLASHES = "Cannot edit because task clashes with other tasks.";
 	public static final String MESSAGE_TASK_CLEARED = "All tasks was deleted.";
 	public static final String MESSAGE_UNDO_DONE = "The command was undone.";
+	public static final String MESSAGE_PRIORITY_SET = "Priority level set for task.";
 	
 	// logic exceptions constants
 	public static final String EXCEPTIONS_ADD_FAIL = "Unable to add to TasKoord.";

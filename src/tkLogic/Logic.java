@@ -208,4 +208,10 @@ public class Logic {
 		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);     
 		return formatter.format(time.getTime());
 	}
+	
+	public String setPriorityLevel(Task task, int priorityLevel){
+		storage.queryTask(task);
+		task.setPriority(priorityLevel);
+		return Constants.MESSAGE_PRIORITY_SET;
+	}
 }
