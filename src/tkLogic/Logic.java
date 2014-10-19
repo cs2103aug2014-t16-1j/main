@@ -227,7 +227,14 @@ public class Logic {
 	}
 	
 	private boolean queryFreeTimeslots(Task task){
-		ArrayList<Task> queryList = storage.load();
+		ArrayList<Task> allTasks = storage.load();
+		ArrayList<Task> queryList = new ArrayList<Task>();
+		
+		for(Task item: allTasks){
+			if (item.getStartTime() != null || item.getEndTime() != null){
+				queryList.add(item);
+			}
+		}
 		
 		for(Task queriedTask: queryList){
 			if(isSameStartTime(task, queriedTask)){
