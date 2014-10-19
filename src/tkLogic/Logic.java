@@ -230,8 +230,12 @@ public class Logic {
 		ArrayList<Task> allTasks = storage.load();
 		ArrayList<Task> queryList = new ArrayList<Task>();
 		
+		if(isFloatingTask(task)){
+			return true;
+		}
+		
 		for(Task item: allTasks){
-			if (item.getStartTime() != null || item.getEndTime() != null){
+			if (isDeadlineOrTimedTask(item)){
 				queryList.add(item);
 			}
 		}
@@ -240,25 +244,36 @@ public class Logic {
 			if(isSameStartTime(task, queriedTask)){
 				return false;
 			}
-			if(isBetweenStartAndEndTimeForTask(task, queriedTask)){
+			if(isBetweenStartAndEndTimeForTaskEndTime(task, queriedTask)){
 				return false;
 			}
-			if(isBetweenStartAndEndTimeForQueriedTask(queriedTask, task)){
+			if(isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
+				return false;
+			}
+			if(isBetweenStartAndEndTimeForTaskStartTime(task, queriedTask)){
 				return false;
 			}
 		}
 		return true;
 	}
 	
+	private boolean isFloatingTask(Task task){
+		return (task.getEndTime() == null || task.getStartTime() == null);
+	}
+	
+	private boolean isDeadlineOrTimedTask(Task task){
+		return (task.getStartTime() != null && task.getEndTime() != null);
+	}
+	
 	private boolean isSameStartTime(Task task, Task queriedTask){
 		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
 	}
 	
-	private boolean isBetweenStartAndEndTimeForTask(Task task, Task queriedTask){
-		return (task.getEndTime().compareTo(queriedTask.getEndTime()) <= 0) && (task.getEndTime().compareTo(queriedTask.getStartTime()) >= 0);
+	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
+		return (task.getEndTime().compareTo(queriedTask.getEndTime()) < 0) && (task.getEndTime().compareTo(queriedTask.getStartTime()) > 0);
 	}
 	
-	private boolean isBetweenStartAndEndTimeForQueriedTask(Task queriedTask, Task task){
-		return (queriedTask.getStartTime().compareTo(task.getStartTime()) >= 0) && (queriedTask.getStartTime().compareTo(task.getEndTime()) <= 0);
+	private boolean isBetweenStartAndEndTimeForTaskStartTime(Task task, Task queriedTask){
+		return (queriedTask.getStartTime().compareTo(task.getStartTime()) > 0) && (queriedTask.getStartTime().compareTo(task.getEndTime()) < 0);
 	}
 }
