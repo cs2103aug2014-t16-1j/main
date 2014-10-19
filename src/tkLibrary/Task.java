@@ -12,7 +12,7 @@ public class Task {
     private StateType state;
     private String location;
     private String description;
-    private int priorityLevel;
+    private PriorityType priorityLevel;
 
     public Task() {
         this.startTime = null;
@@ -92,7 +92,7 @@ public class Task {
         this.description = description;
     }
     
-    public void setPriority(int priorityLevel){
+    public void setPriority(PriorityType priorityLevel){
     	this.priorityLevel = priorityLevel;
     }
 
@@ -124,7 +124,7 @@ public class Task {
         return this.state;
     }
     
-    public int getPriorityLevel(){
+    public PriorityType getPriorityLevel(){
     	return this.priorityLevel;
     }
 }
