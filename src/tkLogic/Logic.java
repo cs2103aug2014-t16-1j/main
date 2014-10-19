@@ -68,7 +68,7 @@ public class Logic {
 	}
 
 	private boolean isFreeTimeslots(Task task){
-		return (storage.queryFreeSlot(task.getStartTime()) || storage.queryFreeSlot(task.getEndTime()));
+		return (queryFreeTimeslots(task));
 	}
 	
 	private boolean isExistingTask(Task task){
@@ -222,8 +222,36 @@ public class Logic {
 		
 		if(!queryList.isEmpty()){
 			return true;
-		}
-		
+		}	
 		return false;
+	}
+	
+	private boolean queryFreeTimeslots(Task task){
+		ArrayList<Task> queryList = storage.load();
+		
+		for(Task queriedTask: queryList){
+			if(isSameStartTime(task, queriedTask)){
+				return false;
+			}
+			if(isBetweenStartAndEndTimeForTask(task, queriedTask)){
+				return false;
+			}
+			if(isBetweenStartAndEndTimeForQueriedTask(queriedTask, task)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean isSameStartTime(Task task, Task queriedTask){
+		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
+	}
+	
+	private boolean isBetweenStartAndEndTimeForTask(Task task, Task queriedTask){
+		return (task.getEndTime().compareTo(queriedTask.getEndTime()) <= 0) && (task.getEndTime().compareTo(queriedTask.getStartTime()) >= 0);
+	}
+	
+	private boolean isBetweenStartAndEndTimeForQueriedTask(Task queriedTask, Task task){
+		return (queriedTask.getStartTime().compareTo(task.getStartTime()) >= 0) && (queriedTask.getStartTime().compareTo(task.getEndTime()) <= 0);
 	}
 }
