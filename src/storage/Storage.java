@@ -146,11 +146,13 @@ public class Storage {
 		}
 	}
 	
-	public void delete(Task feature) {
+	// delete only 1 task with its name (description).
+	public void delete(Task taskToBeDeleted) {
+		String taskName = taskToBeDeleted.getDescription();
 		ArrayList<Task> list = new ArrayList<Task>();
 		
 		for (Task task : listOfTasks) {
-			if (!isIncluded(feature, task)) {
+			if (!taskName.equalsIgnoreCase(task.getDescription())) {
 				list.add(task);
 			}
 		}
@@ -173,30 +175,6 @@ public class Storage {
 		deleteFile();
 		listOfTasks.clear();
 		store(oldTasks);
-	}
-	
-	private boolean isIncluded(Task feature, Task task) {
-		if (feature.getStartTime() != null) {
-			if (!convertCalendarToString(feature.getStartTime()).equals(convertCalendarToString(task.getStartTime())))
-			return false;
-		}
-		
-		if (feature.getEndTime() != null) {
-			if (!convertCalendarToString(feature.getEndTime()).equals(convertCalendarToString(task.getEndTime())))
-			return false;
-		}
-		
-		if (feature.getLocation() != null
-				&& !feature.getLocation().equals(task.getLocation())) {
-			return false;
-		}
-		
-		if (feature.getDescription() != null
-				&& !feature.getDescription().equals(task.getDescription())) {
-			return false;
-		}
-		
-		return true;
 	}
 	
 	private String convertCalendarToString(Calendar time) {
@@ -243,8 +221,14 @@ public class Storage {
 		return true;
 	}
 
+	// find out if a task is in the list.
 	public boolean queryTask(Task task) {
-		// TODO Auto-generated method stub
-		return true;
+		String taskName = task.getDescription();
+		for (Task item : listOfTasks) {
+			if (taskName.equalsIgnoreCase(item.getDescription())) {
+				return true;
+			}
+		}
+		return false;
 	}
 }
