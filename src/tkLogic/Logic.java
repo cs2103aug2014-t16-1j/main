@@ -209,10 +209,12 @@ public class Logic {
 		return formatter.format(time.getTime());
 	}
 	
-	public String setPriorityLevel(Task task, int priorityLevel){
-		queryTask(task);
-		task.setPriority(priorityLevel);
-		return Constants.MESSAGE_PRIORITY_SET;
+	public String setPriorityLevel(Task task){
+		if(queryTask(task)){
+			task.setPriority(task.getPriorityLevel());
+			return Constants.MESSAGE_PRIORITY_SET;
+		}
+		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
 	}
 	
 	private boolean queryTask(Task task){
