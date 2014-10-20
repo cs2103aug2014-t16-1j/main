@@ -83,6 +83,10 @@ public class Task {
             this.state = StateType.GIVEUP;
         }
     }
+    
+    public void setState(StateType state) {
+    	this.state = state;
+    }
 
     public void setLocation(String location) {
         this.location = location;
