@@ -68,11 +68,11 @@ public class Logic {
 	}
 
 	private boolean isFreeTimeslots(Task task){
-		return (storage.queryFreeSlot(task.getStartTime()) || storage.queryFreeSlot(task.getEndTime()));
+		return (queryFreeTimeslots(task));
 	}
 	
 	private boolean isExistingTask(Task task){
-		return (storage.queryTask(task));
+		return (queryTask(task));
 	}
 
 	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
@@ -209,9 +209,71 @@ public class Logic {
 		return formatter.format(time.getTime());
 	}
 	
-	public String setPriorityLevel(Task task, int priorityLevel){
-		storage.queryTask(task);
-		task.setPriority(priorityLevel);
-		return Constants.MESSAGE_PRIORITY_SET;
+	public String setPriorityLevel(Task task){
+		if(queryTask(task)){
+			task.setPriority(task.getPriorityLevel());
+			return Constants.MESSAGE_PRIORITY_SET;
+		}
+		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
+	}
+	
+	private boolean queryTask(Task task){
+		ArrayList<Task> queryList = search(task.getDescription());
+		
+		if(!queryList.isEmpty()){
+			return true;
+		}	
+		return false;
+	}
+	
+	private boolean queryFreeTimeslots(Task task){
+		ArrayList<Task> allTasks = storage.load();
+		ArrayList<Task> queryList = new ArrayList<Task>();
+		
+		if(isFloatingTask(task)){
+			return true;
+		}
+		
+		for(Task item: allTasks){
+			if (isDeadlineOrTimedTask(item)){
+				queryList.add(item);
+			}
+		}
+		
+		for(Task queriedTask: queryList){
+			if(isSameStartTime(task, queriedTask)){
+				return false;
+			}
+			if(isBetweenStartAndEndTimeForTaskEndTime(task, queriedTask)){
+				return false;
+			}
+			if(isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
+				return false;
+			}
+			if(isBetweenStartAndEndTimeForTaskStartTime(task, queriedTask)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean isFloatingTask(Task task){
+		return (task.getEndTime() == null || task.getStartTime() == null);
+	}
+	
+	private boolean isDeadlineOrTimedTask(Task task){
+		return (task.getStartTime() != null && task.getEndTime() != null);
+	}
+	
+	private boolean isSameStartTime(Task task, Task queriedTask){
+		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
+	}
+	
+	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
+		return (task.getEndTime().compareTo(queriedTask.getEndTime()) < 0) && (task.getEndTime().compareTo(queriedTask.getStartTime()) > 0);
+	}
+	
+	private boolean isBetweenStartAndEndTimeForTaskStartTime(Task task, Task queriedTask){
+		return (queriedTask.getStartTime().compareTo(task.getStartTime()) > 0) && (queriedTask.getStartTime().compareTo(task.getEndTime()) < 0);
 	}
 }
