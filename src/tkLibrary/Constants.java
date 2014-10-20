@@ -12,7 +12,7 @@ public final class Constants {
 	public static final String FORMAT_HOUR = "HH:mm:ss";
 	
 	// logic constants
-	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, unable to add to specified timeslot.";
+	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, task still added to TasKoord.";
 	public static final String MESSAGE_TASK_ADDED = "Task added to TasKoord!";
 	public static final String MESSAGE_TASK_DOES_NOT_EXIST = "Task does not exist!";
 	public static final String MESSAGE_TASK_DELETED = "Task deleted from TasKoord!";
