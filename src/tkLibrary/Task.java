@@ -12,6 +12,7 @@ public class Task {
     private StateType state;
     private String location;
     private String description;
+    private String category;
     private PriorityType priorityLevel;
 
     public Task() {
@@ -111,6 +112,10 @@ public class Task {
             }
         }
     }
+    
+    public void setCategory(String category) {
+        this.category = category;
+    }
 
     public Calendar getStartTime() {
         return this.startTime;
@@ -142,5 +147,9 @@ public class Task {
 
     public PriorityType getPriorityLevel() {
         return this.priorityLevel;
+    }
+    
+    public String getCategory() {
+        return this.category;
     }
 }
