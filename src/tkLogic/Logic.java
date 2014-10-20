@@ -50,11 +50,13 @@ public class Logic {
 	public String add(Task task) {
 		if (isFreeTimeslots(task)) {
 			storage.add(task);
+			logger.log(Level.INFO, "Task added.");
+			return Constants.MESSAGE_TASK_ADDED;
 		} else {
+			storage.add(task);
+			logger.log(Level.INFO, "Task added.");
 			return Constants.MESSAGE_CLASHING_TIMESLOTS;
 		}
-		logger.log(Level.INFO, "Task added.");
-		return Constants.MESSAGE_TASK_ADDED;
 	}
 	
 	public String delete(Task task){
