@@ -83,9 +83,9 @@ public class Task {
             this.state = StateType.GIVEUP;
         }
     }
-    
+
     public void setState(StateType state) {
-    	this.state = state;
+        this.state = state;
     }
 
     public void setLocation(String location) {
@@ -95,9 +95,21 @@ public class Task {
     public void setDescription(String description) {
         this.description = description;
     }
-    
-    public void setPriority(PriorityType priorityLevel){
-    	this.priorityLevel = priorityLevel;
+
+    public void setPriority(PriorityType priorityLevel) {
+        this.priorityLevel = priorityLevel;
+    }
+
+    public void setPriority(String priorityLevel) {
+        if (priorityLevel != null) {
+            if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_LOW)) {
+                this.priorityLevel = PriorityType.LOW;
+            } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_MEDIUM)) {
+                this.priorityLevel = PriorityType.MEDIUM;
+            } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_HIGH)) {
+                this.priorityLevel = PriorityType.HIGH;
+            }
+        }
     }
 
     public Calendar getStartTime() {
@@ -127,8 +139,8 @@ public class Task {
     public StateType getState() {
         return this.state;
     }
-    
-    public PriorityType getPriorityLevel(){
-    	return this.priorityLevel;
+
+    public PriorityType getPriorityLevel() {
+        return this.priorityLevel;
     }
 }

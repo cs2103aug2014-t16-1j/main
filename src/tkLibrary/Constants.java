@@ -51,4 +51,9 @@ public final class Constants {
 	public static final String STATE_DONE = "DONE";
 	public static final String STATE_PENDING = "PENDING";
 	public static final String STATE_GIVEUP = "GIVEUP";
+	
+	// constants for state type
+    public static final String PRIORITY_LOW = "LOW";
+    public static final String PRIORITY_MEDIUM = "MEDIUM";
+    public static final String PRIORITY_HIGH = "HIGH";
 }

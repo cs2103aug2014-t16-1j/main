@@ -28,6 +28,7 @@ public class Parser {
     private String[] date;
     private String startTimeAndDate;
     private String endTimeAndDate;
+    private String priority;
 
     private boolean isEdit;
 
@@ -45,6 +46,7 @@ public class Parser {
         date = new String[0];
         startTimeAndDate = null;
         endTimeAndDate = null;
+        priority = null;
         isEdit = false;
     }
 
@@ -88,6 +90,8 @@ public class Parser {
             return CommandType.SEARCH;
         } else if (commandTypeString.equalsIgnoreCase("list")) {
             return CommandType.LIST;
+        } else if (commandTypeString.equalsIgnoreCase("set")) {
+            return CommandType.SET;
         } else {
             throw new Exception("invalid command: " + commandTypeString);
         }
@@ -122,6 +126,7 @@ public class Parser {
         task.setStartTime(startTimeAndDate);
         task.setEndTime(endTimeAndDate);
         task.setState(Constants.STATE_PENDING);
+        task.setPriority(priority);
     }
 
     private CommandKey determineCommandKey(String commandKeyString) {
@@ -140,6 +145,8 @@ public class Parser {
             return CommandKey.EDIT;
         } else if (commandKeyString.equalsIgnoreCase("every")) {
             return CommandKey.EVERY;
+        } else if (commandKeyString.equalsIgnoreCase("priority")) {
+            return CommandKey.PRIORITY;
         } else {
             return null;
         }
@@ -169,6 +176,9 @@ public class Parser {
                 break;
             case EDIT:
                 changeTaskObject(word);
+                break;
+            case PRIORITY:
+                parsePriority(word);
                 break;
         }
     }
@@ -320,5 +330,9 @@ public class Parser {
     private String getTime(String[] time) {
         return date[1] + " " + date[0] + " " + date[2] + " " + time[0] + ":"
                 + time[1] + ":00";
+    }
+
+    private void parsePriority(ArrayList<String> priorityLevel) {
+        priority = priorityLevel.get(0);
     }
 }
