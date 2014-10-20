@@ -1,5 +1,5 @@
 package tkLibrary;
 
 public enum CommandType {
-	ADD, DELETE, UNDO, EDIT, CLEAR, LIST, SEARCH
+	ADD, DELETE, UNDO, EDIT, CLEAR, LIST, SEARCH, SET
 }

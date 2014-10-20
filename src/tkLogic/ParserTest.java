@@ -5,6 +5,7 @@ import static org.junit.Assert.*;
 import org.junit.Test;
 
 import tkLibrary.CommandType;
+import tkLibrary.PriorityType;
 import tkLibrary.StateType;
 import tkLibrary.Task;
 import tkLibrary.UserInput;
@@ -239,6 +240,39 @@ public class ParserTest {
             assertEquals("Test that the frequency is as default", 0,
                     task.getFrequency());
             assertEquals("Test that the frequency is as default", null,
+                    task.getFrequencyType());
+        } catch (Exception e) {
+            System.out.println("testParserUndo: ");
+            e.printStackTrace();
+            assert (false);
+        }
+    }
+    
+    @Test
+    public void testParserSetPriority() {
+        Parser parser = Parser.getInstance();
+        String input = "set Submit audit report priority high";
+        try {
+            UserInput userInput = parser.format(input);
+            CommandType command = userInput.getCommand();
+            assertEquals("Test that method format works correctly",
+                    CommandType.SET, command);
+            Task task = userInput.getTask();
+            assertEquals("Test that the Description is correctly recorded", "Submit audit report",
+                    task.getDescription());
+            assertEquals("Test that the Start Time is correctly recorded", null,
+                    task.getStartTime());
+            assertEquals("Test that the End Time is correctly recorded", null,
+                    task.getEndTime());
+            assertEquals("Test that the Location is correctly recorded", null,
+                    task.getLocation());
+            assertEquals("Test that the State is correctly set", null,
+                    task.getState());
+            assertEquals("Test that the frequency is as default", 0,
+                    task.getFrequency());
+            assertEquals("Test that the frequency is as default", null,
+                    task.getFrequencyType());
+            assertEquals("Test that the priority is correctly recorded", PriorityType.HIGH,
                     task.getFrequencyType());
         } catch (Exception e) {
             System.out.println("testParserUndo: ");
