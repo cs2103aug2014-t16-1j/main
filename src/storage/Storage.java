@@ -35,7 +35,7 @@ public class Storage {
 	}
 	
 	public ArrayList<Task> load() {
-		return listOfTasks;
+		return new ArrayList<Task> (listOfTasks);
 	}
 	
 	public ArrayList<Task> loadFromFile() {
@@ -146,21 +146,34 @@ public class Storage {
 		}
 	}
 	
-	// delete only 1 task with its name (description).
-	public void delete(Task taskToBeDeleted) {
-		String taskName = taskToBeDeleted.getDescription();
-		ArrayList<Task> list = new ArrayList<Task>();
+	// delete only 1 task with its name and its location(description).
+	public ArrayList<Task> delete(Task taskToBeDeleted) {
+		String taskName = taskToBeDeleted.getDescription().toLowerCase();
+		String taskLocation = taskToBeDeleted.getLocation();
+		ArrayList<Task> deletedTasks = new ArrayList<Task>();
+		ArrayList<Task> newList = new ArrayList<Task>();
 		
-		for (Task task : listOfTasks) {
-			if (!taskName.equalsIgnoreCase(task.getDescription())) {
-				list.add(task);
+		for (Task item : listOfTasks) {
+			if (!item.getDescription().toLowerCase().contains(taskName)) {
+				newList.add(item);
+			} else if (taskLocation != null && item.getLocation() == null) {
+				newList.add(item);
+			} else if (taskLocation != null && item.getLocation() != null) {
+				if (!item.getLocation().toLowerCase().contains(taskLocation.toLowerCase())) {
+					newList.add(item);
+				} else {
+					deletedTasks.add(item);
+				}
+			} else {
+				deletedTasks.add(item);
 			}
 		}
 		
 		deleteFile();
 		oldTasks = new ArrayList<Task> (listOfTasks);
 		listOfTasks.clear();
-		store(list);
+		store(newList);
+		return deletedTasks;
 	}
 	
 	public void clear() {

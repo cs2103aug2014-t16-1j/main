@@ -48,6 +48,9 @@ public class Logic {
 	}
 	
 	public String add(Task task) {
+		if (isExistingTask(task)) {
+			return Constants.MESSAGE_DUPLICATED_TASK;
+		}
 		if (isFreeTimeslots(task)) {
 			storage.add(task);
 			logger.log(Level.INFO, "Task added.");
@@ -59,22 +62,10 @@ public class Logic {
 		}
 	}
 	
-	public String delete(Task task){
-		if(isExistingTask(task)) {
-			storage.delete(task);
-		} else {
-			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
-		}
-		logger.log(Level.INFO, "Task deleted.");
-		return Constants.MESSAGE_TASK_DELETED;
-	}
-
-	private boolean isFreeTimeslots(Task task){
-		return (queryFreeTimeslots(task));
-	}
-	
-	private boolean isExistingTask(Task task){
-		return (queryTask(task));
+	// for delete, need the accuracy of the name and the location. Storage does the searching.
+	public ArrayList<Task> delete(Task task) {
+		ArrayList<Task> deletedTasks = storage.delete(task);
+		return sort(deletedTasks);
 	}
 
 	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
@@ -135,7 +126,7 @@ public class Logic {
 
 	/*
 	 * searching a task by keyword
-	 * mention the description and the location
+	 * only consider the description and the location
 	 */
 	public ArrayList<Task> search(String keyword) {
 		ArrayList<Task> allTasks = storage.load();
@@ -173,21 +164,37 @@ public class Logic {
 		return list;
 	}
 	
+	public String setPriorityLevel(Task task){
+		if(isExistingTask(task)){
+			task.setPriority(task.getPriorityLevel());
+			return Constants.MESSAGE_PRIORITY_SET;
+		}
+		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
+	}
+	
 	private boolean isIncluded(Task feature, Task task) {
 		if (feature.getStartTime() != null) {
-			String featureTime = convertCalendarToString(feature.getStartTime(), Constants.FORMAT_DATE);
+			String featureStartTime = convertCalendarToString(feature.getStartTime(), Constants.FORMAT_DATE);
+			String featureEndTime = convertCalendarToString(feature.getEndTime(), Constants.FORMAT_DATE);
+			if (featureEndTime == null) {
+				featureEndTime = featureStartTime;
+			}
+			
 			String startTime = convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE);
 			String endTime = convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE);
+	
 			if (startTime == null && endTime == null) {
 				return false;
 			} else if (startTime != null && endTime !=null) {
-				if (startTime.compareTo(featureTime) > 0 
-						|| featureTime.compareTo(endTime) > 0) {
+				if (startTime.compareTo(featureEndTime) > 0 
+						|| featureStartTime.compareTo(endTime) > 0) {
 					return false;
 				}
-			} else if (!featureTime.equals(startTime) && !featureTime.equals(endTime)) {
+			} else if (startTime != null && (startTime.compareTo(featureStartTime) < 0 || startTime.compareTo(featureEndTime) > 0)) {
 				return false;
-			}
+			} else if (endTime != null && (endTime.compareTo(featureStartTime) < 0 || endTime.compareTo(featureEndTime) > 0)) {
+				return false;
+			} 
 		}
 		
 		if (feature.getFrequencyType() != null
@@ -211,24 +218,23 @@ public class Logic {
 		return formatter.format(time.getTime());
 	}
 	
-	public String setPriorityLevel(Task task){
-		if(queryTask(task)){
-			task.setPriority(task.getPriorityLevel());
-			return Constants.MESSAGE_PRIORITY_SET;
-		}
-		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
-	}
-	
-	private boolean queryTask(Task task){
+	// this is to check if a task already existing. using description and location to check.
+	private boolean isExistingTask(Task task){
 		ArrayList<Task> queryList = search(task.getDescription());
-		
-		if(!queryList.isEmpty()){
-			return true;
-		}	
+		for (Task item : queryList) {
+			if (item.getDescription().equalsIgnoreCase(task.getDescription())) {
+				if (item.getLocation() == null && task.getLocation() == null) {
+					return true;
+				}
+				if (item.getLocation() != null && item.getLocation().equalsIgnoreCase(task.getLocation())) {
+					return true;
+				}	
+			}
+		}
 		return false;
 	}
 	
-	private boolean queryFreeTimeslots(Task task){
+	private boolean isFreeTimeslots(Task task){
 		ArrayList<Task> allTasks = storage.load();
 		ArrayList<Task> queryList = new ArrayList<Task>();
 		
@@ -274,7 +280,7 @@ public class Logic {
 	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
 		return (task.getEndTime().compareTo(queriedTask.getEndTime()) < 0) && (task.getEndTime().compareTo(queriedTask.getStartTime()) > 0);
 	}
-	
+		
 	private boolean isBetweenStartAndEndTimeForTaskStartTime(Task task, Task queriedTask){
 		return (queriedTask.getStartTime().compareTo(task.getStartTime()) > 0) && (queriedTask.getStartTime().compareTo(task.getEndTime()) < 0);
 	}

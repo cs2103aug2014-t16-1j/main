@@ -15,11 +15,12 @@ public final class Constants {
 	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, task still added to TasKoord.";
 	public static final String MESSAGE_TASK_ADDED = "Task added to TasKoord!";
 	public static final String MESSAGE_TASK_DOES_NOT_EXIST = "Task does not exist!";
-	public static final String MESSAGE_TASK_DELETED = "Task deleted from TasKoord!";
+	public static final String MESSAGE_TASK_DELETED = "Tasks were deleted from TasKoord:";
 	public static final String MESSAGE_TASK_EDITED = "Task edited!";
 	public static final String MESSAGE_EDIT_TASK_DOES_NOT_EXIST = "Cannot edit because task does not exist.";
 	public static final String MESSAGE_EDIT_TASK_CLASHES = "Cannot edit because task clashes with other tasks.";
 	public static final String MESSAGE_TASK_CLEARED = "All tasks was deleted.";
+	public static final String MESSAGE_DUPLICATED_TASK = "Cannot add task. The same name and location were found.";
 	public static final String MESSAGE_UNDO_DONE = "The command was undone.";
 	public static final String MESSAGE_PRIORITY_SET = "Priority level set for task.";
 	public static final String MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST = "Cannot set priority because task does not exist";

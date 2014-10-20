@@ -2,9 +2,6 @@ package theUI;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-
 import tkLibrary.CommandType;
 import tkLibrary.Constants;
 import tkLibrary.PriorityType;
@@ -25,13 +22,11 @@ public class UserInterface {
     private Logic logic;
     private Parser parser;
     private Gui gui;
-    private Logger logger;
     
     public void run(String fileName) {
         parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
-        logger = Logger.getLogger("log" + fileName); 
         
         while (true) {
             try {
@@ -98,17 +93,21 @@ public class UserInterface {
         
         try {
             String feedback = logic.add(task);
-            if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
-                gui.displayDone(feedback, false);
-                Task newTask = new Task();
+            if (!feedback.equals(Constants.MESSAGE_DUPLICATED_TASK)) {
+                if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
+                	gui.displayDone(feedback, false);
+                } else {
+                	gui.displayWarning(feedback, false);
+                }
+                
+            	Task newTask = new Task();
                 newTask.setStartTime(task.getStartTime());
                 gui.display(logic.list(newTask), true);
             } else {
                 gui.displayWarning(feedback, false);
             }
         } catch (Exception e){
-            System.out.println(e.getMessage());
-            logger.log(Level.WARNING, "processing error", e);
+            System.out.println(e);
         }
     }
 
@@ -159,8 +158,7 @@ public class UserInterface {
                 gui.display(result, false);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            logger.log(Level.WARNING, "processing error", e);
+            System.out.println(e);
         }
     }
     
@@ -171,19 +169,15 @@ public class UserInterface {
         }
         
         try {
-            String feedback = logic.delete(task);       
-            
-            assert feedback.equals(Constants.MESSAGE_TASK_DELETED) 
-                || feedback.equals(Constants.MESSAGE_TASK_DOES_NOT_EXIST);
-    
-            if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
-                gui.displayDone(feedback, false);
+            ArrayList<Task> deletedTasks = logic.delete(task);       
+            if (!deletedTasks.isEmpty()) { 
+                gui.displayDone(Constants.MESSAGE_TASK_DELETED, false);
+                gui.display(deletedTasks, true);
             } else {
-                gui.displayWarning(feedback, false);
+                gui.displayWarning(Constants.MESSAGE_TASK_DOES_NOT_EXIST, false);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            logger.log(Level.WARNING, "processing error", e);
+            System.out.println(e);
         }
     }
     
@@ -197,8 +191,7 @@ public class UserInterface {
             }
             //gui.display(logic.search(newTask), false);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            logger.log(Level.WARNING, "processing error", e);
+            System.out.println(e);
         }
     }
 
@@ -211,8 +204,7 @@ public class UserInterface {
                 gui.displayWarning(feedback, false);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            logger.log(Level.WARNING, "processing error", e);
+            System.out.println(e);
         }
     }
 
@@ -221,8 +213,7 @@ public class UserInterface {
             String feedback = logic.undo();
             gui.displayDone(feedback, false);
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            logger.log(Level.WARNING, "processing error", e);
+            System.out.println(e);
         }
     }
     
@@ -239,8 +230,7 @@ public class UserInterface {
                 gui.display(result, false);
             }
         } catch (Exception e) {
-            System.out.println(e.getMessage());
-            logger.log(Level.WARNING, "processing error", e);
+            System.out.println(e);
         }
     }
     
