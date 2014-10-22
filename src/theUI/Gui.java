@@ -1,6 +1,7 @@
 package theUI;
 
 import tkLibrary.Constants;
+import tkLibrary.PriorityType;
 import tkLibrary.Task;
 
 import java.awt.event.ActionEvent;
@@ -20,8 +21,12 @@ public class Gui {
     private final String COLOR_WARNING = "#F92672";
     private final String COLOR_HOUR = "#E6DB74";
     private final String COLOR_DESCRIPTION = "#66D9EF";
-    private final String COLOR_LOCATION = "#F8F8F0";
+    private final String COLOR_LOCATION = "#CECEF6";
     private final String COLOR_DATE = "#FD971F";
+    private final String SIZE_NORMAL = "4";
+    private final String COLOR_DESCRIPTION_HIGH = "#FE2E2E";
+    private final String COLOR_DESCRIPTION_LOW = "#A4A4A4";
+    
     
     private final int SPACE_BEFORE_LOCATION = 20;
     
@@ -91,35 +96,48 @@ public class Gui {
 
     public void displayWarning(String text, boolean isAppended) {
     	if (isAppended) {
-    		displayText += formatWithNewLine(text, COLOR_WARNING);
+    		displayText += formatWithNewLine(text, SIZE_NORMAL, COLOR_WARNING);
     	} else {
-    		displayText = formatWithNewLine(text, COLOR_WARNING);
+    		displayText = formatWithNewLine(text, SIZE_NORMAL, COLOR_WARNING);
     	}
     	setDisplayBox();
     }
     
     public void displayDone(String text, boolean isAppended) {
     	if (isAppended) {
-    		displayText += formatWithNewLine(text, COLOR_DONE);
+    		displayText += formatWithNewLine(text, SIZE_NORMAL, COLOR_DONE);
     	} else {
-    		displayText = formatWithNewLine(text, COLOR_DONE);
+    		displayText = formatWithNewLine(text, SIZE_NORMAL, COLOR_DONE);
     	}
     	setDisplayBox();
     }
     
     private void display(Task task) {
     	String res = "";
+    	
     	if (task.getStartTime() != null) {
-    		res += 	format("[" + convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR), COLOR_HOUR);
+    		if (task.getEndTime() == null) {
+    			res += format("[", SIZE_NORMAL, COLOR_HOUR);
+    			for(int i = 1; i <= 19; i ++) {
+        			res += format("&nbsp", SIZE_NORMAL, COLOR_HOUR);
+        		}
+        		res += 	format(convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR);
+    		} else {
+    			res += 	format("[" + convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR), SIZE_NORMAL, COLOR_HOUR);
+    		}
     	}
     	if (task.getEndTime() != null) {
-    		res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_HOUR) + "] ", COLOR_HOUR);
-    	} else {
-    		res += format("           ] ", COLOR_HOUR);
-    	}
+    		res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR);
+    	} 
     	
     	if (task.getDescription() != null) {
-    		res += formatWithNewLine(task.getDescription(), COLOR_DESCRIPTION);
+    		String color = COLOR_DESCRIPTION;
+    		if (task.getPriorityLevel() == PriorityType.HIGH) {
+    			color = COLOR_DESCRIPTION_HIGH;
+    		} else if (task.getPriorityLevel() == PriorityType.LOW) {
+    			color = COLOR_DESCRIPTION_LOW;
+    		}  
+    		res += formatWithNewLine(task.getDescription(), SIZE_NORMAL, color);
     	}
     	
     	if (task.getLocation() != null) {
@@ -127,7 +145,7 @@ public class Gui {
     		for(int i = 1; i <= SPACE_BEFORE_LOCATION; i ++) {
     			rr += "&nbsp";
     		}
-    		res += formatWithNewLine(rr + "@ " + task.getLocation(), COLOR_LOCATION);
+    		res += formatWithNewLine(rr + "@ " + task.getLocation(), SIZE_NORMAL, COLOR_LOCATION);
     	}
     	
     	displayText += res;
@@ -145,9 +163,9 @@ public class Gui {
     			if (preTask == null || !convertCalendarToString(preTask.getStartTime(), Constants.FORMAT_EEE)
     					 .equals(convertCalendarToString(curTask.getStartTime(), Constants.FORMAT_EEE))) {
     				displayText += "<br>" 
-    					+ format("======", COLOR_DATE)
-    					+ format("["+convertCalendarToString(curTask.getStartTime(), Constants.FORMAT_EEE)+"]", COLOR_DATE)
-    					+ format("======", COLOR_DATE)
+    					+ format("======", SIZE_NORMAL, COLOR_DATE)
+    					+ format("["+convertCalendarToString(curTask.getStartTime(), Constants.FORMAT_EEE)+"]", SIZE_NORMAL, COLOR_DATE)
+    					+ format("======", SIZE_NORMAL, COLOR_DATE)
     					+ "<br><br>";
     			}
     			display(curTask);
@@ -159,12 +177,12 @@ public class Gui {
     	for (int i = 0; i < lists.size(); i ++) {
     		if (checkFloatingTask(lists.get(i))) {
     			if (flag) {
-    				displayText += "<br>" + formatWithNewLine("===GOOD-TO-DO TASKS===", COLOR_DATE) + "<br>";
+    				displayText += "<br>" + formatWithNewLine("===GOOD-TO-DO TASKS===", SIZE_NORMAL, COLOR_DATE) + "<br>";
     				flag = false;
     			}
-    			displayText += format(lists.get(i).getDescription(), COLOR_DESCRIPTION);
+    			displayText += format(lists.get(i).getDescription(), SIZE_NORMAL, COLOR_DESCRIPTION);
     			if (lists.get(i).getLocation() != null) 
-    				displayText += format(" @ " + lists.get(i).getLocation(), COLOR_LOCATION);
+    				displayText += format(" @ " + lists.get(i).getLocation(), SIZE_NORMAL, COLOR_LOCATION);
     			displayText += "<br>";
     		}
     	}
@@ -205,11 +223,11 @@ public class Gui {
 		return formatter.format(time.getTime());
 	}
 	
-	private String format(String text, String color) {
-		return "<font color = " + color + ">" + text + "</font>";
+	private String format(String text, String size, String color) {
+		return "<font size = " + size + " color = " + color + ">" + text + "</font>";
 	}
 	
-	private String formatWithNewLine(String text, String color) {
-		return "<font color = " + color + ">" + text + "</font><br>";
+	private String formatWithNewLine(String text, String size, String color) {
+		return "<font size = " + size + " color = " + color + ">" + text + "</font><br>";
 	}
 }
