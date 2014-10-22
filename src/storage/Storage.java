@@ -63,7 +63,9 @@ public class Storage {
 				task.setFrequency(in.nextInt());
 			} else if (s.equals(Constants.STATE_TYPE)) {
 				task.setState(in.nextLine());
-			}
+			} else if (s.equals(Constants.PRIORITY_TYPE)) {
+				task.setPriority(in.nextLine());
+			} 
 		}
 		
 		closeFileToRead();
@@ -135,6 +137,25 @@ public class Storage {
 					break;
 			}
 		}
+		
+		if (task.getPriorityLevel() != null) {
+			out.println(Constants.PRIORITY_TYPE);
+			switch (task.getPriorityLevel()) {
+				case HIGH:
+					out.println(Constants.PRIORITY_HIGH);
+					break;
+				case MEDIUM:
+					out.println(Constants.PRIORITY_MEDIUM);
+					break;
+				case LOW:
+					out.println(Constants.PRIORITY_LOW);
+					break;
+				default:
+					break;
+			}
+		}
+		
+		
 		
 		out.println(Constants.END_OBJECT_SIGNAL);
 		closeFileToWrite();
