@@ -60,7 +60,7 @@ public class UserInterface {
             if (e.getMessage().contains("invalid command")) {
                 gui.displayWarning("Invalid command: " + userCommand, false);
             } else {
-                System.out.println(e.getMessage());
+                System.out.println(e);
             }
             return;
         }
@@ -92,6 +92,11 @@ public class UserInterface {
         }
         
         try {
+        	task.setState(StateType.PENDING);
+        	if (task.getPriorityLevel() == null) {
+        		task.setPriority(PriorityType.MEDIUM);
+        	}
+        	
             String feedback = logic.add(task);
             if (!feedback.equals(Constants.MESSAGE_DUPLICATED_TASK)) {
                 if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
@@ -102,6 +107,9 @@ public class UserInterface {
                 
             	Task newTask = new Task();
                 newTask.setStartTime(task.getStartTime());
+                if (newTask.getStartTime() == null) {
+                	newTask.setDescription("floating");
+                }
                 gui.display(logic.list(newTask), true);
             } else {
                 gui.displayWarning(feedback, false);
@@ -118,14 +126,10 @@ public class UserInterface {
                 cmdInfo = cmdInfo.toLowerCase();
             }
             
-            if (cmdInfo != null && cmdInfo.contains("completed")) {
-                task.setState(StateType.DONE);
+            if (task.getState() == null) {
+            	task.setState(StateType.PENDING);
             }
-            
-            if (cmdInfo != null && cmdInfo.contains("discarded")) {
-                task.setState(StateType.GIVEUP);
-            }
-            
+                       
             if (cmdInfo != null && cmdInfo.contains("upcoming") && task.getStartTime() == null) {
                 int time = LISTUPCOMINGTIME_DEFAULT;
                 String s = getFirstInt(cmdInfo);
@@ -140,18 +144,7 @@ public class UserInterface {
                 task.setEndTime(endTime);
             }
             
-            if (cmdInfo != null && cmdInfo.contains("priority")) {
-                if (cmdInfo.contains("high")) {
-                    task.setPriority(PriorityType.HIGH);
-                } else if (cmdInfo.contains("medium")) {
-                    task.setPriority(PriorityType.MEDIUM);
-                } else if (cmdInfo.contains("low")) {
-                    task.setPriority(PriorityType.LOW);
-                }  
-            }
-            
-            ArrayList<Task> result = logic.list(task);
-                
+            ArrayList<Task> result = logic.list(task);           
             if (result.size() == 0) {
                 gui.displayDone(MESSAGE_NO_RESULT, false);
             } else {

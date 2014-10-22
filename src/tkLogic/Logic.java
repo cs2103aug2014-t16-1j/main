@@ -33,7 +33,7 @@ public class Logic {
 	        FileHandler fh = new FileHandler("C:/temp/test/MyLogFile.log");  
 	        logger.addHandler(fh);
 	        SimpleFormatter formatter = new SimpleFormatter();  
-	        fh.setFormatter(formatter);  
+	        fh.setFormatter(formatter);
 
 	        // the following statement is used to log any messages  
 	        logger.info("My first log");  
@@ -194,7 +194,7 @@ public class Logic {
 				return false;
 			} else if (endTime != null && (endTime.compareTo(featureStartTime) < 0 || endTime.compareTo(featureEndTime) > 0)) {
 				return false;
-			} 
+			}
 		}
 		
 		if (feature.getFrequencyType() != null
@@ -204,6 +204,11 @@ public class Logic {
 		
 		if (feature.getState() != null
 				&& feature.getState()!=task.getState()) {
+			return false;
+		}
+		
+		if (feature.getPriorityLevel() != null
+				&& feature.getPriorityLevel()!=task.getPriorityLevel()) {
 			return false;
 		}
 		

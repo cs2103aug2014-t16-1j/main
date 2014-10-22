@@ -163,14 +163,12 @@ public class Gui {
     				flag = false;
     			}
     			displayText += format(lists.get(i).getDescription(), COLOR_DESCRIPTION);
-    			if (lists.get(i).getLocation() != null) {
-    				displayText += format(" @ " + lists.get(i).getDescription(), COLOR_LOCATION);
-    			} else {
-    				displayText += "<br>";
-    			}
+    			if (lists.get(i).getLocation() != null) 
+    				displayText += format(" @ " + lists.get(i).getLocation(), COLOR_LOCATION);
+    			displayText += "<br>";
     		}
     	}
-    
+   
     	setDisplayBox();
     }
 

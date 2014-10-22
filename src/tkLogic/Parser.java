@@ -192,7 +192,11 @@ public class Parser {
     }
 
     private void parseDescription(ArrayList<String> description) {
-        completeDescription = description.get(0);
+        if (description.size() == 0) {
+        	completeDescription = "";
+        } else {
+    		completeDescription = description.get(0);
+    	}
         for (int i = 1; i < description.size(); i++) {
             completeDescription += " " + description.get(i);
         }
