@@ -29,7 +29,6 @@ public class Parser {
     private String startTimeAndDate;
     private String endTimeAndDate;
     private String priority;
-    private String category;
 
     private boolean isEdit;
 
@@ -48,7 +47,6 @@ public class Parser {
         startTimeAndDate = null;
         endTimeAndDate = null;
         priority = null;
-        category = null;
         isEdit = false;
     }
 
@@ -129,7 +127,6 @@ public class Parser {
         task.setEndTime(endTimeAndDate);
         task.setState(Constants.STATE_PENDING);
         task.setPriority(priority);
-        task.setCategory(category);
     }
 
     private CommandKey determineCommandKey(String commandKeyString) {
@@ -150,8 +147,6 @@ public class Parser {
             return CommandKey.EVERY;
         } else if (commandKeyString.equalsIgnoreCase("priority")) {
             return CommandKey.PRIORITY;
-        } else if (commandKeyString.equalsIgnoreCase("category")) {
-            return CommandKey.CATEGORY;
         } else {
             return null;
         }
@@ -184,9 +179,6 @@ public class Parser {
                 break;
             case PRIORITY:
                 parsePriority(word);
-                break;
-            case CATEGORY:
-                parseCategory(word);
                 break;
         }
     }
@@ -346,9 +338,5 @@ public class Parser {
 
     private void parsePriority(ArrayList<String> priorityLevel) {
         priority = priorityLevel.get(0);
-    }
-
-    private void parseCategory(ArrayList<String> category) {
-        this.category = category.get(0);
     }
 }

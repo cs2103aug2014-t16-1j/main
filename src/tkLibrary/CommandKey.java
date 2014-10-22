@@ -1,5 +1,5 @@
 package tkLibrary;
 
 public enum CommandKey {
-	DESCRIPTION, FROM, TO, AT, ON, EVERY, EDIT, PRIORITY, CATEGORY
+	DESCRIPTION, FROM, TO, AT, ON, EVERY, EDIT, PRIORITY
 }
