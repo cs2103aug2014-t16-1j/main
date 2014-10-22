@@ -299,7 +299,7 @@ public class ParserTest {
                     task.getEndTime());
             assertEquals("Test that the Location is correctly recorded", null,
                     task.getLocation());
-            assertEquals("Test that the State is correctly set", StateType.DONE,
+            assertEquals("Test that the State is correctly set", StateType.COMPLETED,
                     task.getState());
             assertEquals("Test that the frequency is as default", 0,
                     task.getFrequency());

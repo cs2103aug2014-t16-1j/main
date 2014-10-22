@@ -49,9 +49,9 @@ public final class Constants {
 	public static final String FREQUENCY_YEAR = "YEAR";
 	
 	// constants for state type
-	public static final String STATE_DONE = "DONE";
+	public static final String STATE_COMPLETED = "COMPLETED";
 	public static final String STATE_PENDING = "PENDING";
-	public static final String STATE_GIVEUP = "GIVEUP";
+	public static final String STATE_DISCARDED = "DISCARDED";
 	
 	// constants for state type
     public static final String PRIORITY_LOW = "LOW";

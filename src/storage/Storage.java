@@ -122,14 +122,14 @@ public class Storage {
 		if (task.getState() != null) {
 			out.println(Constants.STATE_TYPE);
 			switch (task.getState()) {
-				case DONE:
-					out.println(Constants.STATE_DONE);
+				case COMPLETED:
+					out.println(Constants.STATE_COMPLETED);
 					break;
 				case PENDING:
 					out.println(Constants.STATE_PENDING);
 					break;
-				case GIVEUP:
-					out.println(Constants.STATE_GIVEUP);
+				case DISCARDED:
+					out.println(Constants.STATE_DISCARDED);
 					break;
 				default:
 					break;

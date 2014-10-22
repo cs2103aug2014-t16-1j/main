@@ -29,6 +29,7 @@ public class Parser {
     private String startTimeAndDate;
     private String endTimeAndDate;
     private String priority;
+    private String state;
 
     private boolean isEdit;
 
@@ -47,6 +48,7 @@ public class Parser {
         startTimeAndDate = null;
         endTimeAndDate = null;
         priority = null;
+        state = Constants.STATE_PENDING;
         isEdit = false;
     }
 
@@ -125,7 +127,7 @@ public class Parser {
         task.setFrequencyType(frequencyType);
         task.setStartTime(startTimeAndDate);
         task.setEndTime(endTimeAndDate);
-        task.setState(Constants.STATE_PENDING);
+        task.setState(state);
         task.setPriority(priority);
     }
 
@@ -147,6 +149,8 @@ public class Parser {
             return CommandKey.EVERY;
         } else if (commandKeyString.equalsIgnoreCase("priority")) {
             return CommandKey.PRIORITY;
+        } else if (commandKeyString.equalsIgnoreCase("status")) {
+            return CommandKey.STATE;
         } else {
             return null;
         }
@@ -180,15 +184,18 @@ public class Parser {
             case PRIORITY:
                 parsePriority(word);
                 break;
+            case STATE:
+                parseState(word);
+                break;
         }
     }
 
     private void parseDescription(ArrayList<String> description) {
         if (description.size() == 0) {
-        	completeDescription = "";
+            completeDescription = "";
         } else {
-    		completeDescription = description.get(0);
-    	}
+            completeDescription = description.get(0);
+        }
         for (int i = 1; i < description.size(); i++) {
             completeDescription += " " + description.get(i);
         }
@@ -338,5 +345,9 @@ public class Parser {
 
     private void parsePriority(ArrayList<String> priorityLevel) {
         priority = priorityLevel.get(0);
+    }
+
+    private void parseState(ArrayList<String> status) {
+        state = status.get(0);
     }
 }

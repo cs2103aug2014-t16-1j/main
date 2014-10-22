@@ -75,12 +75,12 @@ public class Task {
     }
 
     public void setState(String state) {
-        if (state.equalsIgnoreCase(Constants.STATE_DONE)) {
-            this.state = StateType.DONE;
+        if (state.equalsIgnoreCase(Constants.STATE_COMPLETED)) {
+            this.state = StateType.COMPLETED;
         } else if (state.equalsIgnoreCase(Constants.STATE_PENDING)) {
             this.state = StateType.PENDING;
-        } else if (state.equalsIgnoreCase(Constants.STATE_GIVEUP)) {
-            this.state = StateType.GIVEUP;
+        } else if (state.equalsIgnoreCase(Constants.STATE_DISCARDED)) {
+            this.state = StateType.DISCARDED;
         }
     }
 
