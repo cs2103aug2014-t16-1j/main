@@ -180,7 +180,15 @@ public class Gui {
     				displayText += "<br>" + formatWithNewLine("===GOOD-TO-DO TASKS===", SIZE_NORMAL, COLOR_DATE) + "<br>";
     				flag = false;
     			}
-    			displayText += format(lists.get(i).getDescription(), SIZE_NORMAL, COLOR_DESCRIPTION);
+    			
+    			String color = COLOR_DESCRIPTION;
+    			if (lists.get(i).getPriorityLevel() == PriorityType.HIGH) {
+    				color = COLOR_DESCRIPTION_HIGH;
+    			} else if (lists.get(i).getPriorityLevel() == PriorityType.LOW) {
+    				color = COLOR_DESCRIPTION_LOW;
+    			}   
+    			displayText += format(lists.get(i).getDescription(), SIZE_NORMAL, color);
+    			
     			if (lists.get(i).getLocation() != null) 
     				displayText += format(" @ " + lists.get(i).getLocation(), SIZE_NORMAL, COLOR_LOCATION);
     			displayText += "<br>";

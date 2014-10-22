@@ -164,6 +164,11 @@ public class Logic {
 		return list;
 	}
 	
+	public ArrayList<Task> set(Task newTask) {
+		ArrayList<Task> changedTasks = storage.set(newTask);
+		return sort(changedTasks);
+	}
+	
 	public String setPriorityLevel(Task task){
 		if(isExistingTask(task)){
 			task.setPriority(task.getPriorityLevel());

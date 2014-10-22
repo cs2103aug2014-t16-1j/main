@@ -197,6 +197,49 @@ public class Storage {
 		return deletedTasks;
 	}
 	
+	public ArrayList<Task> set(Task newTask) {
+		String taskName = newTask.getDescription().toLowerCase();
+		String taskLocation = newTask.getLocation();
+		ArrayList<Task> changedTasks = new ArrayList<Task>();
+		ArrayList<Task> newList = new ArrayList<Task>();
+		
+		for (Task item : listOfTasks) {
+			if (!item.getDescription().toLowerCase().contains(taskName)) {
+				newList.add(item);
+			} else if (taskLocation != null && item.getLocation() == null) {
+				newList.add(item);
+			} else if (taskLocation != null && item.getLocation() != null) {
+				if (!item.getLocation().toLowerCase().contains(taskLocation.toLowerCase())) {
+					newList.add(item);
+				} else {
+					if (newTask.getPriorityLevel() != null) {
+						item.setPriority(newTask.getPriorityLevel());
+					}
+					if (newTask.getState() != null) {
+						item.setState(newTask.getState());
+					}
+					changedTasks.add(item);
+					newList.add(item);
+				}
+			} else {
+				if (newTask.getPriorityLevel() != null) {
+					item.setPriority(newTask.getPriorityLevel());
+				}
+				if (newTask.getState() != null) {
+					item.setState(newTask.getState());
+				}
+				changedTasks.add(item);
+				newList.add(item);
+			}
+		}
+		
+		deleteFile();
+		oldTasks = new ArrayList<Task> (listOfTasks);
+		listOfTasks.clear();
+		store(newList);
+		return changedTasks;
+	}
+	
 	public void clear() {
 		oldTasks = new ArrayList<Task> (listOfTasks);
 		listOfTasks.clear();

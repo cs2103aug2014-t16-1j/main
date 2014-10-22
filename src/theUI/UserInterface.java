@@ -80,6 +80,8 @@ public class UserInterface {
             list(task);
         } else if (command == CommandType.SEARCH) {
             search(task);
+        } else if (command == CommandType.SET){
+        	set(task);
         } else {
             gui.displayWarning("Informat command", false);
         }
@@ -224,6 +226,20 @@ public class UserInterface {
         } catch (Exception e) {
             System.out.println(e);
         }
+    }
+    
+    private void set(Task task) {
+    	try {
+    		ArrayList<Task> result = logic.set(task);
+            if (result.size() == 0) {
+                gui.displayDone(MESSAGE_NO_RESULT, false);
+            } else {
+            	gui.displayDone("Command was implemented.", false);
+                gui.display(result, true);
+            }
+    	} catch (Exception e) {
+    		System.out.println(e);
+    	}
     }
     
     private String getFirstInt(String s) {
