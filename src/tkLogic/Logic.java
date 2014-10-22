@@ -26,25 +26,19 @@ public class Logic {
 	
 	public Logic(String fileName) {
 		storage = new Storage(fileName);
-		logger = Logger.getLogger("log" + fileName);
 		try {  
 
 	        // This block configure the logger with handler and formatter  
-	        FileHandler fh = new FileHandler("C:/temp/test/MyLogFile.log");  
+	        FileHandler fh = new FileHandler("C:/Users/Leslie/Documents/GitHub/main/LogicLogFile.log");  
 	        logger.addHandler(fh);
 	        SimpleFormatter formatter = new SimpleFormatter();  
-	        fh.setFormatter(formatter);
-
-	        // the following statement is used to log any messages  
-	        logger.info("My first log");  
+	        fh.setFormatter(formatter);  
 
 	    } catch (SecurityException e) {  
 	        e.printStackTrace();  
 	    } catch (IOException e) {  
 	        e.printStackTrace();  
 	    }  
-	    logger.info("Hi How r u?");  
-
 	}
 	
 	public String add(Task task) {
@@ -53,11 +47,11 @@ public class Logic {
 		}
 		if (isFreeTimeslots(task)) {
 			storage.add(task);
-			logger.log(Level.INFO, "Task added.");
+			logger.info("Task added.");
 			return Constants.MESSAGE_TASK_ADDED;
 		} else {
 			storage.add(task);
-			logger.log(Level.INFO, "Task added.");
+			logger.info("Task added.");
 			return Constants.MESSAGE_CLASHING_TIMESLOTS;
 		}
 	}
@@ -65,17 +59,20 @@ public class Logic {
 	// for delete, need the accuracy of the name and the location. Storage does the searching.
 	public ArrayList<Task> delete(Task task) {
 		ArrayList<Task> deletedTasks = storage.delete(task);
+		logger.info("Task deleted.");
 		return sort(deletedTasks);
 	}
 
 	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
 		if (delete(taskToBeEdited).equals(Constants.MESSAGE_TASK_DOES_NOT_EXIST)) {
+			logger.info("Task does not exist.");
 			return Constants.MESSAGE_EDIT_TASK_DOES_NOT_EXIST;
 		}
 		if (add(editedTask).equals(Constants.MESSAGE_CLASHING_TIMESLOTS)) {
+			logger.info("Task cannot be edited because new task clashes.");
 			return Constants.MESSAGE_EDIT_TASK_CLASHES;
 		}
-		logger.log(Level.INFO, "Task edited.");
+		logger.info("Task edited.");
 		return Constants.MESSAGE_TASK_EDITED;
 	}
 	
@@ -87,7 +84,7 @@ public class Logic {
 		ArrayList<Task> list = storage.load();
 		
 		boolean isDeadline = false, isEvent = false, isFloating = false;
-		if (task.getDescription()!=null) {
+		if (task.getDescription() != null) {
 			isDeadline = task.getDescription().toLowerCase().contains("deadline");
 			isEvent = task.getDescription().toLowerCase().contains("event");
 			isFloating = task.getDescription().toLowerCase().contains("floating");
@@ -108,19 +105,19 @@ public class Logic {
 			}
 		}
 		res = sort(res);
-		logger.log(Level.INFO, "Tasks acquired to be displayed.");
+		logger.info("Tasks acquired to be displayed.");
 		return res;
 	}
 
 	public String undo() {
 		storage.undo();
-		logger.log(Level.INFO, "Last command undone.");
+		logger.info("Last command undone.");
 		return Constants.MESSAGE_UNDO_DONE;
 	}
 	
 	public String clear() {
 		storage.clear();
-		logger.log(Level.INFO, "Tasks cleared from TasKoord.");
+		logger.info("Tasks cleared from TasKoord.");
 		return Constants.MESSAGE_TASK_CLEARED;
 	}
 
@@ -139,7 +136,7 @@ public class Logic {
 			}
 		}
 		searchResults = sort(searchResults);
-		logger.log(Level.INFO, "Tasks with keyword found.");
+		logger.info("Tasks with keyword found.");
 		return searchResults;
 	}
 
@@ -160,7 +157,7 @@ public class Logic {
 	            return t1.compareTo(t2);
 	        }
 	    });
-		logger.log(Level.INFO, "Tasks sorted.");
+		logger.info("Tasks sorted.");
 		return list;
 	}
 	
@@ -172,8 +169,10 @@ public class Logic {
 	public String setPriorityLevel(Task task){
 		if(isExistingTask(task)){
 			task.setPriority(task.getPriorityLevel());
+			logger.info("Task priority added.");
 			return Constants.MESSAGE_PRIORITY_SET;
 		}
+		logger.info("Task does not exist.");
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
 	}
 	
@@ -276,7 +275,7 @@ public class Logic {
 	}
 	
 	private boolean isFloatingTask(Task task){
-		return (task.getEndTime() == null || task.getStartTime() == null);
+		return (task.getEndTime() == null && task.getStartTime() == null);
 	}
 	
 	private boolean isTimedTask(Task task){
@@ -294,4 +293,24 @@ public class Logic {
 	private boolean isBetweenStartAndEndTimeForTaskStartTime(Task task, Task queriedTask){
 		return (queriedTask.getStartTime().compareTo(task.getStartTime()) > 0) && (queriedTask.getStartTime().compareTo(task.getEndTime()) < 0);
 	}
+	
+	public String setState(Task task){
+		if(isExistingTask(task)){
+			task.setState(task.getState());
+			logger.info("Task state changed.");
+			switch (task.getState()){
+				case COMPLETED:
+					logger.info("State changed to completed");
+					return Constants.MESSAGE_STATE_COMPLETED;	
+				case DISCARDED:
+					logger.info("State changed to discarded");
+					return Constants.MESSAGE_STATE_DISCARDED;
+				case PENDING:
+					logger.info("State changed to pending");
+					return Constants.MESSAGE_STATE_PENDING;
+			}
+		}
+		logger.info("Task does not exist.");
+		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
+	} 
 }

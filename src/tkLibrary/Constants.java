@@ -24,6 +24,9 @@ public final class Constants {
 	public static final String MESSAGE_UNDO_DONE = "The command was undone.";
 	public static final String MESSAGE_PRIORITY_SET = "Priority level set for task.";
 	public static final String MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST = "Cannot set priority because task does not exist";
+	public static final String MESSAGE_STATE_COMPLETED = "State changed to 'completed'.";
+	public static final String MESSAGE_STATE_DISCARDED = "State changed to 'discarded'.";
+	public static final String MESSAGE_STATE_PENDING = "State changed to 'pending'.";
 	
 	// logic exceptions constants
 	public static final String EXCEPTIONS_ADD_FAIL = "Unable to add to TasKoord.";
