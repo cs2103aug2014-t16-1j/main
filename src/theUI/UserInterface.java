@@ -182,7 +182,6 @@ public class UserInterface {
             } else {
                 gui.displayWarning(feedback, false);
             }
-            //gui.display(logic.search(newTask), false);
         } catch (Exception e) {
             System.out.println(e);
         }
