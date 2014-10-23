@@ -302,7 +302,11 @@ public class UserInterface {
     
     private void addToStackForUndo(Task task, String message) {
     	statusForUndo.push(message);
-    	tasksForUndo.push(new Task(task));
+    	if (task == null) {
+    		tasksForUndo.push(null);
+    	} else {
+    			tasksForUndo.push(new Task(task));
+    	}
     }
     
     private void search(Task task) {
