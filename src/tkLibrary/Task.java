@@ -41,6 +41,27 @@ public class Task {
         this.priorityLevel = task.getPriorityLevel();
         this.state = task.getState();
     }
+    
+    public void update(Task task) {
+    	if (task.getStartTime() != null) {
+    		this.startTime = (Calendar) task.getStartTime().clone();
+    	}
+    	if (task.getEndTime() != null) {
+    		this.endTime = (Calendar) task.getEndTime().clone();
+    	}
+        if (task.getLocation() != null && task.getLocation() != "") {
+        	this.location = task.getLocation();
+        }
+        if (task.getDescription() != null && task.getDescription() != "") {
+        	this.description = task.getDescription();
+        }
+        if (task.getPriorityLevel() != null) {
+        	this.priorityLevel = task.getPriorityLevel();
+        }
+        if (task.getState() != null) {
+        	this.state = task.getState();
+        }
+    }
 
     public void setStartTime(Calendar time) {
         this.startTime = time;

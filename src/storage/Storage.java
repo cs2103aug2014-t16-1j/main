@@ -203,6 +203,24 @@ public class Storage {
 		listOfTasks.clear();
 		store(newList);
 	}
+	
+	public void edit(Task oldTask, Task newTask) {
+		ArrayList<Task> newList = new ArrayList<Task>();
+		oldTasks = copyList(listOfTasks);
+		stackForUndo.push(oldTasks);
+		
+		for (Task item : listOfTasks) {
+			if (item.equals(oldTask)) {
+				item.update(newTask);
+			}
+			newList.add(item);
+		}
+		
+		deleteFile();
+		listOfTasks.clear();
+		store(newList);
+	}
+	
 
 	public void clear() {
 		oldTasks = new ArrayList<Task> (listOfTasks);

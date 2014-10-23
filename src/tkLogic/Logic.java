@@ -68,16 +68,17 @@ public class Logic {
 	}
 
 	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
-		if (delete(taskToBeEdited).equals(Constants.MESSAGE_TASK_DOES_NOT_EXIST)) {
-			logger.info("Task does not exist.");
-			return Constants.MESSAGE_EDIT_TASK_DOES_NOT_EXIST;
+		if (isExistingTask(taskToBeEdited)) {
+			if (isFreeTimeslots(editedTask)) {
+				storage.edit(taskToBeEdited, editedTask);
+				return Constants.MESSAGE_TASK_EDITED;
+			} else {
+				storage.edit(taskToBeEdited, editedTask);
+				return Constants.MESSAGE_CLASHING_TIMESLOTS;
+			}
+		} else {
+			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
 		}
-		if (add(editedTask).equals(Constants.MESSAGE_CLASHING_TIMESLOTS)) {
-			logger.info("Task cannot be edited because new task clashes.");
-			return Constants.MESSAGE_EDIT_TASK_CLASHES;
-		}
-		logger.info("Task edited.");
-		return Constants.MESSAGE_TASK_EDITED;
 	}
 	
 	/*

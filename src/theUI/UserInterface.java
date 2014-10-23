@@ -206,20 +206,58 @@ public class UserInterface {
         }
     }
     
-    private void edit(Task taskToBeEdited, Task newTask) {
+    private void edit(Task task, Task updatedTask) {
         try {
-            String feedback = logic.edit(taskToBeEdited, newTask);
-            if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
-            	ArrayList<Task> list = new ArrayList<Task> ();
-            	list.add(newTask);
-                gui.displayDone(feedback, false);
-                showToUser(list, true);
+    		ArrayList<Task> list = new ArrayList<Task> ();
+        
+	        if (isInteger(task.getDescription())) {
+	        	int noOfTask = toInteger(task.getDescription());
+	        	if (noOfTask <= tasksOnScreen.size()) {
+	        		String feedback = logic.edit(tasksOnScreen.get(noOfTask - 1), updatedTask);
+	        		
+	        		Task newTask = new Task(tasksOnScreen.get(noOfTask - 1));
+	        		newTask.update(updatedTask);
+	        		
+	        		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
+	        			list.add(newTask);
+	        			gui.displayDone(feedback, false);
+	        			showToUser(list, true);
+	        		} else {
+	        			gui.displayWarning(feedback, false);
+	        			list.add(newTask);
+	        			gui.displayDone(feedback, false);
+	        			showToUser(list, true);
+	        		}
+	        		return;
+	        	}
+	        }
+    		
+    		list = logic.search(task.getDescription());
+            if (list.size() == 0) {
+                gui.displayDone(Constants.MESSAGE_TASK_DOES_NOT_EXIST, false);
+            } else if (list.size() == 1) {
+            	Task newTask = new Task(list.get(0));
+            	String feedback = logic.edit(newTask, updatedTask);
+        		newTask.update(updatedTask);
+        		
+        		list.clear();
+        		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
+        			list.add(newTask);
+        			gui.displayDone(feedback, false);
+        			showToUser(list, true);
+        		} else {
+        			gui.displayWarning(feedback, false);
+        			list.add(newTask);
+        			gui.displayDone(feedback, false);
+        			showToUser(list, true);
+        		}
             } else {
-                gui.displayWarning(feedback, false);
+            	gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND, false);
+            	showToUser(list, true);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+    	} catch (Exception e) {
+    		e.printStackTrace();
+    	}
     }
 
     private void clear() { 
