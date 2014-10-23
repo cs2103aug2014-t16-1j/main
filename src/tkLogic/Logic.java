@@ -246,7 +246,7 @@ public class Logic {
 		ArrayList<Task> allTasks = storage.load();
 		ArrayList<Task> queryList = new ArrayList<Task>();
 		
-		if(isFloatingTask(task)){
+		if(isFloatingOrDeadlineTask(task)){
 			return true;
 		}
 		
@@ -273,8 +273,8 @@ public class Logic {
 		return true;
 	}
 	
-	private boolean isFloatingTask(Task task){
-		return (task.getEndTime() == null && task.getStartTime() == null);
+	private boolean isFloatingOrDeadlineTask(Task task){
+		return (task.getEndTime() == null || task.getStartTime() == null);
 	}
 	
 	private boolean isTimedTask(Task task){
