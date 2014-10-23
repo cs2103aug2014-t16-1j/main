@@ -41,7 +41,7 @@ public class Gui {
     private JTextField commandBox = new JTextField();
     private JTextArea historyBox = new JTextArea();
     private JTextPane displayBox = new JTextPane();
-    private String displayText = "";
+    public String displayText = "";
     private String userCommand = NO_COMMAND; 
     
     public Gui() {
