@@ -9,6 +9,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -22,6 +23,7 @@ public class Storage {
 	
 	private ArrayList<Task> oldTasks;
 	private ArrayList<Task> listOfTasks;
+	private Stack<ArrayList<Task>> stackForUndo;
 	
 	private Logger logger;
 	
@@ -32,6 +34,7 @@ public class Storage {
 		closeFileToWrite();
 		this.listOfTasks = loadFromFile();
 		this.oldTasks = copyList(this.listOfTasks);
+		this.stackForUndo = new Stack<ArrayList<Task>> ();
 	}
 	
 	public ArrayList<Task> load() {
@@ -74,6 +77,7 @@ public class Storage {
 	
 	public void add(Task task) {
 		oldTasks = copyList(listOfTasks);
+		stackForUndo.push(oldTasks);
 		store(task);
 	}
 	
@@ -176,6 +180,7 @@ public class Storage {
 		} 
 		
 		oldTasks = copyList(listOfTasks);
+		stackForUndo.push(oldTasks);
 		deleteFile();
 		listOfTasks.clear();
 		store(newList);
@@ -184,6 +189,7 @@ public class Storage {
 	public void set(Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
 		oldTasks = copyList(listOfTasks);
+		stackForUndo.push(oldTasks);
 		
 		for (Task item : listOfTasks) {
 			if (item.equals(newTask)) {
@@ -207,9 +213,11 @@ public class Storage {
 	}
 	
 	public void undo() {
-		deleteFile();
-		listOfTasks.clear();
-		store(oldTasks);
+		if (!stackForUndo.empty()) {
+			deleteFile();
+			listOfTasks.clear();
+			store(stackForUndo.pop());
+		}
 	}
 	
 	private ArrayList<Task> copyList(ArrayList<Task> list) {
@@ -227,7 +235,7 @@ public class Storage {
 		SimpleDateFormat formatter = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);     
 		return formatter.format(time.getTime());
 	}
-	
+
 	private void openFileToWrite() {
 		try {
 			out = new PrintWriter(new FileWriter(fileName, true));
@@ -236,11 +244,11 @@ public class Storage {
 			logger.log(Level.WARNING, "File Not Found", e);
 		}
 	}
-	
+
 	private void closeFileToWrite() {
 		out.close();
 	}
-	
+
 	private void openFileToRead() {
 		try {
 			in = new Scanner(new File(fileName));
@@ -249,7 +257,7 @@ public class Storage {
 			logger.log(Level.WARNING, "File Not Found", e);
 		}
 	}
-	
+
 	private void closeFileToRead() {
 		in.close();
 	}
