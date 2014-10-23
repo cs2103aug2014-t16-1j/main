@@ -11,6 +11,7 @@ import tkLibrary.Task;
 import tkLibrary.UserInput;
 
 public class ParserTest {
+    /* This is a boundary case for the optimal partition */
     @Test
     public void testParserAdd() {
         Parser parser = Parser.getInstance();
@@ -45,6 +46,7 @@ public class ParserTest {
         }
     }
 
+    /* This is a boundary case for the partition with additional date */
     @Test
     public void testParserAddTwoDates() {
         Parser parser = Parser.getInstance();
@@ -70,6 +72,7 @@ public class ParserTest {
         }
     }
 
+    /* This is a boundary case for the partition with only one date and time */
     @Test
     public void testParserAddDeadline() {
         Parser parser = Parser.getInstance();
@@ -101,7 +104,8 @@ public class ParserTest {
             assert (false);
         }
     }
-
+    
+    /* This is a boundary case for the partition with no date and time */
     @Test
     public void testParserAddGoodToDo() {
         Parser parser = Parser.getInstance();
@@ -299,8 +303,8 @@ public class ParserTest {
                     task.getEndTime());
             assertEquals("Test that the Location is correctly recorded", null,
                     task.getLocation());
-            assertEquals("Test that the State is correctly set", StateType.COMPLETED,
-                    task.getState());
+            assertEquals("Test that the State is correctly set",
+                    StateType.COMPLETED, task.getState());
             assertEquals("Test that the frequency is as default", 0,
                     task.getFrequency());
             assertEquals("Test that the frequency is as default", null,
