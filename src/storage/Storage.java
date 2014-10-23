@@ -65,7 +65,7 @@ public class Storage {
 				task.setState(in.nextLine());
 			} else if (s.equals(Constants.PRIORITY_TYPE)) {
 				task.setPriority(in.nextLine());
-			} 
+			}
 		}
 		
 		closeFileToRead();
@@ -188,7 +188,7 @@ public class Storage {
 			} else {
 				deletedTasks.add(item);
 			}
-		}
+		} 
 		
 		deleteFile();
 		oldTasks = new ArrayList<Task> (listOfTasks);
@@ -280,7 +280,7 @@ public class Storage {
 			in = new Scanner(new File(fileName));
 		} catch (FileNotFoundException e) {
 			System.out.println(e.getMessage());
-			
+			logger.log(Level.WARNING, "File Not Found", e);
 		}
 	}
 	
