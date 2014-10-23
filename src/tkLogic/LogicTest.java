@@ -14,7 +14,7 @@ public class LogicTest {
 
 	@Test
 	public void test() {
-		Logic testLogic = new Logic("logicTest");
+		Logic testLogic = new Logic("logicTest.txt");
 		testLogic.clear();
 
 		Parser parser = Parser.getInstance();
