@@ -115,9 +115,8 @@ public class Logic {
 	}
 
 	public String undo() {
-		storage.undo();
 		logger.info("Last command undone.");
-		return Constants.MESSAGE_UNDO_DONE;
+		return storage.undo();
 	}
 	
 	public String clear() {

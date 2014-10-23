@@ -221,7 +221,6 @@ public class Storage {
 		store(newList);
 	}
 	
-
 	public void clear() {
 		oldTasks = new ArrayList<Task> (listOfTasks);
 		listOfTasks.clear();
@@ -230,12 +229,14 @@ public class Storage {
 		closeFileToWrite();
 	}
 	
-	public void undo() {
+	public String undo() {
 		if (!stackForUndo.empty()) {
 			deleteFile();
 			listOfTasks.clear();
 			store(stackForUndo.pop());
+			return Constants.MESSAGE_UNDO_DONE;
 		}
+		return "Stack is empty";
 	}
 	
 	private ArrayList<Task> copyList(ArrayList<Task> list) {

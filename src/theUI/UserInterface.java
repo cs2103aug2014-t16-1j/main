@@ -2,6 +2,8 @@ package theUI;
 
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Stack;
+
 import tkLibrary.CommandType;
 import tkLibrary.Constants;
 import tkLibrary.PriorityType;
@@ -23,12 +25,16 @@ public class UserInterface {
     private Parser parser;
     private Gui gui;
     private ArrayList<Task> tasksOnScreen;
+    private Stack<String> statusForUndo;
+    private Stack<Task> tasksForUndo;
     
     public UserInterface(String fileName) {
     	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
         tasksOnScreen = new ArrayList<Task> ();
+        statusForUndo = new Stack<String> ();
+        tasksForUndo = new Stack<Task> ();
     }
     
     public void run() {
@@ -121,6 +127,7 @@ public class UserInterface {
                 	newTask.setDescription("floating");
                 }
                 showToUser(logic.list(newTask), true);
+                addToStackForUndo(task, "Task was deleted.");
             } else {
                 gui.displayWarning(feedback, false);
             }
@@ -178,6 +185,7 @@ public class UserInterface {
 	        	if (noOfTask <= tasksOnScreen.size()) {
 	        		String feedback = logic.delete(tasksOnScreen.get(noOfTask - 1));
 	        		if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
+	        			addToStackForUndo(tasksOnScreen.get(noOfTask - 1), "Task was restored.");
 	        			list.add(tasksOnScreen.get(noOfTask - 1));
 	        			gui.displayDone(feedback, false);
 	        			showToUser(list, true);
@@ -195,6 +203,7 @@ public class UserInterface {
                 
             } else if (list.size() == 1) {
             	logic.delete(list.get(0));
+            	addToStackForUndo(list.get(0), "Task was restored.");
             	gui.displayDone(Constants.MESSAGE_TASK_DELETED, false);
             	showToUser(list, true);
             } else {
@@ -213,21 +222,12 @@ public class UserInterface {
 	        if (isInteger(task.getDescription())) {
 	        	int noOfTask = toInteger(task.getDescription());
 	        	if (noOfTask <= tasksOnScreen.size()) {
-	        		String feedback = logic.edit(tasksOnScreen.get(noOfTask - 1), updatedTask);
-	        		
 	        		Task newTask = new Task(tasksOnScreen.get(noOfTask - 1));
+	        		String feedback = logic.edit(newTask, updatedTask);
+	        		addToStackForUndo(newTask, "Task was changed.");
 	        		newTask.update(updatedTask);
 	        		
-	        		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
-	        			list.add(newTask);
-	        			gui.displayDone(feedback, false);
-	        			showToUser(list, true);
-	        		} else {
-	        			gui.displayWarning(feedback, false);
-	        			list.add(newTask);
-	        			gui.displayDone(feedback, false);
-	        			showToUser(list, true);
-	        		}
+	        		displayFeedbackForEditing(list, newTask, feedback);
 	        		return;
 	        	}
 	        }
@@ -238,19 +238,11 @@ public class UserInterface {
             } else if (list.size() == 1) {
             	Task newTask = new Task(list.get(0));
             	String feedback = logic.edit(newTask, updatedTask);
+            	addToStackForUndo(newTask, "Task was changed.");
         		newTask.update(updatedTask);
         		
         		list.clear();
-        		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
-        			list.add(newTask);
-        			gui.displayDone(feedback, false);
-        			showToUser(list, true);
-        		} else {
-        			gui.displayWarning(feedback, false);
-        			list.add(newTask);
-        			gui.displayDone(feedback, false);
-        			showToUser(list, true);
-        		}
+        		displayFeedbackForEditing(list, newTask, feedback);
             } else {
             	gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND, false);
             	showToUser(list, true);
@@ -260,11 +252,26 @@ public class UserInterface {
     	}
     }
 
+	private void displayFeedbackForEditing(ArrayList<Task> list, Task newTask,
+			String feedback) {
+		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
+			list.add(newTask);
+			gui.displayDone(feedback, false);
+			showToUser(list, true);
+		} else {
+			gui.displayWarning(feedback, false);
+			list.add(newTask);
+			gui.displayDone(feedback, false);
+			showToUser(list, true);
+		}
+	}
+
     private void clear() { 
         try {
             String feedback = logic.clear();
             if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
                 gui.displayDone(feedback, false);
+                addToStackForUndo(null, "All task was restored.");
             } else {
                 gui.displayWarning(feedback, false);
             }
@@ -276,10 +283,26 @@ public class UserInterface {
     private void undo() {
         try {
             String feedback = logic.undo();
-            gui.displayDone(feedback, false);
+            if (feedback.equals(Constants.MESSAGE_UNDO_DONE)) {
+            	gui.displayDone(statusForUndo.pop(), false);
+            	Task task = tasksForUndo.pop();
+            	if (task != null) {
+            		ArrayList<Task> list = new ArrayList<Task> ();
+            		list.add(task);
+            		gui.display(list, true);
+            	}
+            	
+            } else {
+            	gui.displayWarning(feedback, false);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
+    }
+    
+    private void addToStackForUndo(Task task, String message) {
+    	statusForUndo.push(message);
+    	tasksForUndo.push(new Task(task));
     }
     
     private void search(Task task) {
@@ -307,18 +330,13 @@ public class UserInterface {
 	        	int noOfTask = toInteger(task.getDescription());
 	        	if (noOfTask <= tasksOnScreen.size()) {
         			Task newTask = tasksOnScreen.get(noOfTask - 1);
-        			if (task.getPriorityLevel() != null) {
-        				newTask.setPriority(task.getPriorityLevel());
-        			}
-        			if (task.getState() != null) {
-        				newTask.setState(task.getState());
-        			}
-	        		String feedback = logic.set(tasksOnScreen.get(noOfTask - 1));
-	        		
+        			updateNewPriorityAndState(task, newTask);
+        			String feedback = logic.set(tasksOnScreen.get(noOfTask - 1));
 	        		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
 	        			list.add(newTask);
 	        			gui.displayDone(feedback, false);
 	        			showToUser(list, true);
+	        			addToStackForUndo(null, "Task was changed.");
 	        		} else {
 	        			gui.displayWarning(feedback, false);
 	        		}
@@ -331,16 +349,12 @@ public class UserInterface {
                 gui.displayDone(MESSAGE_NO_RESULT, false);
             } else if (list.size() == 1) {
             	Task newTask = list.get(0);
-    			if (task.getPriorityLevel() != null) {
-    				newTask.setPriority(task.getPriorityLevel());
-    			}
-    			if (task.getState() != null) {
-    				newTask.setState(task.getState());
-    			}
+    			updateNewPriorityAndState(task, newTask);
     			
             	logic.set(newTask);
             	gui.displayDone("Task was set:", false);
                 showToUser(list, true);
+                addToStackForUndo(null, "Task was changed.");
             } else {
             	gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND, false);
             	showToUser(list, true);
@@ -349,6 +363,15 @@ public class UserInterface {
     		e.printStackTrace();
     	}
     }
+
+	private void updateNewPriorityAndState(Task task, Task newTask) {
+		if (task.getPriorityLevel() != null) {
+			newTask.setPriority(task.getPriorityLevel());
+		}
+		if (task.getState() != null) {
+			newTask.setState(task.getState());
+		}
+	}
     
     private void showToUser(ArrayList<Task> list, boolean isAppended) {
 		tasksOnScreen = new ArrayList<Task> (list);
