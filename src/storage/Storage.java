@@ -31,11 +31,11 @@ public class Storage {
 		openFileToWrite();
 		closeFileToWrite();
 		this.listOfTasks = loadFromFile();
-		this.oldTasks = new ArrayList<Task> (this.listOfTasks);
+		this.oldTasks = copyList(this.listOfTasks);
 	}
 	
 	public ArrayList<Task> load() {
-		return new ArrayList<Task> (listOfTasks);
+		return copyList(listOfTasks);
 	}
 	
 	public ArrayList<Task> loadFromFile() {
@@ -73,7 +73,7 @@ public class Storage {
 	}
 	
 	public void add(Task task) {
-		oldTasks = new ArrayList<Task> (listOfTasks);
+		oldTasks = copyList(listOfTasks);
 		store(task);
 	}
 	
@@ -155,8 +155,6 @@ public class Storage {
 			}
 		}
 		
-		
-		
 		out.println(Constants.END_OBJECT_SIGNAL);
 		closeFileToWrite();
 	}
@@ -168,78 +166,38 @@ public class Storage {
 	}
 	
 	// delete only 1 task with its name and its location(description).
-	public ArrayList<Task> delete(Task taskToBeDeleted) {
-		String taskName = taskToBeDeleted.getDescription().toLowerCase();
-		String taskLocation = taskToBeDeleted.getLocation();
-		ArrayList<Task> deletedTasks = new ArrayList<Task>();
+	public void delete(Task taskToBeDeleted) {
 		ArrayList<Task> newList = new ArrayList<Task>();
 		
 		for (Task item : listOfTasks) {
-			if (!item.getDescription().toLowerCase().contains(taskName)) {
+			if (!item.equals(taskToBeDeleted)) {
 				newList.add(item);
-			} else if (taskLocation != null && item.getLocation() == null) {
-				newList.add(item);
-			} else if (taskLocation != null && item.getLocation() != null) {
-				if (!item.getLocation().toLowerCase().contains(taskLocation.toLowerCase())) {
-					newList.add(item);
-				} else {
-					deletedTasks.add(item);
-				}
-			} else {
-				deletedTasks.add(item);
 			}
 		} 
 		
+		oldTasks = copyList(listOfTasks);
 		deleteFile();
-		oldTasks = new ArrayList<Task> (listOfTasks);
 		listOfTasks.clear();
 		store(newList);
-		return deletedTasks;
 	}
 	
-	public ArrayList<Task> set(Task newTask) {
-		String taskName = newTask.getDescription().toLowerCase();
-		String taskLocation = newTask.getLocation();
-		ArrayList<Task> changedTasks = new ArrayList<Task>();
+	public void set(Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
+		oldTasks = copyList(listOfTasks);
 		
 		for (Task item : listOfTasks) {
-			if (!item.getDescription().toLowerCase().contains(taskName)) {
-				newList.add(item);
-			} else if (taskLocation != null && item.getLocation() == null) {
-				newList.add(item);
-			} else if (taskLocation != null && item.getLocation() != null) {
-				if (!item.getLocation().toLowerCase().contains(taskLocation.toLowerCase())) {
-					newList.add(item);
-				} else {
-					if (newTask.getPriorityLevel() != null) {
-						item.setPriority(newTask.getPriorityLevel());
-					}
-					if (newTask.getState() != null) {
-						item.setState(newTask.getState());
-					}
-					changedTasks.add(item);
-					newList.add(item);
-				}
-			} else {
-				if (newTask.getPriorityLevel() != null) {
-					item.setPriority(newTask.getPriorityLevel());
-				}
-				if (newTask.getState() != null) {
-					item.setState(newTask.getState());
-				}
-				changedTasks.add(item);
-				newList.add(item);
+			if (item.equals(newTask)) {
+				item.setPriority(newTask.getPriorityLevel());
+				item.setState(newTask.getState());
 			}
+			newList.add(item);
 		}
 		
 		deleteFile();
-		oldTasks = new ArrayList<Task> (listOfTasks);
 		listOfTasks.clear();
 		store(newList);
-		return changedTasks;
 	}
-	
+
 	public void clear() {
 		oldTasks = new ArrayList<Task> (listOfTasks);
 		listOfTasks.clear();
@@ -252,6 +210,14 @@ public class Storage {
 		deleteFile();
 		listOfTasks.clear();
 		store(oldTasks);
+	}
+	
+	private ArrayList<Task> copyList(ArrayList<Task> list) {
+		ArrayList<Task> result = new ArrayList<Task> ();
+		for (Task item : list) {
+			result.add(new Task(item));
+		}
+		return result;
 	}
 	
 	private String convertCalendarToString(Calendar time) {
@@ -291,21 +257,5 @@ public class Storage {
 	private void deleteFile() {
 		File f = new File(fileName);
 		f.delete();
-	}
-
-	public boolean queryFreeSlot(Calendar startTime) {
-		// TODO Auto-generated method stub
-		return true;
-	}
-
-	// find out if a task is in the list.
-	public boolean queryTask(Task task) {
-		String taskName = task.getDescription();
-		for (Task item : listOfTasks) {
-			if (taskName.equalsIgnoreCase(item.getDescription())) {
-				return true;
-			}
-		}
-		return false;
 	}
 }

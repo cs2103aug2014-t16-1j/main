@@ -40,7 +40,7 @@ public class Logic {
 	    }  
 	}
 	
-	public String add(Task task) {
+	public String add(Task task) {		
 		if (isExistingTask(task)) {
 			return Constants.MESSAGE_DUPLICATED_TASK;
 		}
@@ -55,11 +55,16 @@ public class Logic {
 		}
 	}
 	
-	// for delete, need the accuracy of the name and the location. Storage does the searching.
-	public ArrayList<Task> delete(Task task) {
-		ArrayList<Task> deletedTasks = storage.delete(task);
-		logger.info("Task deleted.");
-		return sort(deletedTasks);
+	// delete a particular task.
+	public String delete(Task task) {
+		if (isExistingTask(task)) { 
+			storage.delete(task);
+			logger.info("Task deleted.");
+			return Constants.MESSAGE_TASK_DELETED;
+		} else {
+			logger.info("No such task");
+			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
+		}
 	}
 
 	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
@@ -76,7 +81,7 @@ public class Logic {
 	}
 	
 	/*
-	 * for listing, only mention the time, the frequency and the state.
+	 * for listing, only mention the time, the priority and the state.
 	 */
 	public ArrayList<Task> list(Task task) {
 		ArrayList<Task> res = new ArrayList<Task>();
@@ -122,15 +127,14 @@ public class Logic {
 
 	/*
 	 * searching a task by keyword
-	 * only consider the description and the location
+	 * only consider the description
 	 */
 	public ArrayList<Task> search(String keyword) {
 		ArrayList<Task> allTasks = storage.load();
 		ArrayList<Task> searchResults = new ArrayList<Task>();
 		
 		for(Task item : allTasks){
-			if (item.getDescription().toLowerCase().contains(keyword.toLowerCase()) ||
-			   (item.getLocation() != null && item.getLocation().toLowerCase().contains(keyword.toLowerCase()))){
+			if (item.getDescription().toLowerCase().contains(keyword.toLowerCase())){
 				searchResults.add(item);
 			}
 		}
@@ -160,19 +164,13 @@ public class Logic {
 		return list;
 	}
 	
-	public ArrayList<Task> set(Task newTask) {
-		ArrayList<Task> changedTasks = storage.set(newTask);
-		return sort(changedTasks);
-	}
-	
-	public String setPriorityLevel(Task task){
-		if(isExistingTask(task)){
-			task.setPriority(task.getPriorityLevel());
-			logger.info("Task priority added.");
-			return Constants.MESSAGE_PRIORITY_SET;
+	public String set(Task newTask) {
+		if (isExistingTask(newTask)) {
+			storage.set(newTask);
+			return Constants.MESSAGE_TASK_EDITED;
+		} else {
+			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
 		}
-		logger.info("Task does not exist.");
-		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
 	}
 	
 	private boolean isIncluded(Task feature, Task task) {
@@ -227,16 +225,11 @@ public class Logic {
 	}
 	
 	// this is to check if a task already existing. using description and location to check.
-	private boolean isExistingTask(Task task){
-		ArrayList<Task> queryList = search(task.getDescription());
+	private boolean isExistingTask(Task task) {
+		ArrayList<Task> queryList = storage.load();
 		for (Task item : queryList) {
-			if (item.getDescription().equalsIgnoreCase(task.getDescription())) {
-				if (item.getLocation() == null && task.getLocation() == null) {
-					return true;
-				}
-				if (item.getLocation() != null && item.getLocation().equalsIgnoreCase(task.getLocation())) {
-					return true;
-				}	
+			if (item.equals(task)) {
+				return true;
 			}
 		}
 		return false;
@@ -292,9 +285,19 @@ public class Logic {
 	private boolean isBetweenStartAndEndTimeForTaskStartTime(Task task, Task queriedTask){
 		return (queriedTask.getStartTime().compareTo(task.getStartTime()) > 0) && (queriedTask.getStartTime().compareTo(task.getEndTime()) < 0);
 	}
+
+	public String setPriorityLevel(Task task){
+		if(isExistingTask(task)){
+			task.setPriority(task.getPriorityLevel());
+			logger.info("Task priority added.");
+			return Constants.MESSAGE_PRIORITY_SET;
+		}
+		logger.info("Task does not exist.");
+		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
+	}
 	
 	public String setState(Task task){
-		if(isExistingTask(task)){
+		if(isExistingTask(task)) {
 			task.setState(task.getState());
 			logger.info("Task state changed.");
 			switch (task.getState()){
@@ -311,5 +314,5 @@ public class Logic {
 		}
 		logger.info("Task does not exist.");
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
-	} 
+	}
 }

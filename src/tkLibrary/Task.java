@@ -19,12 +19,61 @@ public class Task {
         this.endTime = null;
         this.location = null;
         this.description = null;
-        this.frequencyType = null;
         this.state = null;
+        this.priorityLevel = null;
+    }
+    
+    public Task(Task task) {
+    	if (task.getStartTime() == null) {
+    		this.startTime = null;
+    	} else {
+    		this.startTime = (Calendar) task.getStartTime().clone();
+    	}
+    	
+    	if (task.getEndTime() == null) {
+    		this.endTime = null;
+    	} else {
+    		this.endTime = (Calendar) task.getEndTime().clone();
+    	}
+    	
+        this.location = task.getLocation();
+        this.description = task.getDescription();
+        this.priorityLevel = task.getPriorityLevel();
+        this.state = task.getState();
     }
 
     public void setStartTime(Calendar time) {
         this.startTime = time;
+    }
+    
+    public boolean equals(Task task) {
+    	if (!convertCalendarToString(this.startTime, Constants.FORMAT_DATE_CMP).equals( 
+    			 convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE_CMP))) {
+    		return false;
+    	}
+    	
+    	if (!convertCalendarToString(this.endTime, Constants.FORMAT_DATE_CMP).equals( 
+   			 convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE_CMP))) {
+    		return false;
+    	}
+    	
+    	if (this.description == null) {
+    		if (task.getDescription() != null) {
+    			return false;
+    		}
+    	} else if (!this.description.equalsIgnoreCase(task.getDescription())) {
+    		return false;
+    	}
+    	
+    	if (this.location == null) {
+    		if (task.getLocation() != null) {
+    			return false;
+    		}
+    	} else if (!this.location.equalsIgnoreCase(task.getLocation())) {
+    		return false;
+    	}
+    	
+    	return true;
     }
 
     public void setStartTime(String time) {
@@ -143,4 +192,12 @@ public class Task {
     public PriorityType getPriorityLevel() {
         return this.priorityLevel;
     }
+    
+	private String convertCalendarToString(Calendar time, String FORMAT) {
+		if (time == null) {
+			return "null";
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);     
+		return formatter.format(time.getTime());
+	}
 }

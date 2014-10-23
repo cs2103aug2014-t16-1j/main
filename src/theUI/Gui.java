@@ -112,15 +112,15 @@ public class Gui {
     	setDisplayBox();
     }
     
-    private void display(Task task) {
-    	String res = "";
+    private void display(int no, Task task) {
+    	String res = format(intToString(no), "3", COLOR_DONE);
     	
     	if (task.getStartTime() != null) {
     		if (task.getEndTime() == null) {
     			res += format("[", SIZE_NORMAL, COLOR_HOUR);
-    			for(int i = 1; i <= 19; i ++) {
+    			/*for(int i = 1; i <= 19; i ++) {
         			res += format("&nbsp", SIZE_NORMAL, COLOR_HOUR);
-        		}
+        		}*/
         		res += 	format(convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR);
     		} else {
     			res += 	format("[" + convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR), SIZE_NORMAL, COLOR_HOUR);
@@ -150,8 +150,8 @@ public class Gui {
     	
     	displayText += res;
     }
-    
-    public void display(ArrayList<Task> lists, boolean isAppended) {
+
+	public void display(ArrayList<Task> lists, boolean isAppended) {
     	if (!isAppended) {
     		displayText = "";
     	}
@@ -168,7 +168,7 @@ public class Gui {
     					+ format("======", SIZE_NORMAL, COLOR_DATE)
     					+ "<br><br>";
     			}
-    			display(curTask);
+    			display(i + 1, curTask);
     			preTask = curTask;
     		}
     	}
@@ -187,7 +187,8 @@ public class Gui {
     			} else if (lists.get(i).getPriorityLevel() == PriorityType.LOW) {
     				color = COLOR_DESCRIPTION_LOW;
     			}   
-    			displayText += format(lists.get(i).getDescription(), SIZE_NORMAL, color);
+    			displayText += format(intToString(i + 1), "3", COLOR_DONE) 
+    					     + format(lists.get(i).getDescription(), SIZE_NORMAL, color);
     			
     			if (lists.get(i).getLocation() != null) 
     				displayText += format(" @ " + lists.get(i).getLocation(), SIZE_NORMAL, COLOR_LOCATION);
@@ -197,6 +198,14 @@ public class Gui {
    
     	setDisplayBox();
     }
+	
+    private String intToString(int no) {
+		if (no < 10) {
+			return "0" + no + ". ";
+		} else {
+			return Integer.toString(no) + ". ";
+		}
+	}
 
     private boolean checkFloatingTask(Task task) {
     	return (task.getStartTime() == null);

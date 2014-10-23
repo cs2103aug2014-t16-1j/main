@@ -43,7 +43,7 @@ public class UITest {
 				"<font size = 4 color = #A6E22E>Task added to TasKoord!</font><br><br><font size = 4 color = #FD971F>===GOOD-TO-DO TASKS===</font><br><br><font size = 4 color = #66D9EF>read Harry Potter</font><br>");
 
 		// add a deadline
-		ui.executeCommands("add submit report by 10am on 26 Oct 2014 at school");
+		ui.executeCommands("	");
 		assertEquals(
 				ui.getDisplayedMessage(),
 				"<font size = 4 color = #A6E22E>Task added to TasKoord!</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sun, 26 Oct 2014]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 4 color = #E6DB74>[</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>&nbsp</font><font size = 4 color = #E6DB74>10:00:00] </font><font size = 4 color = #66D9EF>submit report</font><br><font size = 4 color = #CECEF6>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp@ school</font><br>");
