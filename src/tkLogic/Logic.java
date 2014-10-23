@@ -26,9 +26,9 @@ public class Logic {
 	public Logic(String fileName) {
 		storage = new Storage(fileName);
 		try {  
-
+		    logger = Logger.getLogger("LogicLogFile.log");
 	        // This block configure the logger with handler and formatter  
-	        FileHandler fh = new FileHandler("C:/Users/Leslie/Documents/GitHub/main/LogicLogFile.log");  
+	        FileHandler fh = new FileHandler("LogicLogFile.log");  
 	        logger.addHandler(fh);
 	        SimpleFormatter formatter = new SimpleFormatter();  
 	        fh.setFormatter(formatter);  
