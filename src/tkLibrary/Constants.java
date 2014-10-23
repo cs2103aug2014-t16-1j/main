@@ -43,8 +43,9 @@ public final class Constants {
 	public static final String FREQUENCY = "FREQUENCY";
 	public static final String FREQUENCY_TYPE = "FREQUENCY_TYPE";
 	public static final String STATE_TYPE = "STATE_TYPE";
-	public static final String END_OBJECT_SIGNAL = "END";
 	public static final String PRIORITY_TYPE = "PRIORITY";
+	public static final String END_OBJECT_SIGNAL = "END";
+
 	
 	// constants for frequency type
 	public static final String FREQUENCY_DAY = "DAY";
