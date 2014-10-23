@@ -5,7 +5,7 @@ import theUI.UserInterface;
  */
 public class TasKoord {
 	public static void main(String[] args) {
-		UserInterface tk = new UserInterface();
-		tk.run("test.txt");
+		UserInterface tk = new UserInterface("test.txt");
+		tk.run();
 	}
 }
