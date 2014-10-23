@@ -23,11 +23,13 @@ public class UserInterface {
     private Parser parser;
     private Gui gui;
     
-    public void run(String fileName) {
-        parser = Parser.getInstance();
+    public UserInterface(String fileName) {
+    	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
-        
+    }
+    
+    public void run() {
         while (true) {
             try {
                 Thread.sleep(50);
@@ -46,8 +48,12 @@ public class UserInterface {
             }
         }
     }
+    
+    public String getDisplayedMessage() {
+    	return gui.displayText;
+    }
 
-    private void executeCommands(String userCommand) {
+    public void executeCommands(String userCommand) {
         UserInput userInput; 
         CommandType command;
         Task task;
