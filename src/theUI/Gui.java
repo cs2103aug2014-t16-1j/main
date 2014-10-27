@@ -118,16 +118,19 @@ public class Gui {
     	if (task.getStartTime() != null) {
     		if (task.getEndTime() == null) {
     			res += format("[", SIZE_NORMAL, COLOR_HOUR);
-    			/*for(int i = 1; i <= 19; i ++) {
-        			res += format("&nbsp", SIZE_NORMAL, COLOR_HOUR);
-        		}*/
-        		res += 	format(convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR);
+        		res += format(convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR);
     		} else {
     			res += 	format("[" + convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR), SIZE_NORMAL, COLOR_HOUR);
     		}
     	}
     	if (task.getEndTime() != null) {
-    		res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR);
+    		String startTimeString = convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE);
+    		String endTimeString = convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE);
+    		if (startTimeString.equals(endTimeString)) {
+    			res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR);
+    		} else {
+    			res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE_DATE_AND_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR);
+    		}
     	} 
     	
     	if (task.getDescription() != null) {

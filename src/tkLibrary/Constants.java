@@ -6,6 +6,7 @@ public final class Constants {
 	
 	// date format
 	public static final String FORMAT_DATE_HOUR = "MMM dd yyyy HH:mm:ss";
+	public static final String FORMAT_DATE_DATE_AND_HOUR= "dd.MM.yyyy HH:mm:ss";
 	public static final String FORMAT_DATE = "yyyyMMdd";
 	public static final String FORMAT_DATE_CMP = "yyyyMMddHHmmss";
 	public static final String FORMAT_EEE = "EEE, dd MMM yyyy";
