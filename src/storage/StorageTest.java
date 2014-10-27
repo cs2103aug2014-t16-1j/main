@@ -28,6 +28,7 @@ public class StorageTest {
 		ArrayList<Task> list = store.loadFromFile();
 		try{
 			assertEquals("Test if task description was aded successfully", "tutorial" , list.get(0).getDescription());
+			assertEquals("Test if task description was aded successfully", "SOC" , list.get(0).getLocation());
 		}
 		catch(Exception e){
 			System.out.println("testStorageAdd: ");
