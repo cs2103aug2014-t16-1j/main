@@ -74,7 +74,7 @@ public class Logic {
 				return Constants.MESSAGE_TASK_EDITED;
 			} else {
 				storage.edit(taskToBeEdited, editedTask);
-				return Constants.MESSAGE_CLASHING_TIMESLOTS;
+				return Constants.MESSAGE_EDIT_CLASHING_TIMESLOTS;
 			}
 		} else {
 			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;

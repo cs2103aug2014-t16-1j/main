@@ -14,6 +14,7 @@ public final class Constants {
 	
 	// logic constants
 	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, task still added to TasKoord.";
+	public static final String MESSAGE_EDIT_CLASHING_TIMESLOTS = "Warning: timeslot of edited task is taken, task still added to TasKoord.";
 	public static final String MESSAGE_TASK_ADDED = "Task added to TasKoord!";
 	public static final String MESSAGE_TASK_DOES_NOT_EXIST = "Task does not exist!";
 	public static final String MESSAGE_TASK_DELETED = "Tasks were deleted from TasKoord:";

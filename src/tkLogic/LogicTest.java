@@ -43,14 +43,28 @@ public class LogicTest {
 			message = testLogic.clear();
 			assertEquals(Constants.MESSAGE_TASK_CLEARED, message);
 			
-			//test for edit
+			//test for editing time
 			userCommand = "add play games from 9am to 10am on 12 Sep 2014 at home";
 			userInput = parser.format(userCommand);
 			task = userInput.getTask();
 			testLogic.add(task);
-			String userCommandEdited = "add Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
+			String userCommandEdited = "edit play games from 10am to 11am on 12 Sep 2014 at home";
 			UserInput userInputEdited = parser.format(userCommandEdited);
 			Task editedTask = userInputEdited.getTask();
+			message = testLogic.edit(task, editedTask);
+			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
+			
+			//test for editing location
+			userCommandEdited = "edit play games from 10am to 11am on 12 Sep 2014 at school";
+			userInputEdited = parser.format(userCommandEdited);
+			editedTask = userInputEdited.getTask();
+			message = testLogic.edit(task, editedTask);
+			assertEquals(Constants.MESSAGE_EDIT_CLASHING_TIMESLOTS, message);
+			
+			//test for editing date
+			userCommandEdited = "add play games from 10am to 11am on 13 Sep 2014 at school";
+			userInputEdited = parser.format(userCommandEdited);
+			editedTask = userInputEdited.getTask();
 			message = testLogic.edit(task, editedTask);
 			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
 			
