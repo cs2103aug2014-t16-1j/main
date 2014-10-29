@@ -47,7 +47,7 @@ public class StorageTest {
             assert (false);
 		}
 	}
-	
+	/*
 	@Test
 	public void testStorageDeleteandUndo() {
         Parser parser = Parser.getInstance();
@@ -127,5 +127,5 @@ public class StorageTest {
             assert (false);
         }
     }
-    
+   */ 
 }

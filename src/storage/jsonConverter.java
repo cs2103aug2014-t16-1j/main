@@ -19,9 +19,9 @@ public class jsonConverter {
 		jTask.put(Constants.STARTTIME, convertCalendarToString(task.getStartTime()));
 		jTask.put(Constants.ENDTIME, convertCalendarToString(task.getEndTime()));
 		jTask.put(Constants.FREQUENCY, new Integer(task.getFrequency()));
-		jTask.put(Constants.FREQUENCY_TYPE, task.getFrequencyType().toString());
-		jTask.put(Constants.PRIORITY_TYPE, task.getPriorityLevel().toString());
-		jTask.put(Constants.STATE_TYPE, task.getState().toString());
+		jTask.put(Constants.FREQUENCY_TYPE, task.getFrequencyType());
+		jTask.put(Constants.PRIORITY_TYPE, task.getPriorityLevel());
+		jTask.put(Constants.STATE_TYPE, task.getState());
 		return jTask;
 	}		
 	
@@ -29,14 +29,14 @@ public class jsonConverter {
 		Task temp = null;
 		try{
 			temp = new Task();
-			temp.setDescription(obj.get(Constants.DESCRIPTION).toString());
-			temp.setLocation(obj.get(Constants.LOCATION).toString());
-			temp.setStartTime(obj.get(Constants.STARTTIME).toString());
-			temp.setEndTime(obj.get(Constants.ENDTIME).toString());
+			temp.setDescription((String) obj.get(Constants.DESCRIPTION));
+			temp.setLocation((String) obj.get(Constants.LOCATION));
+			temp.setStartTime((String) obj.get(Constants.STARTTIME));
+			temp.setEndTime((String) obj.get(Constants.ENDTIME));
 			temp.setFrequency((int) obj.get(Constants.FREQUENCY));
-			temp.setFrequencyType(obj.get(Constants.FREQUENCY_TYPE).toString());
-			temp.setPriority(obj.get(Constants.PRIORITY_TYPE).toString());
-			temp.setState(obj.get(Constants.STATE_TYPE).toString());
+			temp.setFrequencyType((String) obj.get(Constants.FREQUENCY_TYPE));
+			temp.setPriority((String) obj.get(Constants.PRIORITY_TYPE));
+			temp.setState((String) obj.get(Constants.STATE_TYPE));
 		}catch(Exception e){
 			//e.printStackTrace();
 		}
