@@ -20,7 +20,7 @@ public final class Constants {
 	public static final String MESSAGE_TASK_EDITED = "Task edited!";
 	public static final String MESSAGE_EDIT_TASK_DOES_NOT_EXIST = "Cannot edit because task does not exist.";
 	public static final String MESSAGE_EDIT_TASK_CLASHES = "Cannot edit because task clashes with other tasks.";
-	public static final String MESSAGE_TASK_CLEARED = "All tasks was deleted.";
+	public static final String MESSAGE_TASK_CLEARED = "All tasks cleared from TasKoord.";
 	public static final String MESSAGE_DUPLICATED_TASK = "This task has been already in the list.";
 	public static final String MESSAGE_UNDO_DONE = "The command was undone.";
 	public static final String MESSAGE_PRIORITY_SET = "Priority level set for task.";
@@ -64,4 +64,12 @@ public final class Constants {
     public static final String PRIORITY_LOW = "LOW";
     public static final String PRIORITY_MEDIUM = "MEDIUM";
     public static final String PRIORITY_HIGH = "HIGH";
+    
+    // constants for UI
+    public static final int LISTUPCOMINGTIME_DEFAULT = 5;
+    public static final String MESSAGE_NO_RESULT = "There is no such task.";
+    public static final String MESSAGE_NO_SEARCH_INFO = "Please specify a keyword to search for!";
+    public static final String MESSAGE_NO_ADD_INFO = "Please specify the task you want to add!";
+    public static final String MESSAGE_NO_DELETE_INFO = "Please specify the task you want to delete!";
+    public static final String MESSAGE_NO_RESULT_LIST = "There is nothing to list.";
 }

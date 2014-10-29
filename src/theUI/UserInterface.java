@@ -14,12 +14,7 @@ import tkLogic.Logic;
 import tkLogic.Parser;
 
 public class UserInterface {
-    final int LISTUPCOMINGTIME_DEFAULT = 5;
-    final String MESSAGE_NO_RESULT = "There is no such task.";
-    final String MESSAGE_NO_SEARCH_INFO = "Please specify the keyword!";
-    final String MESSAGE_NO_ADD_INFO = "Please specify the task you want to add!";
-    final String MESSAGE_NO_DELETE_INFO = "Please specify the task you want to delete!";
-    
+
     private String NO_COMMAND = "";
     private Logic logic;
     private Parser parser;
@@ -103,7 +98,7 @@ public class UserInterface {
     
     private void add(Task task) {
         if (task.getDescription() == null) {
-            gui.displayWarning(MESSAGE_NO_ADD_INFO, false);
+            gui.displayWarning(Constants.MESSAGE_NO_ADD_INFO, false);
             return;
         }
         
@@ -127,7 +122,7 @@ public class UserInterface {
                 	newTask.setDescription("floating");
                 }
                 showToUser(logic.list(newTask), true);
-                addToStackForUndo(task, "Task was deleted.");
+                addToStackForUndo(task, "Task deleted.");
             } else {
                 gui.displayWarning(feedback, false);
             }
@@ -148,7 +143,7 @@ public class UserInterface {
             }
 
             if (cmdInfo != null && cmdInfo.contains("upcoming") && task.getStartTime() == null) {
-                int time = LISTUPCOMINGTIME_DEFAULT;
+                int time = Constants.LISTUPCOMINGTIME_DEFAULT;
                 String s = getFirstInt(cmdInfo);
                 if (!s.equals("")) {
                     time = Integer.parseInt(s);
@@ -163,7 +158,7 @@ public class UserInterface {
             
             ArrayList<Task> result = logic.list(task);
             if (result.size() == 0) {
-                gui.displayDone(MESSAGE_NO_RESULT, false);
+                gui.displayDone(Constants.MESSAGE_NO_RESULT_LIST, false);
             } else {
             	showToUser(result, false);
             }
@@ -174,7 +169,7 @@ public class UserInterface {
     
     private void delete(Task task) {
         if (task.getDescription() == null) {
-            gui.displayWarning(MESSAGE_NO_DELETE_INFO, false);
+            gui.displayWarning(Constants.MESSAGE_NO_DELETE_INFO, false);
             return;
         }
         try {
@@ -311,13 +306,13 @@ public class UserInterface {
     
     private void search(Task task) {
         if (task.getDescription() == null) {
-            gui.displayWarning(MESSAGE_NO_SEARCH_INFO, false);
+            gui.displayWarning(Constants.MESSAGE_NO_SEARCH_INFO, false);
             return;
         }
         try {
             ArrayList<Task> result = logic.search(task.getDescription());
             if (result.size() == 0) {
-                gui.displayDone(MESSAGE_NO_RESULT, false);
+                gui.displayDone(Constants.MESSAGE_NO_RESULT, false);
             } else {
             	showToUser(result, false);
             }
@@ -351,7 +346,7 @@ public class UserInterface {
     		
     		list = logic.search(task.getDescription());
             if (list.size() == 0) {
-                gui.displayDone(MESSAGE_NO_RESULT, false);
+                gui.displayDone(Constants.MESSAGE_NO_RESULT, false);
             } else if (list.size() == 1) {
             	Task newTask = list.get(0);
             	Task oldTask = new Task(newTask);
