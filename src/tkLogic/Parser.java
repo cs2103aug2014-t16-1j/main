@@ -322,7 +322,7 @@ public class Parser {
             String[] currentTime = new String[2];
             currentTime[0] = "" + Calendar.HOUR;
             currentTime[1] = "" + Calendar.MINUTE;
-            startTimeAndDate = getTime(startTime);
+            startTimeAndDate = getTime(currentTime);
         }
         if (date.length == 0) {
             Calendar.getInstance();
