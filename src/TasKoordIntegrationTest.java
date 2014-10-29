@@ -24,6 +24,23 @@ public class TasKoordIntegrationTest {
         UserInterface ui = new UserInterface("IntegrationTest.txt");
         testCommandClear(ui);
         testSimpleAdd(ui);
+        testDelete(ui);
+    }
+
+    private void testDelete(UserInterface ui) throws FileNotFoundException {
+        ui.executeCommands("add Lunch from 10am to 11am on 25 Oct 2015 at Boardroom");
+        ui.executeCommands("delete Meeting");
+        readFile("IntegrationTest.txt");
+        String[] expectedData =
+                { "STARTTIME", "Oct 25 2015 10:00:00", "ENDTIME",
+                        "Oct 25 2015 11:00:00", "LOCATION", "Boardroom",
+                        "DESCRIPTION", "Lunch", "STATE_TYPE", "PENDING",
+                        "PRIORITY", "MEDIUM", "END" };
+        for (int i = 0; i < expectedData.length; i++) {
+            assertEquals(expectedData[i], scanner.nextLine());
+        }
+        assertEquals(false, scanner.hasNext());
+        closeReadFile();
     }
 
     private void testSimpleAdd(UserInterface ui) throws FileNotFoundException {
