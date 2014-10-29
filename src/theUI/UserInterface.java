@@ -91,6 +91,16 @@ public class UserInterface {
             search(task);
         } else if (command == CommandType.SET){
         	set(task);
+        } else if (command == CommandType.BLOCK) {
+        	block(task);
+        } else if (command == CommandType.EXIT) {
+        	gui.displayDone("Good Bye !!!", false);
+        	 try {
+                 Thread.sleep(1000);
+             } catch(InterruptedException e) {
+                 Thread.currentThread().interrupt();
+             }
+        	System.exit(0);
         } else {
             gui.displayWarning("Informat command", false);
         }
@@ -129,6 +139,10 @@ public class UserInterface {
         } catch (Exception e){
             e.printStackTrace();
         }
+    }
+    
+    private void block(Task task) {
+    	
     }
 
     private void list(Task task) {
@@ -334,7 +348,7 @@ public class UserInterface {
         			String feedback = logic.set(tasksOnScreen.get(noOfTask - 1));
 	        		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
 	        			list.add(newTask);
-	        			gui.displayDone(feedback, false);
+	        			gui.displayDone("Task was changed to status: " + newTask.getState() + " and priority: " + newTask.getPriorityLevel(), false);
 	        			showToUser(list, true);
 	        			addToStackForUndo(oldTask, "Task was changed to status: " + oldTask.getState() + " and priority: " + oldTask.getPriorityLevel());
 	        		} else {
@@ -353,7 +367,7 @@ public class UserInterface {
     			updateNewPriorityAndState(task, newTask);
     			
             	logic.set(newTask);
-            	gui.displayDone("Task was set:", false);
+            	gui.displayDone("Task was changed to status: " + newTask.getState() + " and priority: " + newTask.getPriorityLevel(), false);
                 showToUser(list, true);
                 addToStackForUndo(oldTask, "Task was changed to status: " + oldTask.getState() + " and priority: " + oldTask.getPriorityLevel());
             } else {

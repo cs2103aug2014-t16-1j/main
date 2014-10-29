@@ -13,6 +13,7 @@ public class Task {
     private String location;
     private String description;
     private PriorityType priorityLevel;
+    private boolean blocked;
 
     public Task() {
         this.startTime = null;
@@ -21,6 +22,7 @@ public class Task {
         this.description = null;
         this.state = null;
         this.priorityLevel = null;
+        this.blocked = false;
     }
     
     public Task(Task task) {
@@ -40,6 +42,19 @@ public class Task {
         this.description = task.getDescription();
         this.priorityLevel = task.getPriorityLevel();
         this.state = task.getState();
+        this.blocked = task.isBlocked();
+    }
+    
+    public void block() {
+    	this.blocked = true;
+    }
+    
+    public void free() {
+    	this.blocked = false;
+    }
+    
+    public boolean isBlocked() {
+    	return this.blocked;
     }
     
     public void update(Task task) {

@@ -2,6 +2,7 @@ package theUI;
 
 import tkLibrary.Constants;
 import tkLibrary.PriorityType;
+import tkLibrary.StateType;
 import tkLibrary.Task;
 
 import java.awt.event.ActionEvent;
@@ -26,6 +27,7 @@ public class Gui {
     private final String SIZE_NORMAL = "4";
     private final String COLOR_DESCRIPTION_HIGH = "#FE2E2E";
     private final String COLOR_DESCRIPTION_LOW = "#A4A4A4";
+    private final String COLOR_STATE = "#A6E22E";
     
     
     private final int SPACE_BEFORE_LOCATION = 20;
@@ -133,6 +135,17 @@ public class Gui {
     		}
     	} 
     	
+    	if (task.getState() != StateType.PENDING) {
+			res += format(" [" + task.getState() + "] ", SIZE_NORMAL, COLOR_STATE);
+		}
+    	if (task.getStartTime() != null) {
+    		res += "<br>";
+    	}
+    	
+    	for(int i = 1; i <= 10; i ++) {
+    		res += "&nbsp";
+    	}
+    	
     	if (task.getDescription() != null) {
     		String color = COLOR_DESCRIPTION;
     		if (task.getPriorityLevel() == PriorityType.HIGH) {
@@ -140,15 +153,11 @@ public class Gui {
     		} else if (task.getPriorityLevel() == PriorityType.LOW) {
     			color = COLOR_DESCRIPTION_LOW;
     		}  
-    		res += formatWithNewLine(task.getDescription(), SIZE_NORMAL, color);
+    		res += format(task.getDescription(), SIZE_NORMAL, color);
     	}
     	
     	if (task.getLocation() != null) {
-    		String rr = "";
-    		for(int i = 1; i <= SPACE_BEFORE_LOCATION; i ++) {
-    			rr += "&nbsp";
-    		}
-    		res += formatWithNewLine(rr + "@ " + task.getLocation(), SIZE_NORMAL, COLOR_LOCATION);
+    		res += formatWithNewLine(" @ " + task.getLocation(), SIZE_NORMAL, COLOR_LOCATION);
     	}
     	
     	displayText += res;
@@ -190,11 +199,16 @@ public class Gui {
     			} else if (lists.get(i).getPriorityLevel() == PriorityType.LOW) {
     				color = COLOR_DESCRIPTION_LOW;
     			}   
-    			displayText += format(intToString(i + 1), "3", COLOR_DONE) 
-    					     + format(lists.get(i).getDescription(), SIZE_NORMAL, color);
+    			displayText += format(intToString(i + 1), "3", COLOR_DONE);
+    			displayText += format(lists.get(i).getDescription(), SIZE_NORMAL, color);
     			
     			if (lists.get(i).getLocation() != null) 
     				displayText += format(" @ " + lists.get(i).getLocation(), SIZE_NORMAL, COLOR_LOCATION);
+    			
+    			if (lists.get(i).getState() != StateType.PENDING) {
+    				displayText += format(" [" + lists.get(i).getState() + "] ", SIZE_NORMAL, COLOR_STATE);
+    			}
+    			
     			displayText += "<br>";
     		}
     	}
