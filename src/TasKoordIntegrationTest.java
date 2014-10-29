@@ -23,6 +23,22 @@ public class TasKoordIntegrationTest {
     public void IntegrationTest() throws IOException {
         UserInterface ui = new UserInterface("IntegrationTest.txt");
         testCommandClear(ui);
+        testSimpleAdd(ui);
+    }
+
+    private void testSimpleAdd(UserInterface ui) throws FileNotFoundException {
+        ui.executeCommands("add Meeting from 9am to 10am on 24 Oct 2015 at Boardroom");
+        readFile("IntegrationTest.txt");
+        String[] expectedData =
+                { "STARTTIME", "Oct 24 2015 09:00:00", "ENDTIME",
+                        "Oct 24 2015 10:00:00", "LOCATION", "Boardroom",
+                        "DESCRIPTION", "Meeting", "STATE_TYPE", "PENDING",
+                        "PRIORITY", "MEDIUM", "END" };
+        for (int i = 0; i < expectedData.length; i++) {
+            assertEquals(expectedData[i], scanner.nextLine());
+        }
+        assertEquals(false, scanner.hasNext());
+        closeReadFile();
     }
 
     private void testCommandClear(UserInterface ui) throws IOException,
