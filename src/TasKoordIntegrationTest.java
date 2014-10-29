@@ -1,14 +1,56 @@
 import static org.junit.Assert.*;
 
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.util.Scanner;
+
 import org.junit.Test;
 
 import storage.StorageTest;
 import theUI.UITest;
+import theUI.UserInterface;
 import tkLogic.LogicTest;
 import tkLogic.ParserTest;
 
-
 public class TasKoordIntegrationTest {
+    private Scanner scanner;
+    private PrintWriter printWriter;
+
+    @Test
+    public void IntegrationTest() throws IOException {
+        UserInterface ui = new UserInterface("IntegrationTest.txt");
+        testCommandClear(ui);
+    }
+
+    private void testCommandClear(UserInterface ui) throws IOException,
+            FileNotFoundException {
+        writeToFile("IntegrationTest.txt");
+        printWriter.println("A randome message!");
+        closeWrittenFile();
+        ui.executeCommands("clear");
+        readFile("IntegrationTest.txt");
+        assertEquals(false, scanner.hasNext());
+        closeReadFile();
+    }
+
+    private void writeToFile(String fileName) throws IOException {
+        printWriter = new PrintWriter(new FileWriter(fileName, true));
+    }
+
+    private void closeWrittenFile() {
+        printWriter.close();
+    }
+
+    private void readFile(String fileName) throws FileNotFoundException {
+        scanner = new Scanner(new File(fileName));
+    }
+
+    private void closeReadFile() {
+        scanner.close();
+    }
 
     @Test
     public void individualTest() {
