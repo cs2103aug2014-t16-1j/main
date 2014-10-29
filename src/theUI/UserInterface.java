@@ -194,7 +194,7 @@ public class UserInterface {
 	        	if (noOfTask <= tasksOnScreen.size()) {
 	        		String feedback = logic.delete(tasksOnScreen.get(noOfTask - 1));
 	        		if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
-	        			addToStackForUndo(tasksOnScreen.get(noOfTask - 1), "Task was restored.");
+	        			addToStackForUndo(tasksOnScreen.get(noOfTask - 1), "Task restored.");
 	        			list.add(tasksOnScreen.get(noOfTask - 1));
 	        			gui.displayDone(feedback, false);
 	        			showToUser(list, true);
@@ -212,7 +212,7 @@ public class UserInterface {
                 
             } else if (list.size() == 1) {
             	logic.delete(list.get(0));
-            	addToStackForUndo(list.get(0), "Task was restored.");
+            	addToStackForUndo(list.get(0), "Task restored.");
             	gui.displayDone(Constants.MESSAGE_TASK_DELETED, false);
             	showToUser(list, true);
             } else {
@@ -233,7 +233,7 @@ public class UserInterface {
 	        	if (noOfTask <= tasksOnScreen.size()) {
 	        		Task newTask = new Task(tasksOnScreen.get(noOfTask - 1));
 	        		String feedback = logic.edit(newTask, updatedTask);
-	        		addToStackForUndo(newTask, "Task was changed.");
+	        		addToStackForUndo(newTask, "Task edited.");
 	        		newTask.update(updatedTask);
 	        		
 	        		displayFeedbackForEditing(list, newTask, feedback);
@@ -247,7 +247,7 @@ public class UserInterface {
             } else if (list.size() == 1) {
             	Task newTask = new Task(list.get(0));
             	String feedback = logic.edit(newTask, updatedTask);
-            	addToStackForUndo(newTask, "Task was changed.");
+            	addToStackForUndo(newTask, "Task edited.");
         		newTask.update(updatedTask);
         		
         		list.clear();
@@ -280,7 +280,7 @@ public class UserInterface {
             String feedback = logic.clear();
             if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
                 gui.displayDone(feedback, false);
-                addToStackForUndo(null, "All task was restored.");
+                addToStackForUndo(null, "All tasks restored.");
             } else {
                 gui.displayWarning(feedback, false);
             }
@@ -348,9 +348,9 @@ public class UserInterface {
         			String feedback = logic.set(tasksOnScreen.get(noOfTask - 1));
 	        		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
 	        			list.add(newTask);
-	        			gui.displayDone("Task was changed to status: " + newTask.getState() + " and priority: " + newTask.getPriorityLevel(), false);
+	        			gui.displayDone("Task status changed to: " + newTask.getState() + " and priority changed to: " + newTask.getPriorityLevel(), false);
 	        			showToUser(list, true);
-	        			addToStackForUndo(oldTask, "Task was changed to status: " + oldTask.getState() + " and priority: " + oldTask.getPriorityLevel());
+	        			addToStackForUndo(oldTask, "Task status changed to: " + oldTask.getState() + " and priority changed to: " + oldTask.getPriorityLevel());
 	        		} else {
 	        			gui.displayWarning(feedback, false);
 	        		}
@@ -367,9 +367,9 @@ public class UserInterface {
     			updateNewPriorityAndState(task, newTask);
     			
             	logic.set(newTask);
-            	gui.displayDone("Task was changed to status: " + newTask.getState() + " and priority: " + newTask.getPriorityLevel(), false);
+            	gui.displayDone("Task status changed to: " + newTask.getState() + " and priority changed to: " + newTask.getPriorityLevel(), false);
                 showToUser(list, true);
-                addToStackForUndo(oldTask, "Task was changed to status: " + oldTask.getState() + " and priority: " + oldTask.getPriorityLevel());
+                addToStackForUndo(oldTask, "Task status changed to: " + oldTask.getState() + " and priority changed to: " + oldTask.getPriorityLevel());
             } else {
             	gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND, false);
             	showToUser(list, true);
