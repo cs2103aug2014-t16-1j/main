@@ -2,6 +2,7 @@ bin/
 IntegrationTest.txt
 testing.txt
 test.txt
+storeTest.txt
 logicTest.txt
 TasKoord.txt
 *.log.*
