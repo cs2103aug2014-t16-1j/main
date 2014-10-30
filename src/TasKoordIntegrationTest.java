@@ -132,11 +132,13 @@ public class TasKoordIntegrationTest {
         parserTest.testParserAddDeadline();
         parserTest.testParserAddGoodToDo();
         parserTest.testParserAddTwoDates();
+        parserTest.testParserAddDescriptionWithKeys();
         parserTest.testParserDelete();
         parserTest.testParserEdit();
         parserTest.testParserSetPriority();
         parserTest.testParserSetState();
         parserTest.testParserUndo();
+        parserTest.testParserClear();
     }
 
     private void testLogic() {

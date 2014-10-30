@@ -284,6 +284,36 @@ public class ParserTest {
             assert (false);
         }
     }
+    
+    public void testParserClear() {
+        Parser parser = Parser.getInstance();
+        String input = "clear";
+        try {
+            UserInput userInput = parser.format(input);
+            CommandType command = userInput.getCommand();
+            assertEquals("Test that method format works correctly",
+                    CommandType.CLEAR, command);
+            Task task = userInput.getTask();
+            assertEquals("Test that the Description is correctly recorded", null,
+                    task.getDescription());
+            assertEquals("Test that the Start Time is correctly recorded", null,
+                    task.getStartTime());
+            assertEquals("Test that the End Time is correctly recorded", null,
+                    task.getEndTime());
+            assertEquals("Test that the Location is correctly recorded", null,
+                    task.getLocation());
+            assertEquals("Test that the State is correctly set", null,
+                    task.getState());
+            assertEquals("Test that the frequency is as default", 0,
+                    task.getFrequency());
+            assertEquals("Test that the frequency is as default", null,
+                    task.getFrequencyType());
+        } catch (Exception e) {
+            System.out.println("testParserUndo: ");
+            e.printStackTrace();
+            assert (false);
+        }
+    }
 
     @Test
     public void testParserSetPriority() {
