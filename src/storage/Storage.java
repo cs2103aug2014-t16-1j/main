@@ -35,7 +35,7 @@ public class Storage {
 	public Storage(String fileName) {
 		this.fileName = fileName;
 		logger = Logger.getLogger("log" + fileName);
-		openFileToWrite();
+		openFileToWrite(true);
 		closeFileToWrite();
 		this.listOfTasks = loadFromFile();
 		this.oldTasks = copyList(this.listOfTasks);
@@ -62,6 +62,7 @@ public class Storage {
 				task = new Task();
 			}
 		} catch(ParseException e){
+			System.out.println("Parse Exception:");
 			e.printStackTrace();
 		}
 		closeFileToRead();
@@ -70,22 +71,27 @@ public class Storage {
 	
 	public void add(Task task) {
 		oldTasks = copyList(listOfTasks);
-		stackForUndo.push(oldTasks);
+		if(!oldTasks.isEmpty()){
+			stackForUndo.push(oldTasks);
+		}
+		openFileToWrite(true);
 		store(task);
-	}
-	
-	public void store(Task task) {
-		listOfTasks.add(task);
-		openFileToWrite();
-		JSONObject jTask= jsonConverter.taskToJSON(task);
-		out.print(jTask.toString() + "\r\n");
 		closeFileToWrite();
 	}
 	
+	private void store(Task task) {
+		listOfTasks.add(task);
+		JSONObject jTask= jsonConverter.taskToJSON(task);
+		out.print(jTask.toString() + "\r\n");
+		
+	}
+	
 	public void store(ArrayList<Task> list) {
+		openFileToWrite(false);
 		for (Task task : list) {
 			store(task);
 		}
+		closeFileToWrite();
 	}
 	
 	// delete only 1 task with its name and its location(description).
@@ -100,7 +106,7 @@ public class Storage {
 		
 		oldTasks = copyList(listOfTasks);
 		stackForUndo.push(oldTasks);
-		deleteFile();
+		//deleteFile();
 		listOfTasks.clear();
 		store(newList);
 	}
@@ -118,7 +124,7 @@ public class Storage {
 			newList.add(item);
 		}
 		
-		deleteFile();
+		//deleteFile();
 		listOfTasks.clear();
 		store(newList);
 	}
@@ -135,7 +141,7 @@ public class Storage {
 			newList.add(item);
 		}
 		
-		deleteFile();
+		//deleteFile();
 		listOfTasks.clear();
 		store(newList);
 	}
@@ -144,13 +150,13 @@ public class Storage {
 		oldTasks = new ArrayList<Task> (listOfTasks);
 		listOfTasks.clear();
 		deleteFile();
-		openFileToWrite();
+		openFileToWrite(false);
 		closeFileToWrite();
 	}
 	
 	public String undo() {
 		if (!stackForUndo.empty()) {
-			deleteFile();
+			//deleteFile();
 			listOfTasks.clear();
 			store(stackForUndo.pop());
 			return Constants.MESSAGE_UNDO_DONE;
@@ -174,9 +180,9 @@ public class Storage {
 		return formatter.format(time.getTime());
 	}
 
-	private void openFileToWrite() {
+	private void openFileToWrite(boolean append) {
 		try {
-			out = new PrintWriter(new FileWriter(fileName, true));
+			out = new PrintWriter(new FileWriter(fileName, append));
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
 			logger.log(Level.WARNING, "File Not Found", e);

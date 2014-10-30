@@ -19,9 +19,15 @@ public class jsonConverter {
 		jTask.put(Constants.STARTTIME, convertCalendarToString(task.getStartTime()));
 		jTask.put(Constants.ENDTIME, convertCalendarToString(task.getEndTime()));
 		jTask.put(Constants.FREQUENCY, new Integer(task.getFrequency()));
-		jTask.put(Constants.FREQUENCY_TYPE, task.getFrequencyType());
-		jTask.put(Constants.PRIORITY_TYPE, task.getPriorityLevel());
-		jTask.put(Constants.STATE_TYPE, task.getState());
+		if(task.getFrequencyType() != null){
+			jTask.put(Constants.FREQUENCY_TYPE, task.getFrequencyType().toString());
+		}
+		if(task.getPriorityLevel() != null){
+			jTask.put(Constants.PRIORITY_TYPE, task.getPriorityLevel().toString());
+		}
+		if(task.getState() != null){
+			jTask.put(Constants.STATE_TYPE, task.getState().toString());
+		}
 		return jTask;
 	}		
 	
@@ -33,12 +39,12 @@ public class jsonConverter {
 			temp.setLocation((String) obj.get(Constants.LOCATION));
 			temp.setStartTime((String) obj.get(Constants.STARTTIME));
 			temp.setEndTime((String) obj.get(Constants.ENDTIME));
-			temp.setFrequency((int) obj.get(Constants.FREQUENCY));
+			temp.setFrequency(Integer.parseInt(obj.get(Constants.FREQUENCY).toString()));
 			temp.setFrequencyType((String) obj.get(Constants.FREQUENCY_TYPE));
 			temp.setPriority((String) obj.get(Constants.PRIORITY_TYPE));
 			temp.setState((String) obj.get(Constants.STATE_TYPE));
 		}catch(Exception e){
-			//e.printStackTrace();
+			e.printStackTrace();
 		}
 		return temp;	
 	}
