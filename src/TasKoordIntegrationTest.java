@@ -21,12 +21,13 @@ import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
 public class TasKoordIntegrationTest {
+    private final String fileName = "IntegrationTest.txt";
     private Scanner scanner;
     private PrintWriter printWriter;
 
     @Test
     public void IntegrationTest() throws IOException {
-        UserInterface ui = new UserInterface("IntegrationTest.txt");
+        UserInterface ui = new UserInterface(fileName);
         testCommandClear(ui);
         testSimpleAdd(ui);
         testDelete(ui);
@@ -36,7 +37,7 @@ public class TasKoordIntegrationTest {
     private void testDelete(UserInterface ui) throws FileNotFoundException {
         ui.executeCommands("add Lunch from 10am to 11am on 25 Oct 2015 at Boardroom");
         ui.executeCommands("delete Meeting");
-        readFile("IntegrationTest.txt");
+        readFile(fileName);
         JSONObject expData = new JSONObject();
         expData.put(Constants.STARTTIME, "Oct 25 2015 10:00:00");
         expData.put(Constants.ENDTIME, "Oct 25 2015 11:00:00");
@@ -58,7 +59,7 @@ public class TasKoordIntegrationTest {
     @SuppressWarnings("unchecked")
     private void testSimpleAdd(UserInterface ui) throws FileNotFoundException {
         ui.executeCommands("add Meeting from 9am to 10am on 24 Oct 2015 at Boardroom");
-        readFile("IntegrationTest.txt");
+        readFile(fileName);
         JSONObject expData = new JSONObject();
         expData.put(Constants.STARTTIME, "Oct 24 2015 09:00:00");
         expData.put(Constants.ENDTIME, "Oct 24 2015 10:00:00");
@@ -78,11 +79,11 @@ public class TasKoordIntegrationTest {
     }
 
     private void testCommandClear(UserInterface ui) throws IOException, FileNotFoundException {
-        writeToFile("IntegrationTest.txt");
+        writeToFile(fileName);
         printWriter.println("A randome message!");
         closeWrittenFile();
         ui.executeCommands("clear");
-        readFile("IntegrationTest.txt");
+        readFile(fileName);
         assertEquals(false, scanner.hasNext());
         closeReadFile();
     }
