@@ -95,7 +95,7 @@ public class Parser {
         } else if (commandTypeString.equalsIgnoreCase("set")) {
             return CommandType.SET;
         } else if (commandTypeString.equalsIgnoreCase("exit")) {
-        	return CommandType.EXIT;
+            return CommandType.EXIT;
         } else {
             throw new Exception("invalid command: " + commandTypeString);
         }
@@ -258,9 +258,19 @@ public class Parser {
 
     private void parseDate(ArrayList<String> day) {
         date = new String[3];
-        date[0] = day.get(0);
-        date[1] = determineMonth(day.get(1));
-        date[2] = day.get(2);
+        if (day.size() == 1) {
+            date[0] = day.get(0).substring(0, 2);
+            date[1] = determineMonth(day.get(0).substring(2, 4));
+            if (Integer.valueOf(day.get(0).substring(4, 6)) > 15) {
+                date[2] = "19" + day.get(0).substring(4, 6);
+            } else {
+                date[2] = "20" + day.get(0).substring(4, 6);
+            }
+        } else {
+            date[0] = day.get(0);
+            date[1] = determineMonth(day.get(1));
+            date[2] = day.get(2);
+        }
     }
 
     private String determineMonth(String month) throws Error {
