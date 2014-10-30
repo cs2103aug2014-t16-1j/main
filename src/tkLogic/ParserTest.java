@@ -71,6 +71,32 @@ public class ParserTest {
             assert (false);
         }
     }
+    
+    /* This is a boundary case for the partition with only date */
+    @Test
+    public void testParserAddWithDateNotTime() {
+        Parser parser = Parser.getInstance();
+        String input =
+                "add Meeting on 11 Sep 2014 at Boardroom";
+        UserInput userInput;
+        try {
+            userInput = parser.format(input);
+            CommandType command = userInput.getCommand();
+            assertEquals("Test that method format works correctly", CommandType.ADD,
+                    command);
+            Task task = userInput.getTask();
+            assertEquals("Test that the Start Time is correctly recorded",
+                    "Thu Sep 11 00:00:00 SGT 2014", task.getStartTime().getTime()
+                            .toString());
+            assertEquals("Test that the End Time is correctly recorded",
+                    "Fri Sep 12 23:059:00 SGT 2014", task.getEndTime().getTime()
+                            .toString());
+        } catch (Exception e) {
+            System.out.println("testParserAddWithDateNotTime: ");
+            e.printStackTrace();
+            assert (false);
+        }
+    }
 
     /* This is a boundary case for the partition with only one date and time */
     @Test
