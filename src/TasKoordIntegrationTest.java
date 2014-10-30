@@ -132,6 +132,7 @@ public class TasKoordIntegrationTest {
         parserTest.testParserAddDeadline();
         parserTest.testParserAddGoodToDo();
         parserTest.testParserAddTwoDates();
+        parserTest.testParserAddSpecialDateFormat();
         parserTest.testParserAddDescriptionWithKeys();
         parserTest.testParserAddWithDateNotTime();
         parserTest.testParserDelete();
