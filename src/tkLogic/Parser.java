@@ -114,7 +114,7 @@ public class Parser {
                 commandKey = determineCommandKey(newWord);
                 word = new ArrayList<String>();
             } else {
-                word.add(newWord);
+                word.add(newWord.replaceAll("/", ""));
             }
         }
         executeCmdKey(word, commandKey);
