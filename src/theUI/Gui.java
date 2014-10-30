@@ -133,7 +133,7 @@ public class Gui {
     		} else {
     			res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE_DATE_AND_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR);
     		}
-    	} 
+    	}
     	
     	if (task.getState() != StateType.PENDING) {
 			res += format(" [" + task.getState() + "] ", SIZE_NORMAL, COLOR_STATE);
@@ -157,10 +157,10 @@ public class Gui {
     	}
     	
     	if (task.getLocation() != null) {
-    		res += formatWithNewLine(" @ " + task.getLocation(), SIZE_NORMAL, COLOR_LOCATION);
+    		res += format(" @ " + task.getLocation(), SIZE_NORMAL, COLOR_LOCATION);
     	}
     	
-    	displayText += res;
+    	displayText += res + "<br>";
     }
 
 	public void display(ArrayList<Task> lists, boolean isAppended) {
