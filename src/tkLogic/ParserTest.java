@@ -137,6 +137,39 @@ public class ParserTest {
             assert (false);
         }
     }
+    
+    /* This is a boundary case for the partition with keyword as description */
+    @Test
+    public void testParserAddDescriptionWithKeys() {
+        Parser parser = Parser.getInstance();
+        String input = "add ask John /to /add me as a friend /from school";
+        try {
+            UserInput userInput = parser.format(input);
+            CommandType command = userInput.getCommand();
+            assertEquals("Test that method format works correctly", CommandType.ADD,
+                    command);
+            Task task = userInput.getTask();
+            assertEquals("Test that the Description is correctly recorded",
+                    "ask John to add me as a friend from school",
+                    task.getDescription());
+            assertEquals("Test that the Start Time is correctly recorded", null,
+                    task.getStartTime());
+            assertEquals("Test that the End Time is correctly recorded", null,
+                    task.getEndTime());
+            assertEquals("Test that the Location is correctly recorded", null,
+                    task.getLocation());
+            assertEquals("Test that the State is correctly set", StateType.PENDING,
+                    task.getState());
+            assertEquals("Test that the frequency is as default", 0,
+                    task.getFrequency());
+            assertEquals("Test that the frequency is as default", null,
+                    task.getFrequencyType());
+        } catch (Exception e) {
+            System.out.println("testParserAddDescriptionWithKeys: ");
+            e.printStackTrace();
+            assert (false);
+        }
+    }
 
     @Test
     public void testParserDelete() {
