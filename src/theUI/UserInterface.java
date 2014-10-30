@@ -348,9 +348,9 @@ public class UserInterface {
         			String feedback = logic.set(tasksOnScreen.get(noOfTask - 1));
 	        		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
 	        			list.add(newTask);
-	        			gui.displayDone("Task status changed to: " + newTask.getState() + " and priority changed to: " + newTask.getPriorityLevel(), false);
+	        			gui.displayDone(String.format(Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY, newTask.getState(), newTask.getPriorityLevel()), false);
 	        			showToUser(list, true);
-	        			addToStackForUndo(oldTask, "Task status changed to: " + oldTask.getState() + " and priority changed to: " + oldTask.getPriorityLevel());
+	        			addToStackForUndo(oldTask, String.format(Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY, oldTask.getState(), oldTask.getPriorityLevel()));
 	        		} else {
 	        			gui.displayWarning(feedback, false);
 	        		}
@@ -367,9 +367,9 @@ public class UserInterface {
     			updateNewPriorityAndState(task, newTask);
     			
             	logic.set(newTask);
-            	gui.displayDone("Task status changed to: " + newTask.getState() + " and priority changed to: " + newTask.getPriorityLevel(), false);
+            	gui.displayDone(String.format(Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY, newTask.getState(), newTask.getPriorityLevel()), false);
                 showToUser(list, true);
-                addToStackForUndo(oldTask, "Task status changed to: " + oldTask.getState() + " and priority changed to: " + oldTask.getPriorityLevel());
+                addToStackForUndo(oldTask, String.format(Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY, oldTask.getState(), oldTask.getPriorityLevel()));
             } else {
             	gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND, false);
             	showToUser(list, true);

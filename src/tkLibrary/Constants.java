@@ -73,4 +73,5 @@ public final class Constants {
     public static final String MESSAGE_NO_ADD_INFO = "Please specify the task you want to add!";
     public static final String MESSAGE_NO_DELETE_INFO = "Please specify the task you want to delete!";
     public static final String MESSAGE_NO_RESULT_LIST = "There is nothing to list.";
+    public static final String MESSAGE_UPDATE_STATUS_AND_PRIORITY = "Task status changed to: %s and priority changed to: %s";
 }
