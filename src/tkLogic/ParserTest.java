@@ -89,7 +89,7 @@ public class ParserTest {
                     "Thu Sep 11 00:00:00 SGT 2014", task.getStartTime().getTime()
                             .toString());
             assertEquals("Test that the End Time is correctly recorded",
-                    "Fri Sep 12 23:059:00 SGT 2014", task.getEndTime().getTime()
+                    "Thu Sep 11 23:59:00 SGT 2014", task.getEndTime().getTime()
                             .toString());
         } catch (Exception e) {
             System.out.println("testParserAddWithDateNotTime: ");

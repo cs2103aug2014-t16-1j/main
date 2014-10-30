@@ -320,9 +320,15 @@ public class Parser {
         } else if (startTime.length == 0 && endTime.length == 0 && date.length != 0) {
             Calendar.getInstance();
             String[] currentTime = new String[2];
-            currentTime[0] = "" + Calendar.HOUR;
-            currentTime[1] = "" + Calendar.MINUTE;
+            currentTime[0] = "00";
+            currentTime[1] = "00";
+            startTime = currentTime;
             startTimeAndDate = getTime(currentTime);
+            currentTime = new String[2];
+            currentTime[0] = "23";
+            currentTime[1] = "59";
+            endTime = currentTime;
+            endTimeAndDate = getTime(currentTime);
         }
         if (date.length == 0) {
             Calendar.getInstance();
