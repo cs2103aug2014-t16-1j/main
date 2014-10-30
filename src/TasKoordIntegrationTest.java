@@ -118,8 +118,8 @@ public class TasKoordIntegrationTest {
     }
 
     private void testStorage() {
-        StorageTest storageTest = new StorageTest();
-        storageTest.testAdd();
+        //StorageTest storageTest = new StorageTest();
+        //storageTest.testStorageAdd();
     }
 
 }
