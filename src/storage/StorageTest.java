@@ -21,11 +21,10 @@ import tkLogic.Parser;
 public class StorageTest {
 	public Storage store  = new Storage("storeTest.txt");
 	
-	/*Test each case separately
-	 * Comment out other test cases while testing each part of the system - storage*/
-	
-	/* This is a boundary case for the optimal partition */
-	/* adds the tasks one by one and checks them */
+	/*
+    /* This is a boundary case for the optimal partition */
+    /* First, clear the file
+    /* Then adds the tasks one by one and checks them */
 	@Test
 	public void testStorageAdd(){
 		Parser parser = Parser.getInstance();
@@ -35,6 +34,7 @@ public class StorageTest {
 		try{
 			userInput = parser.format(input);
 			Task task = userInput.getTask();
+			store.clear();
 			store.add(task);
 			userInput = parser.format(input1);
 			Task task1 = userInput.getTask();
@@ -57,7 +57,7 @@ public class StorageTest {
 		}
 	}
 	
-	/*First deletes and then undo the task to check if the both functions work*/
+	/*First add, then deletes and then undo the task to check if the both functions work*/
 	@Test
 	public void testStorageDeleteandUndo() {
         Parser parser = Parser.getInstance();
@@ -65,6 +65,7 @@ public class StorageTest {
         try {
             UserInput userInput = parser.format(input);
             Task task = userInput.getTask();
+            testStorageAdd();
             store.delete(task);
             store.undo();
             ArrayList<Task> list = store.loadFromFile();
@@ -84,8 +85,7 @@ public class StorageTest {
         }
     }
     
-	/*The edit test works by first implementing add test and then edit test
-	 * Comment out the other test cases while testing edit*/
+	/*The edit test works by first adding and then edit and test*/
     @Test
     public void testStorageEdit() {
         Parser parser = Parser.getInstance();
@@ -96,6 +96,7 @@ public class StorageTest {
             UserInput userInput = parser.format(input);
             Task task = userInput.getTask();
             Task editedTask = userInput.getEditedTask();
+            testStorageAdd();
             store.edit(task, editedTask);
             ArrayList<Task> list = store.loadFromFile();
             assertEquals("Test if task description was edited successfully", "Board Meeting", list.get(0).getDescription());
@@ -123,6 +124,7 @@ public class StorageTest {
         try {
             UserInput userInput = parser.format(input);
             Task task = userInput.getTask();
+            testStorageEdit();
             store.set(task);
             ArrayList<Task> list = store.loadFromFile();
             assertEquals("Test if task description was successfully set", "Board Meeting", list.get(0).getDescription());
