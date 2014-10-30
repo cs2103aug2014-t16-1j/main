@@ -4,5 +4,6 @@ testing.txt
 test.txt
 logicTest.txt
 TasKoord.txt
+storeTest.txt
 *.log.*
 *.log
