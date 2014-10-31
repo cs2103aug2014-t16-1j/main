@@ -112,12 +112,12 @@ public class Gui {
     }
     
     private void display(int no, Task task, int effect) {
-    	String res = format(intToString(no), "3", COLOR_DONE);
+    	String res = format(intToString(no), "3", COLOR_DONE, effect);
     	
     	if (task.getStartTime() != null) {
     		if (task.getEndTime() == null) {
     			res += format("[", SIZE_NORMAL, COLOR_HOUR, effect);
-        		res += format(convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR, effect);
+        		res += format(convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR) + "]", SIZE_NORMAL, COLOR_HOUR, effect);
     		} else {
     			res += 	format("[" + convertCalendarToString(task.getStartTime(), Constants.FORMAT_HOUR), SIZE_NORMAL, COLOR_HOUR, effect);
     		}
@@ -126,14 +126,14 @@ public class Gui {
     		String startTimeString = convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE);
     		String endTimeString = convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE);
     		if (startTimeString.equals(endTimeString)) {
-    			res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR, effect);
+    			res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_HOUR) + "]", SIZE_NORMAL, COLOR_HOUR, effect);
     		} else {
-    			res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE_DATE_AND_HOUR) + "] ", SIZE_NORMAL, COLOR_HOUR, effect);
+    			res += format(" - " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE_DATE_AND_HOUR) + "]", SIZE_NORMAL, COLOR_HOUR, effect);
     		}
     	}
     	
     	if (task.getState() != StateType.PENDING) {
-			res += format(" [" + task.getState() + "] ", SIZE_NORMAL, COLOR_STATE, effect);
+			res += format("  [" + task.getState() + "]", SIZE_NORMAL, COLOR_STATE, effect);
 		}
     	if (task.getStartTime() != null) {
     		res += "<br>";
@@ -273,7 +273,9 @@ public class Gui {
 	private String format(String text, String size, String color, int effect) {
 		String res = "<font size = " + size + " color = " + color + ">" + text + "</font>";
 		if (effect == Constants.HIGHLIGH) {
-			return "<ins>" + res + "</ins>";
+			return "<b><u>" + res + "</u></b>";
+		} else if (effect == Constants.DELETED) {
+			return "<strike>" + res + "</strike>";
 		} else {
 			return res;
 		}
@@ -282,7 +284,9 @@ public class Gui {
 	private String formatWithNewLine(String text, String size, String color, int effect) {
 		String res = "<font size = " + size + " color = " + color + ">" + text + "</font><br>";
 		if (effect == Constants.HIGHLIGH) {
-			return "<font style='BACKGROUND-COLOR: #eeb111'" + res + "</font>";
+			return "<b><u>" + res + "</u></b>";
+		} else if (effect == Constants.DELETED) {
+			return "<strike>" + res + "</strike>";
 		} else {
 			return res;
 		}

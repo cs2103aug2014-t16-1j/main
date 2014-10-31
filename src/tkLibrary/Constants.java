@@ -79,6 +79,6 @@ public final class Constants {
 	public static final String MESSAGE_ENDTIME_BEFORE_STARTTIME = "The end time can not be before the start time.";
 
 	public static final int HIGHLIGH = 1;
-
+	public static final int DELETED = 2; 
 	public static final int NO_EFFECT = 0;
 }

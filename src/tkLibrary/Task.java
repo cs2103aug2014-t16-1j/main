@@ -64,6 +64,12 @@ public class Task {
     	if (task.getEndTime() != null) {
     		this.endTime = (Calendar) task.getEndTime().clone();
     	}
+    	
+    	if (task.getStartTime() != null && task.getEndTime() == null) {
+    		this.startTime = (Calendar) task.getStartTime().clone();
+    		this.endTime = null;
+    	}
+    	
         if (task.getLocation() != null && task.getLocation() != "") {
         	this.location = task.getLocation();
         }
@@ -83,6 +89,9 @@ public class Task {
     }
     
     public boolean equals(Task task) {
+    	if (task == null) {
+    		return false;
+    	}
     	if (!convertCalendarToString(this.startTime, Constants.FORMAT_DATE_CMP).equals( 
     			 convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE_CMP))) {
     		return false;
