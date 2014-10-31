@@ -166,6 +166,8 @@ public class Task {
             this.state = StateType.PENDING;
         } else if (state.equalsIgnoreCase(Constants.STATE_DISCARDED)) {
             this.state = StateType.DISCARDED;
+        } else {
+        	this.state = null;
         }
     }
 

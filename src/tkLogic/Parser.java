@@ -48,7 +48,7 @@ public class Parser {
         startTimeAndDate = null;
         endTimeAndDate = null;
         priority = null;
-        state = Constants.STATE_PENDING;
+        state = Constants.STATE_NULL;
         isEdit = false;
     }
 

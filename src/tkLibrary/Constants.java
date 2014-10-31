@@ -5,12 +5,12 @@ public final class Constants {
 	public static final String FAILED = "failed";
 	
 	// date format
-	public static final String FORMAT_DATE_HOUR = "MMM dd yyyy HH:mm:ss";
-	public static final String FORMAT_DATE_DATE_AND_HOUR= "dd.MM.yyyy HH:mm:ss";
+	public static final String FORMAT_DATE_HOUR = "MMM dd yyyy HH:mm";
+	public static final String FORMAT_DATE_DATE_AND_HOUR= "dd.MM.yyyy HH:mm";
 	public static final String FORMAT_DATE = "yyyyMMdd";
-	public static final String FORMAT_DATE_CMP = "yyyyMMddHHmmss";
+	public static final String FORMAT_DATE_CMP = "yyyyMMddHHmm";
 	public static final String FORMAT_EEE = "EEE, dd MMM yyyy";
-	public static final String FORMAT_HOUR = "HH:mm:ss";
+	public static final String FORMAT_HOUR = "HH:mm";
 	
 	// logic constants
 	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, task still added to TasKoord.";
@@ -60,6 +60,7 @@ public final class Constants {
 	public static final String STATE_COMPLETED = "COMPLETED";
 	public static final String STATE_PENDING = "PENDING";
 	public static final String STATE_DISCARDED = "DISCARDED";
+	public static final String STATE_NULL = "NULL";
 	
 	// constants for state type
     public static final String PRIORITY_LOW = "LOW";
@@ -74,4 +75,10 @@ public final class Constants {
     public static final String MESSAGE_NO_DELETE_INFO = "Please specify the task you want to delete!";
     public static final String MESSAGE_NO_RESULT_LIST = "There is nothing to list.";
     public static final String MESSAGE_UPDATE_STATUS_AND_PRIORITY = "Task status changed to: %s and priority changed to: %s";
+
+	public static final String MESSAGE_ENDTIME_BEFORE_STARTTIME = "The end time can not be before the start time.";
+
+	public static final int HIGHLIGH = 1;
+
+	public static final int NO_EFFECT = 0;
 }

@@ -1,5 +1,6 @@
 package theUI;
 
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Stack;
@@ -112,31 +113,39 @@ public class UserInterface {
             return;
         }
         
+        if (task.getStartTime() != null && task.getEndTime() != null) {
+        	if (task.getStartTime().compareTo(task.getEndTime()) > 0) {
+        		gui.displayWarning(Constants.MESSAGE_ENDTIME_BEFORE_STARTTIME, false);
+        		gui.displayWarning("<br>", true);
+        		gui.displayWarning("Start time: " + convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE_DATE_AND_HOUR), true);
+        		gui.displayWarning("End time  : " + convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE_DATE_AND_HOUR), true);
+        		return;
+        	}
+        }
+        
         try {
-        	task.setState(StateType.PENDING);
+        	if (task.getState() == null) {
+        		task.setState(StateType.PENDING);
+        	}
         	if (task.getPriorityLevel() == null) {
         		task.setPriority(PriorityType.MEDIUM);
         	}
         	
             String feedback = logic.add(task);
-            if (!feedback.equals(Constants.MESSAGE_DUPLICATED_TASK)) {
-                if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
-                	gui.displayDone(feedback, false);
-                } else {
-                	gui.displayWarning(feedback, false);
-                }
-                
-            	Task newTask = new Task();
-                newTask.setStartTime(task.getStartTime());
-                if (newTask.getStartTime() == null) {
-                	newTask.setDescription("floating");
-                }
-                showToUser(logic.list(newTask), true);
-                addToStackForUndo(task, "Task deleted.");
+            if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
+            	gui.displayDone(feedback, false);
+            	addToStackForUndo(task, "Task deleted.");
             } else {
-                gui.displayWarning(feedback, false);
+            	gui.displayWarning(feedback, false);
             }
-        } catch (Exception e){
+            
+            Task newTask = new Task();
+            newTask.setStartTime(task.getStartTime());
+            if (newTask.getStartTime() == null) {
+            	newTask.setDescription("floating");
+            }
+            showToUser(logic.list(newTask), task, Constants.HIGHLIGH, true);
+        } catch (Exception e) {
             e.printStackTrace();
         }
     }
@@ -152,7 +161,7 @@ public class UserInterface {
                 cmdInfo = cmdInfo.toLowerCase();
             }
 
-            if (task.getState() == null) {
+            if (task.getState() == null && task.getStartTime() == null) {
             	task.setState(StateType.PENDING);
             }
 
@@ -298,7 +307,7 @@ public class UserInterface {
             	if (task != null) {
             		ArrayList<Task> list = new ArrayList<Task> ();
             		list.add(task);
-            		gui.display(list, true);
+            		gui.display(list, -1, Constants.NO_EFFECT, true);
             	}
             	
             } else {
@@ -390,7 +399,20 @@ public class UserInterface {
     
     private void showToUser(ArrayList<Task> list, boolean isAppended) {
 		tasksOnScreen = new ArrayList<Task> (list);
-		gui.display(list, isAppended);
+		gui.display(list, -1, Constants.NO_EFFECT, isAppended);
+	}
+    
+    private void showToUser(ArrayList<Task> list, Task task, int effect, boolean isAppended) {
+		tasksOnScreen = new ArrayList<Task> (list);
+		
+		int i;
+		for(i = 0; i < list.size(); i ++) {
+			if (list.get(i).equals(task)) {
+				break;
+			}
+		}
+		
+		gui.display(list, i, effect, isAppended);
 	}
 
     public boolean isInteger(String input) {
@@ -409,6 +431,15 @@ public class UserInterface {
             return 0;
         }
     }
+    
+	private String convertCalendarToString(Calendar time, String FORMAT) {
+		if (time == null) {
+			return null;
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);     
+		return formatter.format(time.getTime());
+	}
+    
 	private String getFirstInt(String s) {
         String result = "";
         for(int i = 0; i < s.length(); i++) {
