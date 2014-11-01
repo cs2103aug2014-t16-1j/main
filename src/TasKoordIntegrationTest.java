@@ -39,8 +39,8 @@ public class TasKoordIntegrationTest {
         ui.executeCommands("delete Meeting");
         readFile(fileName);
         JSONObject expData = new JSONObject();
-        expData.put(Constants.STARTTIME, "Oct 25 2015 10:00:00");
-        expData.put(Constants.ENDTIME, "Oct 25 2015 11:00:00");
+        expData.put(Constants.STARTTIME, "Oct 25 2015 10:00");
+        expData.put(Constants.ENDTIME, "Oct 25 2015 11:00");
         expData.put(Constants.LOCATION, "Boardroom");
         expData.put(Constants.DESCRIPTION, "Lunch");
         expData.put(Constants.STATE_TYPE, "PENDING");
@@ -61,8 +61,8 @@ public class TasKoordIntegrationTest {
         ui.executeCommands("add Meeting from 9am to 10am on 24 Oct 2015 at Boardroom");
         readFile(fileName);
         JSONObject expData = new JSONObject();
-        expData.put(Constants.STARTTIME, "Oct 24 2015 09:00:00");
-        expData.put(Constants.ENDTIME, "Oct 24 2015 10:00:00");
+        expData.put(Constants.STARTTIME, "Oct 24 2015 09:00");
+        expData.put(Constants.ENDTIME, "Oct 24 2015 10:00");
         expData.put(Constants.LOCATION, "Boardroom");
         expData.put(Constants.DESCRIPTION, "Meeting");
         expData.put(Constants.STATE_TYPE, "PENDING");
