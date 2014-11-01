@@ -343,11 +343,11 @@ public class Parser {
             endTimeAndDate = getTime(currentTime);
         }
         if (date.length == 0) {
-            Calendar.getInstance();
+            Calendar calendar = Calendar.getInstance();
             date = new String[3];
-            date[0] = "" + Calendar.DATE;
-            date[1] = determineMonth("" + Calendar.MONTH);
-            date[2] = "" + Calendar.YEAR;
+            date[0] = "" + calendar.get(5);
+            date[1] = determineMonth("" + (calendar.get(2) + 1));
+            date[2] = "" + calendar.get(1);
         }
         if (endTime.length != 0 && endTimeAndDate == null) {
             endTimeAndDate = getTime(endTime);
