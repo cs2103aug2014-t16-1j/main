@@ -46,7 +46,7 @@ public class StorageTest {
                     "Fri Sep 12 09:00:00 SGT 2014", list.get(0).getStartTime().getTime().toString());
 			assertEquals("Test that the End Time is correctly recorded",
                     "Fri Sep 12 10:00:00 SGT 2014", list.get(0).getEndTime().getTime().toString());
-			assertEquals("Test that the State is correctly set", StateType.PENDING,list.get(0).getState());
+			assertEquals("Test that the State is correctly set", null,list.get(0).getState());
 			assertEquals("Test that the frequency is as default", 0,list.get(0).getFrequency());
 			assertEquals("Test that the frequency is as default", null,list.get(0).getFrequencyType());
 		}
@@ -75,7 +75,7 @@ public class StorageTest {
                     "Fri Sep 12 09:00:00 SGT 2014", list.get(0).getStartTime().getTime().toString());
 			assertEquals("Test that the End Time is correctly recorded",
                     "Fri Sep 12 10:00:00 SGT 2014", list.get(0).getEndTime().getTime().toString());
-			assertEquals("Test that the State is correctly set", StateType.PENDING,list.get(0).getState());
+			assertEquals("Test that the State is correctly set", null,list.get(0).getState());
 			assertEquals("Test that the frequency is as default", 0,list.get(0).getFrequency());
 			assertEquals("Test that the frequency is as default", null,list.get(0).getFrequencyType());
         } catch (Exception e) {
@@ -105,7 +105,7 @@ public class StorageTest {
                     "Fri Dec 12 21:00:00 SGT 2014", list.get(0).getStartTime().getTime().toString());
 			assertEquals("Test that the End Time is correctly recorded",
                     "Fri Dec 12 23:00:00 SGT 2014", list.get(0).getEndTime().getTime().toString());
-			assertEquals("Test that the State is correctly set", StateType.PENDING,list.get(0).getState());
+			assertEquals("Test that the State is correctly set", null,list.get(0).getState());
 			assertEquals("Test that the frequency is as default", 0,list.get(0).getFrequency());
 			assertEquals("Test that the frequency is as default", null,list.get(0).getFrequencyType());
         } catch (Exception e) {
