@@ -34,13 +34,13 @@ public class UITest {
 		ui.executeCommands("add Meeting from 9am to 10am on 24 Oct 2015 at Boardroom");
 		assertEquals(
 				ui.getDisplayedMessage(),
-				"<font size = 4 color = #A6E22E>Task added to TasKoord!</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[09:00:00</font><font size = 4 color = #E6DB74> - 10:00:00] </font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>Meeting</font><font size = 4 color = #CECEF6> @ Boardroom</font><br>");
+				"<font size = 4 color = #A6E22E>Task added to TasKoord!</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><b><u><font size = 3 color = #A6E22E>01. </font></u></b><b><u><font size = 4 color = #E6DB74>[09:00</font></u></b><b><u><font size = 4 color = #E6DB74> - 10:00]</font></u></b><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b><u><font size = 4 color = #66D9EF>Meeting</font></u></b><b><u><font size = 4 color = #CECEF6> @ Boardroom</font></u></b><br>");
 
 		// add a floating task
 		ui.executeCommands("add read Harry Potter");
 		assertEquals(
 				ui.getDisplayedMessage(),
-				"<font size = 4 color = #A6E22E>Task added to TasKoord!</font><br><br><font size = 4 color = #FD971F>===GOOD-TO-DO TASKS===</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #66D9EF>read Harry Potter</font><br>");
+				"<font size = 4 color = #A6E22E>Task added to TasKoord!</font><br><br><font size = 4 color = #FD971F>===GOOD-TO-DO TASKS===</font><br><br><font size = 3 color = #A6E22E>01. </font><b><u><font size = 4 color = #66D9EF>read Harry Potter</font></u></b><br>");
 
 		// add a deadline
 		ui.executeCommands("  ");
@@ -66,7 +66,7 @@ public class UITest {
 		ui.executeCommands("delete Harry");
 		assertEquals(
 				ui.getDisplayedMessage(),
-				"<font size = 4 color = #A6E22E>Tasks were deleted from TasKoord:</font><br><br><font size = 4 color = #FD971F>===GOOD-TO-DO TASKS===</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #66D9EF>read Harry Potter</font><br>");
+				"<font size = 4 color = #A6E22E>Tasks were deleted from TasKoord:</font><br><br><font size = 4 color = #FD971F>===GOOD-TO-DO TASKS===</font><br><br><font size = 3 color = #A6E22E>01. </font><strike><font size = 4 color = #66D9EF>read Harry Potter</font></strike><br>");
 
 		/*
 		 * tests for "list" partition
@@ -75,13 +75,13 @@ public class UITest {
 		ui.executeCommands("list");
 		assertEquals(
 				ui.getDisplayedMessage(),
-				"<br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[09:00:00</font><font size = 4 color = #E6DB74> - 10:00:00] </font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>Meeting</font><font size = 4 color = #CECEF6> @ Boardroom</font><br>");
+				"<br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[09:00</font><font size = 4 color = #E6DB74> - 10:00]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>Meeting</font><font size = 4 color = #CECEF6> @ Boardroom</font><br>");
 		
 		// list upcoming task
 		ui.executeCommands("list upcoming tasks for next 365 days");
 		assertEquals(
 				ui.getDisplayedMessage(),
-				"<br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[09:00:00</font><font size = 4 color = #E6DB74> - 10:00:00] </font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>Meeting</font><font size = 4 color = #CECEF6> @ Boardroom</font><br>");
+				"<br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[09:00</font><font size = 4 color = #E6DB74> - 10:00]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>Meeting</font><font size = 4 color = #CECEF6> @ Boardroom</font><br>");
 
 	}
 }
