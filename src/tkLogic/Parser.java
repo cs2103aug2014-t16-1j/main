@@ -95,7 +95,7 @@ public class Parser {
         } else if (commandTypeString.equalsIgnoreCase("set")) {
             return CommandType.SET;
         } else if (commandTypeString.equalsIgnoreCase("redo")) {
-        	return CommandType.REDO;
+            return CommandType.REDO;
         } else if (commandTypeString.equalsIgnoreCase("exit")) {
             return CommandType.EXIT;
         } else {
@@ -116,7 +116,7 @@ public class Parser {
                 commandKey = determineCommandKey(newWord);
                 word = new ArrayList<String>();
             } else {
-                word.add(newWord.replaceAll("/", ""));
+                word.add(newWord);
             }
         }
         executeCmdKey(word, commandKey);
@@ -203,6 +203,7 @@ public class Parser {
         for (int i = 1; i < description.size(); i++) {
             completeDescription += " " + description.get(i);
         }
+        completeDescription = completeDescription.replaceAll("/", "");
     }
 
     private void parseStartTime(ArrayList<String> time) {
@@ -261,12 +262,19 @@ public class Parser {
     private void parseDate(ArrayList<String> day) {
         date = new String[3];
         if (day.size() == 1) {
-            date[0] = day.get(0).substring(0, 2);
-            date[1] = determineMonth(day.get(0).substring(2, 4));
-            if (Integer.valueOf(day.get(0).substring(4, 6)) > 15) {
-                date[2] = "19" + day.get(0).substring(4, 6);
-            } else {
-                date[2] = "20" + day.get(0).substring(4, 6);
+            String enteredDate = day.get(0);
+            date[0] = enteredDate.substring(0, enteredDate.indexOf("/"));
+            enteredDate = enteredDate.replaceFirst(date[0] + "/", "");
+            date[1] = enteredDate.substring(0, enteredDate.indexOf("/"));
+            enteredDate = enteredDate.replaceFirst(date[1] + "/", "");
+            date[1] = determineMonth(date[1]);
+            date[2] = enteredDate;
+            if (date[2].length() == 2) {
+                if (Integer.valueOf(date[2]) > 50) {
+                    date[2] = "19" + date[2];
+                } else {
+                    date[2] = "20" + date[2];
+                }
             }
         } else {
             date[0] = day.get(0);
@@ -310,6 +318,7 @@ public class Parser {
         for (int i = 1; i < location.size(); i++) {
             completeLocation += " " + location.get(i);
         }
+        completeLocation = completeLocation.replaceAll("/", "");
     }
 
     private void parseFrequency(ArrayList<String> frequency) {
