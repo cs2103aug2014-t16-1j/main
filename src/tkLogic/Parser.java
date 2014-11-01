@@ -94,6 +94,8 @@ public class Parser {
             return CommandType.LIST;
         } else if (commandTypeString.equalsIgnoreCase("set")) {
             return CommandType.SET;
+        } else if (commandTypeString.equalsIgnoreCase("redo")) {
+        	return CommandType.REDO;
         } else if (commandTypeString.equalsIgnoreCase("exit")) {
             return CommandType.EXIT;
         } else {

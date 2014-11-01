@@ -24,6 +24,7 @@ public final class Constants {
 	public static final String MESSAGE_TASK_CLEARED = "All tasks cleared from TasKoord.";
 	public static final String MESSAGE_DUPLICATED_TASK = "This task has been already in the list.";
 	public static final String MESSAGE_UNDO_DONE = "The command was undone.";
+	public static final String MESSAGE_REDO_DONE = "The command was redone.";
 	public static final String MESSAGE_PRIORITY_SET = "Priority level set for task.";
 	public static final String MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST = "Cannot set priority because task does not exist";
 	public static final String MESSAGE_STATE_COMPLETED = "State changed to 'completed'.";

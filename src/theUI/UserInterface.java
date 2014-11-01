@@ -3,8 +3,6 @@ package theUI;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Stack;
-
 import tkLibrary.CommandType;
 import tkLibrary.Constants;
 import tkLibrary.PriorityType;
@@ -16,25 +14,42 @@ import tkLogic.Parser;
 
 public class UserInterface {
 
-    private String NO_COMMAND = "";
+	private final int COLOR_DONE = 1;
+	private final int COLOR_WARNING = 2;
+    private final String NO_COMMAND = "";
     private Logic logic;
     private Parser parser;
     private Gui gui;
     private ArrayList<Task> tasksOnScreen;
-    private Stack<String> statusForUndo;
-    private Stack<ArrayList<Task>> tasksForUndo;
-    private Stack<Integer> effectForUndo;
-    private Stack<Integer> posToDoEffect;
+    private ArrayList<String> statusForUndo;
+    private ArrayList<String> statusForRedo;
+    private ArrayList<ArrayList<Task>> tasksForUndo;
+    private ArrayList<ArrayList<Task>> tasksForRedo;
+    private ArrayList<Integer> effectForUndo;
+    private ArrayList<Integer> effectForRedo;
+    private ArrayList<Integer> posToDoEffectForUndo;
+    private ArrayList<Integer> posToDoEffectForRedo;
+    private ArrayList<Integer> colorForUndo;
+    private ArrayList<Integer> colorForRedo; 
+    private int currentPos;
+    private int availablePos;
     
     public UserInterface(String fileName) {
     	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
         tasksOnScreen = new ArrayList<Task> ();
-        statusForUndo = new Stack<String> ();
-        tasksForUndo = new Stack<ArrayList<Task>> ();
-        effectForUndo = new Stack<Integer> ();
-        posToDoEffect = new Stack<Integer> ();
+        statusForUndo = new ArrayList<String> ();
+        statusForRedo = new ArrayList<String> ();
+        tasksForUndo = new ArrayList<ArrayList<Task>> ();
+        tasksForRedo = new ArrayList<ArrayList<Task>> ();
+        effectForUndo = new ArrayList<Integer> ();
+        effectForRedo = new ArrayList<Integer> ();
+        posToDoEffectForUndo = new ArrayList<Integer> ();
+        posToDoEffectForRedo = new ArrayList<Integer> ();
+        colorForUndo = new ArrayList<Integer> ();
+        colorForRedo = new ArrayList<Integer> ();
+        currentPos = availablePos = -1;
     }
     
     public void run() {
@@ -98,6 +113,8 @@ public class UserInterface {
         	set(task);
         } else if (command == CommandType.BLOCK) {
         	block(task);
+        } else if (command == CommandType.REDO) {
+        	redo();
         } else if (command == CommandType.EXIT) {
         	gui.displayDone("Good Bye !!!", false);
         	 try {
@@ -139,12 +156,20 @@ public class UserInterface {
             ArrayList<Task> list = searchTaskOfSameDay(task);
             
             if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
+            	addToStackForUndoAndRedo(list, task, Constants.DELETED, "Task deleted.", COLOR_DONE,
+            			list, task, Constants.HIGHLIGH, feedback, COLOR_DONE);
             	gui.displayDone(feedback, false);
-            	addToStackForUndo(list, task, Constants.DELETED, "Task deleted.");
+            	showToUser(list, task, Constants.HIGHLIGH, true);
+            } else if (feedback.equals(Constants.MESSAGE_CLASHING_TIMESLOTS)) {
+            	addToStackForUndoAndRedo(list, task, Constants.DELETED, "Task deleted.", COLOR_DONE,
+            			list, task, Constants.HIGHLIGH, feedback, COLOR_WARNING);
+            	gui.displayWarning(feedback, false);
+            	showToUser(list, task, Constants.HIGHLIGH, true);
             } else {
             	gui.displayWarning(feedback, false);
+            	showToUser(list, task, Constants.HIGHLIGH, true);
             }
-            showToUser(list, task, Constants.HIGHLIGH, true);
+            
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -153,6 +178,7 @@ public class UserInterface {
 	private ArrayList<Task> searchTaskOfSameDay(Task task) {
 		Task taskToSearch = new Task();
 		taskToSearch.setStartTime(task.getStartTime());
+		taskToSearch.setEndTime(task.getEndTime());
 		if (taskToSearch.getStartTime() == null) {
 			taskToSearch.setDescription("floating");
 		}
@@ -215,7 +241,8 @@ public class UserInterface {
 	        		
 	        		String feedback = logic.delete(taskToBeDeleted);
 	        		if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
-	        			addToStackForUndo(list, taskToBeDeleted, Constants.HIGHLIGH, "Task restored.");
+	        			addToStackForUndoAndRedo(list, taskToBeDeleted, Constants.HIGHLIGH, "Task restored.", COLOR_DONE,
+	        					list, taskToBeDeleted, Constants.DELETED, feedback, COLOR_DONE);
 	        			gui.displayDone(feedback, false);
 	        			showToUser(list, taskToBeDeleted, Constants.DELETED, true);
 	        		} else {
@@ -235,7 +262,8 @@ public class UserInterface {
         		
         		String feedback = logic.delete(taskToBeDeleted);
         		if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
-        			addToStackForUndo(list, taskToBeDeleted, Constants.HIGHLIGH, "Task restored.");
+        			addToStackForUndoAndRedo(list, taskToBeDeleted, Constants.HIGHLIGH, "Task restored.", COLOR_DONE,
+        					list, taskToBeDeleted, Constants.DELETED, feedback, COLOR_DONE);
         			gui.displayDone(feedback, false);
         			showToUser(list, taskToBeDeleted, Constants.DELETED, true);
         		} else {
@@ -299,12 +327,17 @@ public class UserInterface {
 	private void displayFeedbackForEditing(ArrayList<Task> oldList, Task oldTask, ArrayList<Task> list, Task task,
 			String feedback) {
 		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
-			addToStackForUndo(oldList, oldTask, Constants.HIGHLIGH, "Task edited.");
+			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH, "Task edited.", COLOR_DONE,
+					list, task, Constants.HIGHLIGH, feedback, COLOR_DONE);
 			gui.displayDone(feedback, false);
+			showToUser(list, task, Constants.HIGHLIGH, true);
+		} else if (feedback.equals(Constants.MESSAGE_EDIT_CLASHING_TIMESLOTS)) {
+			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH, "Task edited.", COLOR_WARNING,
+					list, task, Constants.HIGHLIGH, feedback, COLOR_WARNING);
+			gui.displayWarning(feedback, false);
 			showToUser(list, task, Constants.HIGHLIGH, true);
 		} else {
 			gui.displayWarning(feedback, false);
-			showToUser(list, task, Constants.HIGHLIGH, true);
 		}
 	}
 
@@ -314,7 +347,8 @@ public class UserInterface {
             if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
             	ArrayList<Task> list = logic.list(new Task()); 
                 gui.displayDone(feedback, false);
-                addToStackForUndo(list, new Task(), Constants.NO_EFFECT, "All tasks restored.");
+                addToStackForUndoAndRedo(list, new Task(), Constants.NO_EFFECT, "All tasks restored.", COLOR_DONE,
+                		null, null, Constants.NO_EFFECT, feedback, COLOR_DONE);
             } else {
                 gui.displayWarning(feedback, false);
             }
@@ -326,29 +360,84 @@ public class UserInterface {
     private void undo() {
         try {
             String feedback = logic.undo();
-            if (feedback.equals(Constants.MESSAGE_UNDO_DONE)) {
-            	gui.displayDone(statusForUndo.pop(), false);
-            	gui.display(tasksForUndo.pop(), posToDoEffect.pop(), effectForUndo.pop(), true);
+            if (feedback.equals(Constants.MESSAGE_UNDO_DONE) && currentPos >= 0) {
+            	if (colorForUndo.get(currentPos) == COLOR_DONE) {
+            		gui.displayDone(statusForUndo.get(currentPos), false);
+            	} else {
+            		gui.displayWarning(statusForUndo.get(currentPos), false);
+            	}
+            	gui.display(tasksForUndo.get(currentPos), posToDoEffectForUndo.get(currentPos), effectForUndo.get(currentPos), true);
+            	currentPos --;
             } else {
-            	gui.displayWarning(feedback, false);
+            	gui.displayWarning("No command for undoing", false);
             }
         } catch (Exception e) {
             e.printStackTrace();
         }
     }
     
-    private void addToStackForUndo(ArrayList<Task> list, Task task, int effect, String message) {
-    	int pos;
-    	for (pos = 0; pos < list.size(); pos ++) {
-    		if (list.get(pos).equals(task)) {
-    			break;
-    		}
+    private void redo() {
+        try {
+            String feedback = logic.redo();
+            if (feedback.equals(Constants.MESSAGE_REDO_DONE) && currentPos < availablePos) {
+            	currentPos ++;
+            	if (colorForRedo.get(currentPos) == COLOR_DONE) {
+            		gui.displayDone(statusForRedo.get(currentPos), false);
+            	} else {
+            		gui.displayWarning(statusForRedo.get(currentPos), false);
+            	}
+            	gui.display(tasksForRedo.get(currentPos), posToDoEffectForRedo.get(currentPos), effectForRedo.get(currentPos), true);
+            } else {
+            	gui.displayWarning("No command for redoing", false);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }    	
+    }
+    
+    private void addToStackForUndoAndRedo(ArrayList<Task> listForUndo, Task taskForUndo, int undoEffect, String messageForUndo, int ucolor,
+    		ArrayList<Task> listForRedo, Task taskForRedo, int redoEffect, String messageForRedo, int rcolor) {
+    	int posForUndo = -1, posForRedo = -1;
+    	
+    	if (listForUndo != null) {
+	    	for (posForUndo = 0; posForUndo < listForUndo.size(); posForUndo ++) {
+	    		if (listForUndo.get(posForUndo).equals(taskForUndo)) {
+	    			break;
+	    		}
+	    	}
+    	}
+    	if (listForRedo != null) {
+	    	for (posForRedo = 0; posForRedo < listForRedo.size(); posForRedo ++) {
+	    		if (listForRedo.get(posForRedo).equals(taskForRedo)) {
+	    			break;
+	    		}
+	    	}
     	}
     	
-    	statusForUndo.push(message);
-    	tasksForUndo.push(list);
-    	effectForUndo.push(effect);
-    	posToDoEffect.push(pos);
+    	currentPos ++; availablePos = currentPos;
+    	if (currentPos >= statusForUndo.size()) {
+	    	statusForUndo.add(messageForUndo);
+	    	statusForRedo.add(messageForRedo);
+	    	tasksForUndo.add(listForUndo);
+	    	tasksForRedo.add(listForRedo);
+	    	effectForUndo.add(undoEffect);
+	    	effectForRedo.add(redoEffect);
+	    	posToDoEffectForUndo.add(posForUndo);
+	    	posToDoEffectForRedo.add(posForRedo);
+	    	colorForUndo.add(ucolor);
+	    	colorForRedo.add(rcolor);
+    	} else {
+    		statusForUndo.set(currentPos, messageForUndo);
+	    	statusForRedo.set(currentPos, messageForRedo);
+	    	tasksForUndo.set(currentPos, listForUndo);
+	    	tasksForRedo.set(currentPos, listForRedo);
+	    	effectForUndo.set(currentPos, undoEffect);
+	    	effectForRedo.set(currentPos, redoEffect);
+	    	posToDoEffectForUndo.set(currentPos, posForUndo);
+	    	posToDoEffectForRedo.set(currentPos, posForRedo);
+	    	colorForUndo.set(currentPos, ucolor);
+	    	colorForRedo.set(currentPos, rcolor);
+    	}
     }
     
     private void search(Task task) {
@@ -386,7 +475,8 @@ public class UserInterface {
                 gui.displayDone(Constants.MESSAGE_NO_RESULT, false);
             } else if (list.size() == 1) {
             	Task taskToBeEdited = list.get(0);
-    			editTheTask(task, taskToBeEdited);} else {
+    			editTheTask(task, taskToBeEdited);
+    		} else {
             	gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND, false);
             	showToUser(list, true);
             }
@@ -396,19 +486,24 @@ public class UserInterface {
     }
 
 	private void editTheTask(Task task, Task taskToBeEdited) {
-		ArrayList<Task> list;
-		list = new ArrayList<Task> (searchTaskOfSameDay(taskToBeEdited));
+		ArrayList<Task> originalList;
+		originalList = new ArrayList<Task> (searchTaskOfSameDay(taskToBeEdited));
 		Task originalTask = new Task(taskToBeEdited);
 		
 		updateNewPriorityAndState(task, taskToBeEdited);
 		String feedback = logic.set(taskToBeEdited);
 		
 		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
-			addToStackForUndo(list, originalTask, Constants.HIGHLIGH, String.format(
-					Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY, originalTask.getState(), originalTask.getPriorityLevel()));
-			gui.displayDone(String.format(Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY, 
-					taskToBeEdited.getState(), taskToBeEdited.getPriorityLevel()), false);
-			list = searchTaskOfSameDay(taskToBeEdited);
+			String message = String.format(Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY, 
+					taskToBeEdited.getState(), taskToBeEdited.getPriorityLevel());
+			String messageForUndo = String.format(Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY, 
+					originalTask.getState(), originalTask.getPriorityLevel());
+			
+			ArrayList<Task> list = searchTaskOfSameDay(taskToBeEdited);
+			addToStackForUndoAndRedo(originalList, originalTask, Constants.HIGHLIGH, messageForUndo, COLOR_DONE,
+					list, taskToBeEdited, Constants.HIGHLIGH, messageForUndo, COLOR_DONE);
+			
+			gui.displayDone(message, false);
 			showToUser(list, taskToBeEdited, Constants.HIGHLIGH, true);
 		} else {
 			gui.displayWarning(feedback, false);

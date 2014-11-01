@@ -119,6 +119,11 @@ public class Logic {
 		return storage.undo();
 	}
 	
+	public String redo() {
+		logger.info("Next command redone.");
+		return storage.redo();
+	}
+	
 	public String clear() {
 		storage.clear();
 		logger.info("Tasks cleared from TasKoord.");
@@ -147,17 +152,37 @@ public class Logic {
 		Collections.sort(list, new Comparator<Task>() {
 	        @Override
 	        public int compare(Task  task1, Task  task2) {
-	        	String t1 = convertCalendarToString(task1.getStartTime(), Constants.FORMAT_DATE_CMP);
-	        	String t2 = convertCalendarToString(task2.getStartTime(), Constants.FORMAT_DATE_CMP);
-	        	
-	            if (t1 == null && t2 != null ) {
+	        	String s1 = convertCalendarToString(task1.getStartTime(), Constants.FORMAT_DATE_CMP);
+	        	String s2 = convertCalendarToString(task2.getStartTime(), Constants.FORMAT_DATE_CMP);
+	        	String e1 = convertCalendarToString(task1.getEndTime(), Constants.FORMAT_DATE_CMP);
+	        	String e2 = convertCalendarToString(task2.getEndTime(), Constants.FORMAT_DATE_CMP);
+	        	String n1 = task1.getDescription().toLowerCase();
+	        	String n2 = task2.getDescription().toLowerCase();
+	        			
+	            if (s1 == null && s2 != null ) {
 	            	return 1;
-	            } else if (t1 != null && t2 == null ) {
+	            } else if (s1 != null && s2 == null ) {
 	            	return -1;
-	            } else if (t1 == null && t2 == null ) {
-	            	return 0;
+	            } else if (s1 == null && s2 == null ) {
+	            	return n1.compareTo(n2);
+	            }
+	            
+	            if (s1.compareTo(s2) != 0) {
+	            	return s1.compareTo(s2);
 	            } 
-	            return t1.compareTo(t2);
+	            
+	            if (e1 == null && e2 != null ) {
+	            	return 1;
+	            } else if (e1 != null && e2 == null ) {
+	            	return -1;
+	            } else if (e1 == null && e2 == null ) {
+	            	return n1.compareTo(n2);
+	            }
+	            
+	            if (e1.compareTo(e2) != 0) {
+	            	return e1.compareTo(e2);
+	            }
+	            return n1.compareTo(n2);
 	        }
 	    });
 		logger.info("Tasks sorted.");

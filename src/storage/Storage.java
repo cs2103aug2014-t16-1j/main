@@ -5,11 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.PrintWriter;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Scanner;
-import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -28,7 +25,9 @@ public class Storage {
 	
 	private ArrayList<Task> oldTasks;
 	private ArrayList<Task> listOfTasks;
-	private Stack<ArrayList<Task>> stackForUndo;
+	private ArrayList<ArrayList<Task>> stackForUndo;
+	private int currentPos;
+	private int availablePos;
 	
 	private Logger logger;
 	
@@ -39,7 +38,8 @@ public class Storage {
 		closeFileToWrite();
 		this.listOfTasks = loadFromFile();
 		this.oldTasks = copyList(this.listOfTasks);
-		this.stackForUndo = new Stack<ArrayList<Task>> ();
+		this.stackForUndo = new ArrayList<ArrayList<Task>> ();
+		this.currentPos = this.availablePos = -1;
 	}
 	
 	public ArrayList<Task> load() {
@@ -72,7 +72,7 @@ public class Storage {
 	public void add(Task task) {
 		oldTasks = copyList(listOfTasks);
 		if(!oldTasks.isEmpty()){
-			stackForUndo.push(oldTasks);
+			push(oldTasks);
 		}
 		openFileToWrite(true);
 		store(task);
@@ -105,7 +105,7 @@ public class Storage {
 		} 
 		
 		oldTasks = copyList(listOfTasks);
-		stackForUndo.push(oldTasks);
+		push(oldTasks);
 		//deleteFile();
 		listOfTasks.clear();
 		store(newList);
@@ -114,7 +114,7 @@ public class Storage {
 	public void set(Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
 		oldTasks = copyList(listOfTasks);
-		stackForUndo.push(oldTasks);
+		push(oldTasks);
 		
 		for (Task item : listOfTasks) {
 			if (item.equals(newTask)) {
@@ -132,7 +132,7 @@ public class Storage {
 	public void edit(Task oldTask, Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
 		oldTasks = copyList(listOfTasks);
-		stackForUndo.push(oldTasks);
+		push(oldTasks);
 		
 		for (Task item : listOfTasks) {
 			if (item.equals(oldTask)) {
@@ -155,13 +155,32 @@ public class Storage {
 	}
 	
 	public String undo() {
-		if (!stackForUndo.empty()) {
-			//deleteFile();
+		if (currentPos >= 0) {
 			listOfTasks.clear();
-			store(stackForUndo.pop());
+			store(stackForUndo.get(currentPos));
+			currentPos --;
 			return Constants.MESSAGE_UNDO_DONE;
 		}
 		return "Stack is empty";
+	}
+	
+	public String redo() {
+		if (currentPos < availablePos) {
+			currentPos ++;
+			listOfTasks.clear();
+			store(stackForUndo.get(currentPos));
+			return Constants.MESSAGE_REDO_DONE;
+		}
+		return "No command to redo.";
+	}
+	
+	private void push(ArrayList<Task> list) {
+		currentPos ++; availablePos = currentPos;
+    	if (currentPos >= stackForUndo.size()) {
+    		stackForUndo.add(list);
+    	} else {
+    		stackForUndo.set(currentPos, list);
+    	}
 	}
 	
 	private ArrayList<Task> copyList(ArrayList<Task> list) {
@@ -172,14 +191,6 @@ public class Storage {
 		return result;
 	}
 	
-	private String convertCalendarToString(Calendar time) {
-		if (time == null) {
-			return null;
-		}
-		SimpleDateFormat formatter = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);     
-		return formatter.format(time.getTime());
-	}
-
 	private void openFileToWrite(boolean append) {
 		try {
 			out = new PrintWriter(new FileWriter(fileName, append));

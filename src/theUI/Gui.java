@@ -196,7 +196,7 @@ public class Gui {
     			
     			int eff = Constants.NO_EFFECT;
     			if (i == pos) {
-    				eff = effect; System.out.println("hehehe");
+    				eff = effect;
     			}
     			String color = COLOR_DESCRIPTION;
     			if (lists.get(i).getPriorityLevel() == PriorityType.HIGH) {

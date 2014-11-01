@@ -7,3 +7,7 @@ TasKoord.txt
 storeTest.txt
 *.log.*
 *.log
+/nbproject/private/
+.DS_Store
+build.xml
+nbproject/
