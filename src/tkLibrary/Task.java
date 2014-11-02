@@ -13,6 +13,7 @@ public class Task {
     private String location;
     private String description;
     private PriorityType priorityLevel;
+    private boolean sync;
     private boolean blocked;
 
     public Task() {
@@ -22,6 +23,7 @@ public class Task {
         this.description = null;
         this.state = null;
         this.priorityLevel = null;
+        this.sync = false;
         this.blocked = false;
     }
     
@@ -42,6 +44,7 @@ public class Task {
         this.description = task.getDescription();
         this.priorityLevel = task.getPriorityLevel();
         this.state = task.getState();
+        this.sync = task.isSync();
         this.blocked = task.isBlocked();
     }
     
@@ -55,6 +58,10 @@ public class Task {
     
     public boolean isBlocked() {
     	return this.blocked;
+    }
+    
+    public boolean isSync(){
+    	return this.sync;
     }
     
     public void update(Task task) {
@@ -206,6 +213,10 @@ public class Task {
                 this.priorityLevel = PriorityType.HIGH;
             }
         }
+    }
+    
+    public void setSync(){
+    	this.sync = true;
     }
 
     public Calendar getStartTime() {

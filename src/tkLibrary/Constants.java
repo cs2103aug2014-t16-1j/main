@@ -31,6 +31,15 @@ public final class Constants {
 	public static final String MESSAGE_STATE_DISCARDED = "State changed to 'discarded'.";
 	public static final String MESSAGE_STATE_PENDING = "State changed to 'pending'.";
 	public static final String MESSAGE_MORE_THAN_ONE_TASK_FOUND = "There are more than 1 task found. Specify the task.";
+
+	//Gcal constants
+	public static final String MESSAGE_USER_OFFLINE = "User is Offline.";
+	public static final String MESSAGE_CRED_CORRECT = "The credentials are correct.";
+	public static final String MESSAGE_CRED_NOT_CORRECT = "The credentials are not correct.";
+	public static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete";
+	public static final String MESSAGE_SYNC_NOT_COMPLETE = "Synchronization is not complete";
+	public static final String MESSAGE_USER_NOT_ONLINE = "Please check your internet connection.";
+	public static final String MESSAGE_NOT_UPDATE = "%s is not updated.\n";
 	
 	// logic exceptions constants
 	public static final String EXCEPTIONS_ADD_FAIL = "Unable to add to TasKoord.";
@@ -48,6 +57,7 @@ public final class Constants {
 	public static final String FREQUENCY_TYPE = "FREQUENCY_TYPE";
 	public static final String STATE_TYPE = "STATE_TYPE";
 	public static final String PRIORITY_TYPE = "PRIORITY";
+	public static final String SYNC_STATUS = "SYNC";
 	public static final String END_OBJECT_SIGNAL = "END";
 
 	
