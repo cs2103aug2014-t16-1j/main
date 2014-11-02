@@ -1,9 +1,10 @@
-package GCal;
+	package GCal;
 
 import tkLibrary.Task;
 import tkLibrary.Constants;
 import storage.Storage;
 //import storage.jsonConverter;
+
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -15,17 +16,18 @@ import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.TimeZone;
 import java.text.SimpleDateFormat;
 import java.text.ParseException;
 
 //import org.json.simple.JSONObject;
+
 
 import com.google.api.services.calendar.Calendar;
 //import com.google.api.services.calendar.Calendar.CalendarList;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
-
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -129,7 +131,7 @@ public class GCal {
 					.calendars().get("primary").execute();
 			
 			Storage store  = new Storage("TasKoord.txt");
-			for(Task i : store.loadFromFile()){
+			for(Task i : store.loadFromFile()) {
 				if(!i.isSync()){
 					createEvent(i,calendar.getId());
 				}
@@ -139,24 +141,21 @@ public class GCal {
 
 	public String createEvent(Task task,String calId) throws IOException {
 		Event event = new Event();
-		try{
-			event.setSummary(null);
-			event.setDescription(task.getDescription());
-			event.setLocation(task.getLocation());
-			
-			SimpleDateFormat sdf = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);
-			Date start_date = sdf.parse(sdf.format(task.getStartTime()));
-			event.setStart(new EventDateTime().setDateTime(new DateTime(start_date)));
-			
-			SimpleDateFormat sdf1 = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);
-			Date end_date = sdf1.parse(sdf1.format(task.getEndTime()));
-			event.setStart(new EventDateTime().setDateTime(new DateTime(end_date)));
-			
-			client.events().insert(calId, event).execute();
-			return event.getId();
-		} catch(ParseException e){
-			return null;
-		}
+		event.setSummary(task.getDescription());
+		event.setLocation(task.getLocation());
+		
+		SimpleDateFormat sdf = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);
+		
+		Date startDate = task.getStartTime().getTime();
+		DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
+		event.setStart(new EventDateTime().setDateTime(start));
+		
+		Date endDate = task.getEndTime().getTime();
+		DateTime end = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
+		event.setEnd(new EventDateTime().setDateTime(end));
+		
+		client.events().insert(calId, event).execute();
+		return event.getId();
 	}
 	
 	public static boolean validFile() {

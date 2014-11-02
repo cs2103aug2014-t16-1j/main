@@ -1,8 +1,13 @@
 package theUI;
 
+import java.io.IOException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+
+import GCal.GCal;
 import tkLibrary.CommandType;
 import tkLibrary.Constants;
 import tkLibrary.PriorityType;
@@ -20,6 +25,8 @@ public class UserInterface {
     private Logic logic;
     private Parser parser;
     private Gui gui;
+    private GCal gCal;
+    
     private ArrayList<Task> tasksOnScreen;
     private ArrayList<String> statusForUndo;
     private ArrayList<String> statusForRedo;
@@ -34,10 +41,15 @@ public class UserInterface {
     private int currentPos;
     private int availablePos;
     
+    private boolean isSyncing;
+    private String accessToken;
+    
     public UserInterface(String fileName) {
     	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
+        gCal = new GCal();
+        
         tasksOnScreen = new ArrayList<Task> ();
         statusForUndo = new ArrayList<String> ();
         statusForRedo = new ArrayList<String> ();
@@ -50,21 +62,30 @@ public class UserInterface {
         colorForUndo = new ArrayList<Integer> ();
         colorForRedo = new ArrayList<Integer> ();
         currentPos = availablePos = -1;
+        
+        isSyncing = false;
+        accessToken = "";
     }
     
     public void run() {
         while (true) {
             try {
-                Thread.sleep(50);
+                Thread.sleep(1000);
             } catch(InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
             
             String userCommand = gui.getUserCommand();
             if (!userCommand.equals(NO_COMMAND)) {
+            	if (isSyncing) {
+            		gui.setUserCommand(NO_COMMAND);
+            		accessToken = userCommand;
+            		syncWithToken();
+            		continue;
+            	}
                 try {
+                	gui.setUserCommand(NO_COMMAND);
                     executeCommands(userCommand);
-                    gui.setUserCommand(NO_COMMAND);
                 } catch (Exception e) {
                     System.out.println(e.getMessage());
                 }
@@ -115,10 +136,12 @@ public class UserInterface {
         	block(task);
         } else if (command == CommandType.REDO) {
         	redo();
+        } else if (command == CommandType.SYNC) {
+        	sync();
         } else if (command == CommandType.EXIT) {
         	gui.displayDone("Good Bye !!!", false);
         	 try {
-                 Thread.sleep(1000);
+                 Thread.sleep(100);
              } catch(InterruptedException e) {
                  Thread.currentThread().interrupt();
              }
@@ -126,6 +149,50 @@ public class UserInterface {
         } else {
             gui.displayWarning("Informat command", false);
         }
+    }
+    
+    /* Standard main method to try that test as a standalone application. */
+	public void getTokenPopup(String url)  {
+		
+		try {
+			java.awt.Desktop.getDesktop().browse(new URI(url));
+		} catch (IOException e) {
+			e.printStackTrace();
+		} catch (URISyntaxException e) {
+			e.printStackTrace();
+		}
+	}
+    
+	private void syncWithToken() {
+		isSyncing = false;
+		System.out.println(accessToken);
+		try {
+			gCal.generateNewToken(accessToken);
+			gCal.syncGcal();
+		} catch (Exception e) {
+			e.printStackTrace();
+			gui.displayWarning("Cannot sync, generate the token again!", false);
+		}
+	}
+	
+    private void sync() {
+    	isSyncing = true;
+    	if (!GCal.isOnline()) {
+    		gui.displayWarning("No internet connection!", false);
+    		isSyncing = false;
+    	} else if (gCal.withExistingToken()){
+    		try {
+				gCal.syncGcal();
+				gui.displayDone("Sync done", false);
+				isSyncing = false;
+				return;
+			} catch (IOException e) {
+				e.printStackTrace();
+			}
+    		getTokenPopup(gCal.getURL());
+    	} else {
+    		getTokenPopup(gCal.getURL());
+    	}
     }
     
     private void add(Task task) {

@@ -280,16 +280,5 @@ public class Gui {
 			return res;
 		}
 	}
-	
-	private String formatWithNewLine(String text, String size, String color, int effect) {
-		String res = "<font size = " + size + " color = " + color + ">" + text + "</font><br>";
-		if (effect == Constants.HIGHLIGH) {
-			return "<b><u>" + res + "</u></b>";
-		} else if (effect == Constants.DELETED) {
-			return "<strike>" + res + "</strike>";
-		} else {
-			return res;
-		}
-	}
 }
 
