@@ -4,5 +4,22 @@
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/JavaSE-1.7"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/4"/>
 	<classpathentry kind="lib" path="libs/json-simple-1.1.1.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/google-api-services-calendar-v3-rev103-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/commons-logging-1.1.1.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-api-client-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-api-client-gson-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-api-client-jackson2-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-api-client-java6-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-http-client-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-http-client-gson-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-http-client-jackson2-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-http-client-jdo-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-oauth-client-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-oauth-client-java6-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/google-oauth-client-jetty-1.19.0.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/gson-2.1.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/jackson-core-2.1.3.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/jdo2-api-2.3-eb.jar"/>
+	<classpathentry kind="lib" path="libs/calendar/libs/jsr305-1.3.9.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
