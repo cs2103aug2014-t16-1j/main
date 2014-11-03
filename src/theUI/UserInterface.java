@@ -70,7 +70,7 @@ public class UserInterface {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(100);
+                Thread.sleep(1000);
             } catch(InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -188,9 +188,9 @@ public class UserInterface {
 				isSyncing = false;
 				return;
 			} catch (IOException e) {
-				getTokenPopup(gCal.getURL());
 				e.printStackTrace();
 			}
+    		getTokenPopup(gCal.getURL());
     	} else {
     		getTokenPopup(gCal.getURL());
     	}

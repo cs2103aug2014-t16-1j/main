@@ -141,8 +141,8 @@ public class GCal {
 					i.setSync(true);
 				}
 				newList.add(i);
-				store.store(newList);
 			}
+			store.store(newList);
 			return Constants.MESSAGE_SYNC_COMPLETE;
 	}
 
