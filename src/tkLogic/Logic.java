@@ -264,8 +264,12 @@ public class Logic {
 		ArrayList<Task> allTasks = storage.load();
 		ArrayList<Task> queryList = new ArrayList<Task>();
 		
-		if(isFloatingOrDeadlineTask(task)){
+		if(isFloatingTask(task)){
 			return true;
+		}
+		
+		if(isDeadlineTask(task)){
+			return false;
 		}
 		
 		for(Task item: allTasks){
@@ -291,8 +295,12 @@ public class Logic {
 		return true;
 	}
 	
-	private boolean isFloatingOrDeadlineTask(Task task){
-		return (task.getEndTime() == null || task.getStartTime() == null);
+	private boolean isFloatingTask(Task task){
+		return (task.getEndTime() == null && task.getStartTime() == null);
+	}
+	
+	private boolean isDeadlineTask(Task task){
+		return (task.getEndTime() == null);
 	}
 	
 	private boolean isTimedTask(Task task){
