@@ -92,7 +92,7 @@ public class Logic {
 		if (task.getDescription() != null) {
 			isDeadline = task.getDescription().toLowerCase().contains("deadline");
 			isEvent = task.getDescription().toLowerCase().contains("event");
-			isFloating = task.getDescription().toLowerCase().contains("floating");
+			isFloating = task.getDescription().toLowerCase().contains("good to do");
 		}
 		if (!isDeadline && !isEvent && !isFloating) {
 			isDeadline = isEvent = isFloating = true;
