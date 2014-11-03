@@ -5,6 +5,7 @@ test.txt
 logicTest.txt
 TasKoord.txt
 storeTest.txt
+GToken
 *.log.*
 *.log
 /nbproject/private/
