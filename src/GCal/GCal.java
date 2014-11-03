@@ -17,8 +17,6 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
-import java.text.SimpleDateFormat;
-import java.text.ParseException;
 
 //import org.json.simple.JSONObject;
 
@@ -143,8 +141,6 @@ public class GCal {
 		Event event = new Event();
 		event.setSummary(task.getDescription());
 		event.setLocation(task.getLocation());
-		
-		SimpleDateFormat sdf = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);
 		
 		Date startDate = task.getStartTime().getTime();
 		DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));

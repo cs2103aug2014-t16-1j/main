@@ -37,7 +37,7 @@ public class UserInterface {
     private ArrayList<Integer> posToDoEffectForUndo;
     private ArrayList<Integer> posToDoEffectForRedo;
     private ArrayList<Integer> colorForUndo;
-    private ArrayList<Integer> colorForRedo; 
+    private ArrayList<Integer> colorForRedo;
     private int currentPos;
     private int availablePos;
     
@@ -70,7 +70,7 @@ public class UserInterface {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch(InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -153,7 +153,7 @@ public class UserInterface {
     
     /* Standard main method to try that test as a standalone application. */
 	public void getTokenPopup(String url)  {
-		
+		gui.displayDone("Please follow the link and type down the access key!", false);
 		try {
 			java.awt.Desktop.getDesktop().browse(new URI(url));
 		} catch (IOException e) {
@@ -169,6 +169,7 @@ public class UserInterface {
 		try {
 			gCal.generateNewToken(accessToken);
 			gCal.syncGcal();
+			gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			gui.displayWarning("Cannot sync, generate the token again!", false);
@@ -183,13 +184,13 @@ public class UserInterface {
     	} else if (gCal.withExistingToken()){
     		try {
 				gCal.syncGcal();
-				gui.displayDone("Sync done", false);
+				gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
 				isSyncing = false;
 				return;
 			} catch (IOException e) {
+				getTokenPopup(gCal.getURL());
 				e.printStackTrace();
 			}
-    		getTokenPopup(gCal.getURL());
     	} else {
     		getTokenPopup(gCal.getURL());
     	}
