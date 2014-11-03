@@ -268,6 +268,10 @@ public class Logic {
 			return true;
 		}
 		
+		if(isDeadlineTask(task)){
+			return false;
+		}
+		
 		for(Task item: allTasks){
 			if (isTimedTask(item)){
 				queryList.add(item);
@@ -292,7 +296,11 @@ public class Logic {
 	}
 	
 	private boolean isFloatingOrDeadlineTask(Task task){
-		return (task.getEndTime() == null || task.getStartTime() == null);
+		return (task.getEndTime() == null && task.getStartTime() == null);
+	}
+	
+	private boolean isDeadlineTask(Task task){
+		return (task.getEndTime() == null);
 	}
 	
 	private boolean isTimedTask(Task task){
