@@ -215,8 +215,8 @@ public class Task {
         }
     }
     
-    public void setSync(){
-    	this.sync = true;
+    public void setSync(boolean sync_status){
+    	this.sync = sync_status;
     }
 
     public Calendar getStartTime() {

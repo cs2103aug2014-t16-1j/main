@@ -38,7 +38,7 @@ public final class Constants {
 	public static final String MESSAGE_CRED_NOT_CORRECT = "The credentials are not correct.";
 	public static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete";
 	public static final String MESSAGE_SYNC_NOT_COMPLETE = "Synchronization is not complete";
-	public static final String MESSAGE_USER_NOT_ONLINE = "Please check your internet connection.";
+	public static final String MESSAGE_USER_NOT_ONLINE = "User Offline \n Please check your internet connection.";
 	public static final String MESSAGE_NOT_UPDATE = "%s is not updated.\n";
 	
 	// logic exceptions constants

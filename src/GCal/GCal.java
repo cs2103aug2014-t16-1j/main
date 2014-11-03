@@ -1,9 +1,10 @@
-	package GCal;
+package GCal;
 
 import tkLibrary.Task;
 import tkLibrary.Constants;
 import storage.Storage;
 //import storage.jsonConverter;
+
 
 
 import java.io.BufferedReader;
@@ -14,11 +15,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.net.InetSocketAddress;
 import java.net.Socket;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.TimeZone;
 
 //import org.json.simple.JSONObject;
+
 
 
 import com.google.api.services.calendar.Calendar;
@@ -130,11 +133,15 @@ public class GCal {
 			com.google.api.services.calendar.model.Calendar calendar = client
 					.calendars().get("primary").execute();
 			
+			ArrayList<Task> newList = new ArrayList<Task>();
 			Storage store  = new Storage(fileName);
 			for(Task i : store.loadFromFile()) {
-				if(!i.isSync()){
+				if(!i.isSync() && isTimedTask(i)){
 					createEvent(i,calendar.getId());
+					i.setSync(true);
 				}
+				newList.add(i);
+				store.store(newList);
 			}
 			return Constants.MESSAGE_SYNC_COMPLETE;
 	}
@@ -204,5 +211,9 @@ public class GCal {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+	
+	private boolean isTimedTask(Task task){
+		return (task.getStartTime() != null && task.getEndTime() != null);
 	}
 }

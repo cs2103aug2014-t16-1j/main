@@ -28,6 +28,9 @@ public class jsonConverter {
 		if(task.getState() != null){
 			jTask.put(Constants.STATE_TYPE, task.getState().toString());
 		}
+		if(!task.isSync()){
+			jTask.put(Constants.SYNC_STATUS,"true");
+		}
 		return jTask;
 	}		
 	
@@ -43,6 +46,9 @@ public class jsonConverter {
 			temp.setFrequencyType((String) obj.get(Constants.FREQUENCY_TYPE));
 			temp.setPriority((String) obj.get(Constants.PRIORITY_TYPE));
 			temp.setState((String) obj.get(Constants.STATE_TYPE));
+			if(obj.get(Constants.SYNC_STATUS) != null){
+				temp.setSync(true);
+			}
 		}catch(Exception e){
 			e.printStackTrace();
 		}

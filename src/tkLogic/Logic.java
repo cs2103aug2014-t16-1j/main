@@ -13,7 +13,7 @@ import java.util.logging.SimpleFormatter;
 import storage.Storage;
 import tkLibrary.Constants;
 import tkLibrary.Task;
-
+import GCal.GCal;
 /*
  * Basically the logic functions should be very clear and simple.
  * So that UserInterface have to parse the command and call the logic.
@@ -22,9 +22,11 @@ import tkLibrary.Task;
 public class Logic {
 	private Storage storage;
 	private Logger logger;
+	private GCal gcal;
 	
 	public Logic(String fileName) {
 		storage = new Storage(fileName);
+		gcal = new GCal(fileName);
 		try {  
 		    logger = Logger.getLogger(".LogicLogFile.log");
 	        // This block configure the logger with handler and formatter  
@@ -347,5 +349,21 @@ public class Logic {
 		}
 		logger.info("Task does not exist.");
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
+	}
+	
+	public String getUrl(){
+		return gcal.getURL();
+	}
+	
+	public boolean sycnWithGoogleExistingToken(){
+		return gcal.withExistingToken();
+	}
+
+	public boolean generateNewToken(String code) throws IOException{
+		return gcal.generateNewToken(code);
+	}
+	
+	public String syncWithGoogle() throws IOException{
+		return gcal.syncGcal();
 	}
 }
