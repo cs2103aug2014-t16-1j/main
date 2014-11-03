@@ -48,7 +48,7 @@ public class UserInterface {
     	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
-        gCal = new GCal();
+        gCal = new GCal(fileName);
         
         tasksOnScreen = new ArrayList<Task> ();
         statusForUndo = new ArrayList<String> ();

@@ -43,6 +43,7 @@ public class GCal {
 	HttpTransport httpTransport;
 	JacksonFactory jsonFactory;
 	private static Calendar client;
+	String fileName ;
 
 	public static boolean isOnline() {
 		Socket socket = new Socket();
@@ -62,7 +63,8 @@ public class GCal {
 		}
 	}
 
-	public GCal() {
+	public GCal(String filename) {
+		this.fileName = filename;
 		httpTransport = new NetHttpTransport();
 		jsonFactory = new JacksonFactory();
 		String clientId = "635832951373-quldjs5vlr7h2s7jdsfgc8u4nct863jd.apps.googleusercontent.com";
@@ -128,7 +130,7 @@ public class GCal {
 			com.google.api.services.calendar.model.Calendar calendar = client
 					.calendars().get("primary").execute();
 			
-			Storage store  = new Storage("TasKoord.txt");
+			Storage store  = new Storage(fileName);
 			for(Task i : store.loadFromFile()) {
 				if(!i.isSync()){
 					createEvent(i,calendar.getId());
