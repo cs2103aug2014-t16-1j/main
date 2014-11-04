@@ -12,3 +12,4 @@ GToken
 .DS_Store
 build.xml
 nbproject/
+.TasKoordLogFile.log

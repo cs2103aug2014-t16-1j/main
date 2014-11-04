@@ -1,19 +1,21 @@
 package tkLogic;
 
-import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.logging.Logger;
-import java.util.logging.FileHandler;
-import java.util.logging.SimpleFormatter;
 
 import storage.Storage;
 import tkLibrary.Constants;
 import tkLibrary.Task;
+<<<<<<< HEAD
 import GCal.GCal;
+=======
+import tkLibrary.LogFile;
+
+>>>>>>> origin/master
 /*
  * Basically the logic functions should be very clear and simple.
  * So that UserInterface have to parse the command and call the logic.
@@ -21,6 +23,7 @@ import GCal.GCal;
  */
 public class Logic {
 	private Storage storage;
+<<<<<<< HEAD
 	private Logger logger;
 	private GCal gcal;
 	
@@ -40,6 +43,13 @@ public class Logic {
 	    } catch (IOException e) {  
 	        e.printStackTrace();  
 	    }  
+=======
+	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
+
+	public Logic(String fileName) {
+		storage = new Storage(fileName);
+		LogFile.newLogger();
+>>>>>>> origin/master
 	}
 	
 	public String add(Task task) {		
@@ -48,11 +58,11 @@ public class Logic {
 		}
 		if (isFreeTimeslots(task)) {
 			storage.add(task);
-			logger.info("Task added.");
+			LOGGER.info("Task added.");
 			return Constants.MESSAGE_TASK_ADDED;
 		} else {
 			storage.add(task);
-			logger.info("Task added.");
+			LOGGER.info("Task added.");
 			return Constants.MESSAGE_CLASHING_TIMESLOTS;
 		}
 	}
@@ -61,10 +71,10 @@ public class Logic {
 	public String delete(Task task) {
 		if (isExistingTask(task)) { 
 			storage.delete(task);
-			logger.info("Task deleted.");
+			LOGGER.info("Task deleted.");
 			return Constants.MESSAGE_TASK_DELETED;
 		} else {
-			logger.info("No such task");
+			LOGGER.info("No such task");
 			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
 		}
 	}
@@ -73,6 +83,7 @@ public class Logic {
 		if (isExistingTask(taskToBeEdited)) {
 			if (isFreeTimeslots(editedTask)) {
 				storage.edit(taskToBeEdited, editedTask);
+				LOGGER.info("Task edited");
 				return Constants.MESSAGE_TASK_EDITED;
 			} else {
 				storage.edit(taskToBeEdited, editedTask);
@@ -112,23 +123,23 @@ public class Logic {
 			}
 		}
 		res = sort(res);
-		logger.info("Tasks acquired to be displayed.");
+		LOGGER.info("Tasks acquired to be displayed.");
 		return res;
 	}
 
 	public String undo() {
-		logger.info("Last command undone.");
+		LOGGER.info("Last command undone.");
 		return storage.undo();
 	}
 	
 	public String redo() {
-		logger.info("Next command redone.");
+		LOGGER.info("Next command redone.");
 		return storage.redo();
 	}
 	
 	public String clear() {
 		storage.clear();
-		logger.info("Tasks cleared from TasKoord.");
+		LOGGER.info("Tasks cleared from TasKoord.");
 		return Constants.MESSAGE_TASK_CLEARED;
 	}
 
@@ -146,7 +157,7 @@ public class Logic {
 			}
 		}
 		searchResults = sort(searchResults);
-		logger.info("Tasks with keyword found.");
+		LOGGER.info("Tasks with keyword found.");
 		return searchResults;
 	}
 
@@ -187,7 +198,7 @@ public class Logic {
 	            return n1.compareTo(n2);
 	        }
 	    });
-		logger.info("Tasks sorted.");
+		LOGGER.info("Tasks sorted.");
 		return list;
 	}
 	
@@ -270,14 +281,27 @@ public class Logic {
 			return true;
 		}
 		
-		if(isDeadlineTask(task)){
-			return false;
-		}
-		
 		for(Task item: allTasks){
 			if (isTimedTask(item)){
 				queryList.add(item);
 			}
+		}
+		
+		if (queryList.isEmpty()){
+			return true;
+		}
+		
+		// for deadline tasks, the time when it is due is start time instead of deadline for efficiency in sorting
+		if(isDeadlineTask(task)){
+			for(Task queriedTask: queryList){
+				if(isSameStartTime(task, queriedTask)){
+					return true;
+				}
+				if(isBeforeQueriedTaskStartTime(task, queriedTask)){
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		for(Task queriedTask: queryList){
@@ -313,6 +337,10 @@ public class Logic {
 		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
 	}
 	
+	private boolean isBeforeQueriedTaskStartTime(Task task, Task queriedTask){
+		return (task.getStartTime().compareTo(queriedTask.getStartTime()) < 0);
+	}
+	
 	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
 		return (task.getEndTime().compareTo(queriedTask.getEndTime()) < 0) && (task.getEndTime().compareTo(queriedTask.getStartTime()) > 0);
 	}
@@ -324,30 +352,30 @@ public class Logic {
 	public String setPriorityLevel(Task task){
 		if(isExistingTask(task)){
 			task.setPriority(task.getPriorityLevel());
-			logger.info("Task priority added.");
+			LOGGER.info("Task priority changed.");
 			return Constants.MESSAGE_PRIORITY_SET;
 		}
-		logger.info("Task does not exist.");
+		LOGGER.info("Task does not exist.");
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
 	}
 	
 	public String setState(Task task){
 		if(isExistingTask(task)) {
 			task.setState(task.getState());
-			logger.info("Task state changed.");
+			LOGGER.info("Task state changed.");
 			switch (task.getState()){
 				case COMPLETED:
-					logger.info("State changed to completed");
+					LOGGER.info("State changed to completed");
 					return Constants.MESSAGE_STATE_COMPLETED;	
 				case DISCARDED:
-					logger.info("State changed to discarded");
+					LOGGER.info("State changed to discarded");
 					return Constants.MESSAGE_STATE_DISCARDED;
 				case PENDING:
-					logger.info("State changed to pending");
+					LOGGER.info("State changed to pending");
 					return Constants.MESSAGE_STATE_PENDING;
 			}
 		}
-		logger.info("Task does not exist.");
+		LOGGER.info("Task does not exist.");
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
 	}
 	
