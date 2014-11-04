@@ -274,6 +274,7 @@ public class Logic {
 			}
 		}
 		
+		// for deadline tasks, the time when it is due is start time instead of deadline for efficiency in sorting
 		if(isDeadlineTask(task)){
 			for(Task queriedTask: queryList){
 				if(isSameStartTime(task, queriedTask)){
