@@ -268,14 +268,22 @@ public class Logic {
 			return true;
 		}
 		
-		if(isDeadlineTask(task)){
-			return false;
-		}
-		
 		for(Task item: allTasks){
 			if (isTimedTask(item)){
 				queryList.add(item);
 			}
+		}
+		
+		if(isDeadlineTask(task)){
+			for(Task queriedTask: queryList){
+				if(isSameStartTime(task, queriedTask)){
+					return true;
+				}
+				if(isBeforeQueriedTaskStartTime(task, queriedTask)){
+					return true;
+				}
+			}
+			return false;
 		}
 		
 		for(Task queriedTask: queryList){
@@ -309,6 +317,10 @@ public class Logic {
 	
 	private boolean isSameStartTime(Task task, Task queriedTask){
 		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
+	}
+	
+	private boolean isBeforeQueriedTaskStartTime(Task task, Task queriedTask){
+		return (task.getStartTime().compareTo(queriedTask.getStartTime()) < 0);
 	}
 	
 	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
