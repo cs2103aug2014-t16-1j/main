@@ -48,21 +48,28 @@ public class LogicTest {
 			userInput = parser.format(userCommand);
 			task = userInput.getTask();
 			testLogic.add(task);
-			String userCommandEdited = "edit play games from 10am to 11am on 12 Sep 2014 at home";
+			String userCommandEdited = "edit play games correct from 10am to 11am on 12 Sep 2014 at home";
 			UserInput userInputEdited = parser.format(userCommandEdited);
 			Task editedTask = userInputEdited.getTask();
 			message = testLogic.edit(task, editedTask);
 			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
 			
 			//test for editing location
-			userCommandEdited = "edit play games from 10am to 11am on 12 Sep 2014 at school";
+			userCommandEdited = "edit play games correct from 10am to 11am on 12 Sep 2014 at school";
 			userInputEdited = parser.format(userCommandEdited);
 			editedTask = userInputEdited.getTask();
 			message = testLogic.edit(task, editedTask);
-			assertEquals(Constants.MESSAGE_EDIT_CLASHING_TIMESLOTS, message);
+			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
 			
 			//test for editing date
-			userCommandEdited = "add play games from 10am to 11am on 13 Sep 2014 at school";
+			userCommandEdited = "edit play games correct from 10am to 11am on 13 Sep 2014 at school";
+			userInputEdited = parser.format(userCommandEdited);
+			editedTask = userInputEdited.getTask();
+			message = testLogic.edit(task, editedTask);
+			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
+			
+			//test for editing description
+			userCommandEdited = "edit play games from 10am to 11am on 13 Sep 2014 at school";
 			userInputEdited = parser.format(userCommandEdited);
 			editedTask = userInputEdited.getTask();
 			message = testLogic.edit(task, editedTask);
@@ -76,16 +83,15 @@ public class LogicTest {
 			ArrayList<Task> expectedDeletedTasks = new ArrayList<Task>();
 			expectedDeletedTasks.add(deletedTask);
 			assertEquals(expectedDeletedTasks, actualDeletedTasks);
+			**/
 			
 			//test for search
-			userCommand = "search meeting";
+			userCommand = "search play";
 			userInput = parser.format(userCommand);
 			task = userInput.getTask();
 			ArrayList<Task> expectedResults = testLogic.search(task.getDescription());
-			ArrayList<Task> actualResults = new ArrayList<Task>();
-			actualResults.add(task);
-			assertEquals(expectedResults, actualResults);
-			**/
+			Task actualResult = editedTask;
+			assertTrue(expectedResults.get(0).equals(actualResult));
 			
 		}catch (Exception e) {
 			System.out.println("test: ");
