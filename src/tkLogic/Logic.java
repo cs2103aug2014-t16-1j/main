@@ -326,7 +326,7 @@ public class Logic {
 	public String setPriorityLevel(Task task){
 		if(isExistingTask(task)){
 			task.setPriority(task.getPriorityLevel());
-			LOGGER.info("Task priority added.");
+			LOGGER.info("Task priority changed.");
 			return Constants.MESSAGE_PRIORITY_SET;
 		}
 		LOGGER.info("Task does not exist.");
