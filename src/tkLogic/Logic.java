@@ -6,16 +6,17 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.logging.Logger;
+import java.io.IOException;
 
 import storage.Storage;
 import tkLibrary.Constants;
 import tkLibrary.Task;
-<<<<<<< HEAD
-import GCal.GCal;
-=======
 import tkLibrary.LogFile;
 
->>>>>>> origin/master
+import GCal.GCal;
+
+
+
 /*
  * Basically the logic functions should be very clear and simple.
  * So that UserInterface have to parse the command and call the logic.
@@ -23,33 +24,13 @@ import tkLibrary.LogFile;
  */
 public class Logic {
 	private Storage storage;
-<<<<<<< HEAD
-	private Logger logger;
+	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
 	private GCal gcal;
-	
+
 	public Logic(String fileName) {
 		storage = new Storage(fileName);
 		gcal = new GCal(fileName);
-		try {  
-		    logger = Logger.getLogger(".LogicLogFile.log");
-	        // This block configure the logger with handler and formatter  
-	        FileHandler fh = new FileHandler(".LogicLogFile.log");  
-	        logger.addHandler(fh);
-	        SimpleFormatter formatter = new SimpleFormatter();  
-	        fh.setFormatter(formatter);  
-
-	    } catch (SecurityException e) {  
-	        e.printStackTrace();  
-	    } catch (IOException e) {  
-	        e.printStackTrace();  
-	    }  
-=======
-	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
-
-	public Logic(String fileName) {
-		storage = new Storage(fileName);
 		LogFile.newLogger();
->>>>>>> origin/master
 	}
 	
 	public String add(Task task) {		
