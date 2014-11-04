@@ -11,6 +11,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 import tkLibrary.Constants;
+import tkLibrary.LogFile;
 import tkLibrary.Task;
 
 import org.json.simple.JSONObject;
@@ -29,11 +30,11 @@ public class Storage {
 	private int currentPos;
 	private int availablePos;
 	
-	private Logger logger;
+	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
 	
 	public Storage(String fileName) {
 		this.fileName = fileName;
-		logger = Logger.getLogger("log" + fileName);
+		LogFile.newLogger();
 		openFileToWrite(true);
 		closeFileToWrite();
 		this.listOfTasks = loadFromFile();
@@ -196,7 +197,7 @@ public class Storage {
 			out = new PrintWriter(new FileWriter(fileName, append));
 		} catch (IOException e) {
 			System.out.println(e.getMessage());
-			logger.log(Level.WARNING, "File Not Found", e);
+			LOGGER.log(Level.WARNING, "File Not Found", e);
 		}
 	}
 
@@ -209,7 +210,7 @@ public class Storage {
 			in = new Scanner(new File(fileName));
 		} catch (FileNotFoundException e) {
 			System.out.println(e.getMessage());
-			logger.log(Level.WARNING, "File Not Found", e);
+			LOGGER.log(Level.WARNING, "File Not Found", e);
 		}
 	}
 
