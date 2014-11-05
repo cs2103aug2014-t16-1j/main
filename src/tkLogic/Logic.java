@@ -388,6 +388,8 @@ public class Logic {
 	public void setSynced() {
 		storage.setSynced();
 	}
+	
+	//@author A0118919U
 	public boolean isOnline(){
 		return GCal.isOnline();
 	}

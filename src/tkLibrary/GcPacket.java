@@ -8,6 +8,7 @@ public class GcPacket {
 	public ArrayList<Task> taskAddedToGC;
 	public ArrayList<Task> taskDeletedFromGC;
 	
+	//@author A0112068N
 	public GcPacket() {
 		taskAddedToTK = new ArrayList<Task> ();
 		taskAddedToGC = new ArrayList<Task> ();

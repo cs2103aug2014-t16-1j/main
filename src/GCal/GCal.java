@@ -47,6 +47,7 @@ public class GCal {
 	JacksonFactory jsonFactory;
 	private static Calendar client;
 
+	//@author A0118919U
 	public static boolean isOnline() {
 		Socket socket = new Socket();
 		InetSocketAddress adderess = new InetSocketAddress("www.google.com", 80);
@@ -63,7 +64,7 @@ public class GCal {
 			}
 		}
 	}
-
+	
 	public GCal() {
 		initFlow();
 	}
@@ -142,6 +143,7 @@ public class GCal {
 		return packet;
 	}
 
+	//@author A0112068N
 	private void deleteTaskFromGc(ArrayList<Task> tkList,
 			com.google.api.services.calendar.model.Calendar calendar,
 			ArrayList<Event> gcEvents, ArrayList<Task> gcList, GcPacket packet)
@@ -237,7 +239,6 @@ public class GCal {
 		}
 	}
 	
-
 	public Task convertToTkTask(Event event) {
 		Task task = new Task();
 		task.setDescription(event.getSummary());
@@ -312,6 +313,7 @@ public class GCal {
 		return event.getId();
 	}
 	
+	//@author A0118919U
 	public static boolean validFile() {
 		File f = new File("GToken");
 		if (f.exists()) {

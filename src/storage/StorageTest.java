@@ -20,7 +20,7 @@ import tkLogic.Parser;
 
 public class StorageTest {
 	public Storage store  = new Storage("storeTest.txt");
-	
+	//@author A0118919U
 	/*
     /* This is a boundary case for the optimal partition */
     /* First, clear the file

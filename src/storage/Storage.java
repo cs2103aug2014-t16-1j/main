@@ -32,6 +32,7 @@ public class Storage {
 	
 	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
 	
+	//@author A0118919U
 	public Storage(String fileName) {
 		this.fileName = fileName;
 		LogFile.newLogger();
@@ -119,6 +120,7 @@ public class Storage {
 		store(newList);
 	}
 	
+	//@author A0112068N
 	public void set(Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
 		oldTasks = copyList(listOfTasks);
@@ -137,6 +139,7 @@ public class Storage {
 		store(newList);
 	}
 	
+	//@author A0118919U
 	public void edit(Task oldTask, Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
 		oldTasks = copyList(listOfTasks);
@@ -172,6 +175,7 @@ public class Storage {
 		return "Stack is empty";
 	}
 	
+	//@author A0112068N
 	public String redo() {
 		if (currentPos < availablePos) {
 			currentPos ++;
@@ -182,6 +186,7 @@ public class Storage {
 		return "No command to redo.";
 	}
 	
+	//@author A0112068N
 	private void push(ArrayList<Task> list) {
 		currentPos ++; availablePos = currentPos;
     	if (currentPos >= stackForUndo.size()) {
@@ -191,6 +196,7 @@ public class Storage {
     	}
 	}
 	
+	//@author A0118919U
 	private ArrayList<Task> copyList(ArrayList<Task> list) {
 		ArrayList<Task> result = new ArrayList<Task> ();
 		for (Task item : list) {
@@ -207,7 +213,7 @@ public class Storage {
 			LOGGER.log(Level.WARNING, "File Not Found", e);
 		}
 	}
-
+	
 	private void closeFileToWrite() {
 		out.close();
 	}
