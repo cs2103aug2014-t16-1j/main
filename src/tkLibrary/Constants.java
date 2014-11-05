@@ -31,6 +31,7 @@ public final class Constants {
 	public static final String MESSAGE_STATE_DISCARDED = "State changed to 'discarded'.";
 	public static final String MESSAGE_STATE_PENDING = "State changed to 'pending'.";
 	public static final String MESSAGE_MORE_THAN_ONE_TASK_FOUND = "There are more than 1 task found. Specify the task.";
+	public static final String MESSAGE_NO_START_TIME = "Please indicate a start time for your task.";
 
 	//Gcal constants
 	public static final String MESSAGE_USER_OFFLINE = "User is Offline.";
