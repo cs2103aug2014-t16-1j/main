@@ -360,11 +360,11 @@ public class Logic {
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
 	}
 	
-	public String getUrl(){
+	public String getURL(){
 		return gcal.getURL();
 	}
 	
-	public boolean sycnWithGoogleExistingToken(){
+	public boolean WithExistingToken(){
 		return gcal.withExistingToken();
 	}
 

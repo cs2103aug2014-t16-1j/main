@@ -25,7 +25,6 @@ public class UserInterface {
     private Logic logic;
     private Parser parser;
     private Gui gui;
-    private GCal gCal;
     
     private ArrayList<Task> tasksOnScreen;
     private ArrayList<String> statusForUndo;
@@ -48,7 +47,6 @@ public class UserInterface {
     	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
-        gCal = new GCal(fileName);
         
         tasksOnScreen = new ArrayList<Task> ();
         statusForUndo = new ArrayList<String> ();
@@ -70,7 +68,7 @@ public class UserInterface {
     public void run() {
         while (true) {
             try {
-                Thread.sleep(1000);
+                Thread.sleep(100);
             } catch(InterruptedException e) {
                 Thread.currentThread().interrupt();
             }
@@ -167,8 +165,8 @@ public class UserInterface {
 		isSyncing = false;
 		System.out.println(accessToken);
 		try {
-			gCal.generateNewToken(accessToken);
-			gCal.syncGcal();
+			logic.generateNewToken(accessToken);
+			logic.syncWithGoogle();
 			gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -181,18 +179,18 @@ public class UserInterface {
     	if (!GCal.isOnline()) {
     		gui.displayWarning("No internet connection!", false);
     		isSyncing = false;
-    	} else if (gCal.withExistingToken()){
+    	} else if (logic.WithExistingToken()){
     		try {
-				gCal.syncGcal();
+				logic.syncWithGoogle();
 				gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
 				isSyncing = false;
 				return;
 			} catch (IOException e) {
+	    		getTokenPopup(logic.getURL());
 				e.printStackTrace();
 			}
-    		getTokenPopup(gCal.getURL());
     	} else {
-    		getTokenPopup(gCal.getURL());
+    		getTokenPopup(logic.getURL());
     	}
     }
     
