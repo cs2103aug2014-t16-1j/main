@@ -10,6 +10,7 @@ import java.util.Calendar;
 import GCal.GCal;
 import tkLibrary.CommandType;
 import tkLibrary.Constants;
+import tkLibrary.GcPacket;
 import tkLibrary.PriorityType;
 import tkLibrary.StateType;
 import tkLibrary.Task;
@@ -25,6 +26,7 @@ public class UserInterface {
     private Logic logic;
     private Parser parser;
     private Gui gui;
+    private GCal gCal;
     
     private ArrayList<Task> tasksOnScreen;
     private ArrayList<String> statusForUndo;
@@ -47,6 +49,7 @@ public class UserInterface {
     	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
+        gCal = new GCal();
         
         tasksOnScreen = new ArrayList<Task> ();
         statusForUndo = new ArrayList<String> ();
@@ -163,35 +166,56 @@ public class UserInterface {
     
 	private void syncWithToken() {
 		isSyncing = false;
-		System.out.println(accessToken);
 		try {
-			logic.generateNewToken(accessToken);
-			logic.syncWithGoogle();
+			gCal.connectByNewToken(accessToken);
+			gui.displayDone(Constants.MESSAGE_SYNCING, false);
+			GcPacket packet = gCal.sync(logic.load());
 			gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
+			displayPacket(packet);
 		} catch (Exception e) {
 			e.printStackTrace();
-			gui.displayWarning("Cannot sync, generate the token again!", false);
+			gui.displayWarning(Constants.MESSAGE_SYNC_ERROR, false);
 		}
 	}
 	
     private void sync() {
     	isSyncing = true;
     	if (!GCal.isOnline()) {
-    		gui.displayWarning("No internet connection!", false);
+    		gui.displayWarning(Constants.MESSAGE_NO_INTERNET, false);
     		isSyncing = false;
-    	} else if (logic.WithExistingToken()){
-    		try {
-				logic.syncWithGoogle();
-				gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
-				isSyncing = false;
-				return;
-			} catch (IOException e) {
-	    		getTokenPopup(logic.getURL());
-				e.printStackTrace();
-			}
     	} else {
-    		getTokenPopup(logic.getURL());
+    		gui.displayDone(Constants.MESSAGE_SYNCING, false);
+    		if (gCal.connectUsingExistingToken()) {
+	    		try {
+					GcPacket packet = gCal.sync(logic.load());
+					gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
+					displayPacket(packet);
+					isSyncing = false;
+					return;
+				} catch (IOException e) {
+					getTokenPopup(gCal.getURL());
+					e.printStackTrace();
+				}
+	    	} else {
+	    		getTokenPopup(gCal.getURL());
+	    	}
     	}
+    }
+    
+    private void displayPacket(GcPacket packet) {
+    	for (Task item : packet.taskAddedToTK) {
+    		try {
+	    		item.setPriority(Constants.PRIORITY_MEDIUM);
+	    		item.setState(Constants.STATE_PENDING);
+    		} catch(Exception e) {
+    			
+    		}
+    		logic.add(item);
+    	}
+    	for (Task item : packet.taskDeletedFromTK) {
+    		logic.delete(item);
+    	}
+    	logic.setSynced();
     }
     
     private void add(Task task) {
@@ -201,7 +225,7 @@ public class UserInterface {
         }
         
         if (task.getStartTime() != null && task.getEndTime() != null) {
-        	if (task.getStartTime().compareTo(task.getEndTime()) > 0) {
+        	if (task.getStartTime().compareTo(task.getEndTime()) >= 0) {
         		gui.displayWarning(Constants.MESSAGE_ENDTIME_BEFORE_STARTTIME, false);
         		gui.displayWarning("<br>", true);
         		gui.displayWarning("Start time: " + convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE_DATE_AND_HOUR), true);

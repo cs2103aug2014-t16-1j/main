@@ -1,11 +1,7 @@
 package GCal;
 
+import tkLibrary.GcPacket;
 import tkLibrary.Task;
-import tkLibrary.Constants;
-import storage.Storage;
-//import storage.jsonConverter;
-
-
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
@@ -18,17 +14,14 @@ import java.net.Socket;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
+import java.util.List;
 import java.util.TimeZone;
 
-//import org.json.simple.JSONObject;
-
-
-
 import com.google.api.services.calendar.Calendar;
-//import com.google.api.services.calendar.Calendar.CalendarList;
 import com.google.api.services.calendar.CalendarScopes;
 import com.google.api.services.calendar.model.Event;
 import com.google.api.services.calendar.model.EventDateTime;
+import com.google.api.services.calendar.model.Events;
 import com.google.api.client.http.HttpRequestInitializer;
 import com.google.api.client.http.HttpTransport;
 import com.google.api.client.http.javanet.NetHttpTransport;
@@ -40,13 +33,19 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 
 public class GCal {
-	GoogleAuthorizationCodeFlow codeFlow;
+	String MESSAGE_ORIGINAL_CREATOR = "[Task synced with TasKoord]";
+	String START_OF_DAY = "T00:00:00.000+08:00";
 	String redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
-	String appName = "TasKoord";
+	String clientName = "TasKoord";
+	String clientEmail = "658469510712-compute@developer.gserviceaccount.com";
+	String clientId = "658469510712-5565en3ob92ou4mvoijl524956l6c1qm.apps.googleusercontent.com";
+	String clientSecret = "60vxHWIf_PObkRlfUl23TlBO";
+	Event.Creator creator = new Event.Creator();
+	
+	GoogleAuthorizationCodeFlow codeFlow;
 	HttpTransport httpTransport;
 	JacksonFactory jsonFactory;
 	private static Calendar client;
-	String fileName ;
 
 	public static boolean isOnline() {
 		Socket socket = new Socket();
@@ -55,7 +54,6 @@ public class GCal {
 			socket.connect(adderess);
 			return true;
 		} catch (IOException e) {
-			System.err.println(Constants.MESSAGE_USER_OFFLINE);
 			e.printStackTrace();
 			return false;
 		} finally {
@@ -66,26 +64,23 @@ public class GCal {
 		}
 	}
 
-	public GCal(String filename) {
-		this.fileName = filename;
+	public GCal() {
+		initFlow();
+	}
+
+	private void initFlow() {
 		httpTransport = new NetHttpTransport();
 		jsonFactory = new JacksonFactory();
-		String clientId = "635832951373-quldjs5vlr7h2s7jdsfgc8u4nct863jd.apps.googleusercontent.com";
-		String clientSecret = "efCVVM5s04_Grob_V9dIvtd-";
-
 		codeFlow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
 				jsonFactory, clientId, clientSecret,
 				Arrays.asList(CalendarScopes.CALENDAR)).build();
 	}
 
 	public String getURL() {
-		String url = codeFlow.newAuthorizationUrl().setRedirectUri(redirectUrl)
-				.build();
-
-		return url;
+		return codeFlow.newAuthorizationUrl().setRedirectUri(redirectUrl).build();
 	}
 
-	public boolean generateNewToken(String code) throws IOException {
+	public boolean connectByNewToken(String code) throws IOException {
 		try {
 			TokenResponse tokenRes = new TokenResponse();
 			AuthorizationCodeTokenRequest tokenRequest = codeFlow.newTokenRequest(code)
@@ -93,11 +88,11 @@ public class GCal {
 			tokenRes = tokenRequest.execute();
 			writeFile(tokenRes.getAccessToken());
 			Credential credential = codeFlow
-					.createAndStoreCredential(tokenRes, appName);
+					.createAndStoreCredential(tokenRes, clientName);
 			HttpRequestInitializer initializer = credential;
 			Calendar.Builder builder = new Calendar.Builder(httpTransport,
 					jsonFactory, initializer);
-			builder.setApplicationName(appName);
+			builder.setApplicationName(clientName);
 			client = builder.build();
 			return true;
 		} catch (Exception e) {
@@ -106,18 +101,18 @@ public class GCal {
 		}
 	}
 
-	public boolean withExistingToken() {
+	public boolean connectUsingExistingToken() {
 		TokenResponse tokenRes = new TokenResponse();
 		if (validFile()) {
 			System.out.println(readFile());
 			tokenRes.setAccessToken(readFile());
 			try {
 				Credential credential = codeFlow.createAndStoreCredential(tokenRes,
-						appName);
+						clientName);
 				HttpRequestInitializer initializer = credential;
 				Calendar.Builder builder = new Calendar.Builder(httpTransport,
 						jsonFactory, initializer);
-				builder.setApplicationName(appName);
+				builder.setApplicationName(clientName);
 				client = builder.build();
 				return true;
 			} catch (Exception e) {
@@ -129,24 +124,172 @@ public class GCal {
 		}
 	}
 	
-	public String syncGcal() throws IOException {
-			com.google.api.services.calendar.model.Calendar calendar = client
-					.calendars().get("primary").execute();
-			
-			ArrayList<Task> newList = new ArrayList<Task>();
-			Storage store  = new Storage(fileName);
-			for(Task i : store.loadFromFile()) {
-				if(!i.isSync() && isTimedTask(i)){
-					createEvent(i,calendar.getId());
-					i.setSync(true);
-				}
-				newList.add(i);
-			}
-			store.store(newList);
-			return Constants.MESSAGE_SYNC_COMPLETE;
+	public GcPacket sync(ArrayList<Task> tkList) throws IOException {
+		com.google.api.services.calendar.model.Calendar calendar = client
+				.calendars().get("primary").execute();
+		ArrayList<Event> gcEvents = listEvent(calendar.getId());
+		ArrayList<Task> gcList = new ArrayList<Task> ();
+		GcPacket packet = new GcPacket();
+		
+		for(Event event : gcEvents) {
+			gcList.add(convertToTkTask(event));
+		}
+	
+		deleteTaskFromTk(tkList, gcList, packet);
+		deleteTaskFromGc(tkList, calendar, gcEvents, gcList, packet);
+		addTaskFromTkToGc(tkList, calendar, gcList, packet);
+		addTaskFromGcToTk(tkList, gcEvents, gcList, packet, calendar);
+		return packet;
 	}
 
-	public String createEvent(Task task,String calId) throws IOException {
+	private void deleteTaskFromGc(ArrayList<Task> tkList,
+			com.google.api.services.calendar.model.Calendar calendar,
+			ArrayList<Event> gcEvents, ArrayList<Task> gcList, GcPacket packet)
+			throws IOException {
+		for (int i = 0; i < gcList.size(); i ++) {
+			Task task = gcList.get(i);
+			if (gcEvents.get(i).getDescription() != null
+					&& gcEvents.get(i).getDescription().contains(MESSAGE_ORIGINAL_CREATOR)) {
+				boolean existing = false;
+				for (Task item : tkList) {
+					if (item.equals(task)) {
+						existing = true;
+						break;
+					}
+				}
+				if (!existing) {
+					packet.taskDeletedFromGC.add(task);
+					client.events().delete(calendar.getId(), gcEvents.get(i).getId()).execute();
+				}
+			}
+		}
+	}
+
+	private void deleteTaskFromTk(ArrayList<Task> tkList,
+			ArrayList<Task> gcList, GcPacket packet) {
+		for (int i = 0; i < tkList.size(); i ++) {
+			Task task = tkList.get(i);
+			if (task.getStartTime() != null && task.isSynced()) {
+				boolean existing = false;
+				for (Task item : gcList) {
+					if (item.equals(task)) {
+						existing = true;
+						break;
+					}
+				}
+				if (!existing) {
+					packet.taskDeletedFromTK.add(task);
+				}
+			}
+		}
+	}
+
+	private void addTaskFromGcToTk(ArrayList<Task> tkList,
+			ArrayList<Event> gcEvents, ArrayList<Task> gcList, GcPacket packet,
+			com.google.api.services.calendar.model.Calendar calendar) throws IOException {
+		for (int i = 0; i < gcList.size(); i ++) 
+			if (gcEvents.get(i).getSummary() != null){
+			if (gcEvents.get(i).getDescription() == null
+					|| !gcEvents.get(i).getDescription().contains(MESSAGE_ORIGINAL_CREATOR)) {
+				Task task = gcList.get(i);
+				boolean existing = false;
+				for (Task item : tkList) {
+					if (item.equals(task)) {
+						existing = true;
+						break;
+					}
+				}
+				if (!existing) {
+					System.out.println(task.getDescription());
+					packet.taskAddedToTK.add(task);
+				}
+				Event event = gcEvents.get(i);
+				if (event.getDescription() == null) {
+					event.setDescription(MESSAGE_ORIGINAL_CREATOR);
+				} else {
+					event.setDescription(event.getDescription() + " " + MESSAGE_ORIGINAL_CREATOR);
+				}
+				client.events().update(calendar.getId(), event.getId(), event).execute();
+			}
+		}
+	}
+
+	private void addTaskFromTkToGc(ArrayList<Task> tkList,
+			com.google.api.services.calendar.model.Calendar calendar,
+			ArrayList<Task> gcList, GcPacket packet) throws IOException {
+		
+		for (int i = 0; i < tkList.size(); i ++) {
+			Task task = tkList.get(i);
+			
+			if (task.getStartTime() != null && !task.isSynced()) {
+				boolean existing = false;
+				for (Task item : gcList) {
+					if (item.equals(task)) {
+						existing = true;
+						break;
+					}
+				}
+				packet.taskAddedToGC.add(task);
+				if (!existing) {
+					insertEvent(task, calendar.getId());
+				}
+			}
+		}
+	}
+	
+
+	public Task convertToTkTask(Event event) {
+		Task task = new Task();
+		task.setDescription(event.getSummary());
+		task.setLocation(event.getLocation());
+		
+		DateTime startDateTime = event.getStart().getDateTime();
+		DateTime endDateTime = event.getEnd().getDateTime();
+		
+		if (startDateTime == null) {
+			startDateTime = event.getStart().getDate();
+			startDateTime = new DateTime(startDateTime.toStringRfc3339() + START_OF_DAY);
+		}
+		if (endDateTime == null) {
+			endDateTime = event.getEnd().getDate();
+			endDateTime = new DateTime(endDateTime.toStringRfc3339() + START_OF_DAY);
+		}
+		
+		java.util.Calendar start = DateTimeConverter(startDateTime);
+		java.util.Calendar end = DateTimeConverter(endDateTime);
+		
+		task.setStartTime(start);
+		if (start.compareTo(end) < 0) {
+			task.setEndTime(end);
+		}
+		
+		return task;
+	}
+	
+    public java.util.Calendar DateTimeConverter (DateTime originalTime) {
+        Date time = new Date(originalTime.getValue());
+        java.util.Calendar result = java.util.Calendar.getInstance();
+        result.setTime(time);
+        return result;
+    }
+
+	public ArrayList<Event> listEvent(String calId) throws IOException {
+		ArrayList<Event> result = new ArrayList<Event>();
+		String pageToken = null;
+		
+		do {
+		  Events events = client.events().list(calId).setPageToken(pageToken).execute();
+		  List<Event> items = events.getItems();
+		  for (Event event : items) {
+		    result.add(event);
+		  }
+		  pageToken = events.getNextPageToken();
+		} while (pageToken != null);
+		
+		return result;
+	}
+	
+	public String insertEvent(Task task, String calId) throws IOException {
 		Event event = new Event();
 		event.setSummary(task.getDescription());
 		event.setLocation(task.getLocation());
@@ -155,9 +298,15 @@ public class GCal {
 		DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
 		event.setStart(new EventDateTime().setDateTime(start));
 		
-		Date endDate = task.getEndTime().getTime();
-		DateTime end = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
-		event.setEnd(new EventDateTime().setDateTime(end));
+		if (task.getEndTime() != null) {
+			Date endDate = task.getEndTime().getTime();
+			DateTime end = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
+			event.setEnd(new EventDateTime().setDateTime(end));
+		} else {
+			event.setEnd(new EventDateTime().setDateTime(start));
+		}
+		
+		event.setDescription(MESSAGE_ORIGINAL_CREATOR);
 		
 		client.events().insert(calId, event).execute();
 		return event.getId();
@@ -211,9 +360,5 @@ public class GCal {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-	}
-	
-	private boolean isTimedTask(Task task){
-		return (task.getStartTime() != null && task.getEndTime() != null);
 	}
 }

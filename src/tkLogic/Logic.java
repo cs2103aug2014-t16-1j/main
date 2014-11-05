@@ -6,16 +6,11 @@ import java.util.Calendar;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.logging.Logger;
-import java.io.IOException;
 
 import storage.Storage;
 import tkLibrary.Constants;
 import tkLibrary.Task;
 import tkLibrary.LogFile;
-
-import GCal.GCal;
-
-
 
 /*
  * Basically the logic functions should be very clear and simple.
@@ -25,14 +20,15 @@ import GCal.GCal;
 public class Logic {
 	private Storage storage;
 	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
-	private GCal gcal;
 
 	public Logic(String fileName) {
 		storage = new Storage(fileName);
-		gcal = new GCal(fileName);
 		LogFile.newLogger();
 	}
 	
+	public void setSynced() {
+		storage.setSynced();
+	}
 	public String add(Task task) {		
 		if (isExistingTask(task)) {
 			return Constants.MESSAGE_DUPLICATED_TASK;
@@ -73,6 +69,10 @@ public class Logic {
 		} else {
 			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
 		}
+	}
+	
+	public ArrayList<Task> load() {
+		return storage.load();
 	}
 	
 	/*
@@ -275,19 +275,14 @@ public class Logic {
 		// for deadline tasks, the time when it is due is start time instead of deadline for efficiency in sorting
 		if(isDeadlineTask(task)){
 			for(Task queriedTask: queryList){
-				if(isDeadlineTask(queriedTask)){
-					if(isSameStartTime(task, queriedTask)){
-						return false;
-					}
+				if(isSameStartTime(task, queriedTask)){
+					return true;
 				}
-				if(isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
-					return false;
-				}
-				if(isSameEndTime(task, queriedTask)){
-					return false;
+				if(isBeforeQueriedTaskStartTime(task, queriedTask)){
+					return true;
 				}
 			}
-			return true;
+			return false;
 		}
 		
 		for(Task queriedTask: queryList){
@@ -323,8 +318,8 @@ public class Logic {
 		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
 	}
 	
-	private boolean isSameEndTime(Task task, Task queriedTask){
-		return (task.getStartTime().compareTo(queriedTask.getEndTime()) == 0);
+	private boolean isBeforeQueriedTaskStartTime(Task task, Task queriedTask){
+		return (task.getStartTime().compareTo(queriedTask.getStartTime()) < 0);
 	}
 	
 	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
@@ -363,21 +358,5 @@ public class Logic {
 		}
 		LOGGER.info("Task does not exist.");
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
-	}
-	
-	public String getURL(){
-		return gcal.getURL();
-	}
-	
-	public boolean WithExistingToken(){
-		return gcal.withExistingToken();
-	}
-
-	public boolean generateNewToken(String code) throws IOException{
-		return gcal.generateNewToken(code);
-	}
-	
-	public String syncWithGoogle() throws IOException{
-		return gcal.syncGcal();
 	}
 }

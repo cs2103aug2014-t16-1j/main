@@ -13,7 +13,7 @@ public class Task {
     private String location;
     private String description;
     private PriorityType priorityLevel;
-    private boolean sync;
+    private int sync;
     private boolean blocked;
 
     public Task() {
@@ -23,7 +23,7 @@ public class Task {
         this.description = null;
         this.state = null;
         this.priorityLevel = null;
-        this.sync = false;
+        this.sync = 0;
         this.blocked = false;
     }
     
@@ -44,7 +44,7 @@ public class Task {
         this.description = task.getDescription();
         this.priorityLevel = task.getPriorityLevel();
         this.state = task.getState();
-        this.sync = task.isSync();
+        this.sync = task.getSyncedValue();
         this.blocked = task.isBlocked();
     }
     
@@ -60,8 +60,8 @@ public class Task {
     	return this.blocked;
     }
     
-    public boolean isSync(){
-    	return this.sync;
+    public boolean isSynced(){
+    	return this.sync == 1;
     }
     
     public void update(Task task) {
@@ -206,22 +206,25 @@ public class Task {
     }
 
     public void setPriority(String priorityLevel) throws Exception {
-            if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_LOW)) {
-                this.priorityLevel = PriorityType.LOW;
-            } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_MEDIUM)) {
-                this.priorityLevel = PriorityType.MEDIUM;
-            } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_HIGH)) {
-                this.priorityLevel = PriorityType.HIGH;
-            }else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_NULL)) {
-                this.priorityLevel = null;
-            } else {
-                throw new Exception("The indicate priority: \"" + state + "\" is not recognised.");
-            }
-        
+        if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_LOW)) {
+            this.priorityLevel = PriorityType.LOW;
+        } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_MEDIUM)) {
+            this.priorityLevel = PriorityType.MEDIUM;
+        } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_HIGH)) {
+            this.priorityLevel = PriorityType.HIGH;
+        } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_NULL)) {
+            this.priorityLevel = null;
+        } else {
+            throw new Exception("The indicate priority: \"" + state + "\" is not recognised.");
+        }
     }
     
-    public void setSync(boolean sync_status){
-    	this.sync = sync_status;
+    public void setSynced() {
+    	this.sync = 1;
+    }
+    
+    public void setNotSynced() {
+    	this.sync = 0;
     }
 
     public Calendar getStartTime() {
@@ -262,5 +265,13 @@ public class Task {
 		}
 		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);     
 		return formatter.format(time.getTime());
+	}
+
+	public void setSyncedValue(int syncedValue) {
+		this.sync = syncedValue;
+	}
+	
+	public int getSyncedValue() {
+		return this.sync;
 	}
 }

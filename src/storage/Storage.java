@@ -70,6 +70,15 @@ public class Storage {
 		return list;
 	}
 	
+	public void setSynced() {
+		ArrayList<Task> newList = copyList(listOfTasks);
+		for(Task item : newList) {
+			item.setSynced();
+		}
+		listOfTasks.clear();
+		store(newList);
+	}
+	
 	public void add(Task task) {
 		oldTasks = copyList(listOfTasks);
 		if(!oldTasks.isEmpty()){
@@ -84,7 +93,6 @@ public class Storage {
 		listOfTasks.add(task);
 		JSONObject jTask= jsonConverter.taskToJSON(task);
 		out.print(jTask.toString() + "\r\n");
-		
 	}
 	
 	public void store(ArrayList<Task> list) {
@@ -107,7 +115,6 @@ public class Storage {
 		
 		oldTasks = copyList(listOfTasks);
 		push(oldTasks);
-		//deleteFile();
 		listOfTasks.clear();
 		store(newList);
 	}

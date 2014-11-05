@@ -38,7 +38,7 @@ public final class Constants {
 	public static final String MESSAGE_CRED_NOT_CORRECT = "The credentials are not correct.";
 	public static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete";
 	public static final String MESSAGE_SYNC_NOT_COMPLETE = "Synchronization is not complete";
-	public static final String MESSAGE_USER_NOT_ONLINE = "User Offline \n Please check your internet connection.";
+	public static final String MESSAGE_USER_NOT_ONLINE = "Please check your internet connection.";
 	public static final String MESSAGE_NOT_UPDATE = "%s is not updated.\n";
 	
 	// logic exceptions constants
@@ -93,4 +93,8 @@ public final class Constants {
 	public static final int HIGHLIGH = 1;
 	public static final int DELETED = 2; 
 	public static final int NO_EFFECT = 0;
+
+	public static final String MESSAGE_SYNCING = "Syncing is in process, it may takes minutes to be completed..";
+	public static final String MESSAGE_NO_INTERNET = "No internet connection!";
+	public static final String MESSAGE_SYNC_ERROR = "Cannot sync, please try again!";
 }
