@@ -112,6 +112,7 @@ public class UserInterface {
                 gui.displayWarning(String.format(Constants.EXCEPTIONS_INVALID_USERCOMMAND, 
                         userCommand, e.getMessage()), false);
             } else {
+            	gui.displayWarning("Cannot understand the command!", false);
                 e.printStackTrace();
             }
             return;
@@ -204,6 +205,10 @@ public class UserInterface {
     }
     
     private void displayPacket(GcPacket packet) {
+    	for (Task item : packet.taskDeletedFromTK) {
+    		logic.delete(item);
+    	}
+    	
     	for (Task item : packet.taskAddedToTK) {
     		try {
 	    		item.setPriority(Constants.PRIORITY_MEDIUM);
@@ -212,9 +217,6 @@ public class UserInterface {
     			
     		}
     		logic.add(item);
-    	}
-    	for (Task item : packet.taskDeletedFromTK) {
-    		logic.delete(item);
     	}
     	logic.setSynced();
     }
@@ -256,6 +258,8 @@ public class UserInterface {
             			list, task, Constants.HIGHLIGH, feedback, COLOR_WARNING);
             	gui.displayWarning(feedback, false);
             	showToUser(list, task, Constants.HIGHLIGH, true);
+            } else if (feedback.equals(Constants.MESSAGE_NO_START_TIME)) {
+            	gui.displayWarning(feedback, false);
             } else {
             	gui.displayWarning(feedback, false);
             	showToUser(list, task, Constants.HIGHLIGH, true);
