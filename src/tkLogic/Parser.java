@@ -200,14 +200,14 @@ public class Parser {
 
     private void parseDescription(ArrayList<String> description) {
         if (description.size() == 0) {
-            completeDescription = "";
+            completeDescription = null;
         } else {
             completeDescription = description.get(0);
+            for (int i = 1; i < description.size(); i++) {
+                completeDescription += " " + description.get(i);
+            }
+            completeDescription = completeDescription.replaceAll("/", "");
         }
-        for (int i = 1; i < description.size(); i++) {
-            completeDescription += " " + description.get(i);
-        }
-        completeDescription = completeDescription.replaceAll("/", "");
     }
 
     private void parseStartTime(ArrayList<String> time) {

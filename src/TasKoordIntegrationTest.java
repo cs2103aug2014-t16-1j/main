@@ -106,6 +106,7 @@ public class TasKoordIntegrationTest {
         parserTest.testParserSetState();
         parserTest.testParserUndo();
         parserTest.testParserClear();
+        parserTest.testParserSearchNull();
     }
 
     private void testLogic() {
