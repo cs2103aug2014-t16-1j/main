@@ -16,10 +16,10 @@ import tkLibrary.GcPacket;
 import java.io.IOException;
 import GCal.GCal;
 
+//@author A0111705W
 /*
  * Basically the logic functions should be very clear and simple.
  * So that UserInterface have to parse the command and call the logic.
- * This maybe be a little bit more complicated so I can help Ben.
  */
 public class Logic {
 	private Storage storage;
@@ -78,6 +78,7 @@ public class Logic {
 		}
 	}
 	
+	//@author A0112068N
 	/*
 	 * for listing, only mention the time, the priority and the state.
 	 */
@@ -126,7 +127,8 @@ public class Logic {
 		LOGGER.info("Tasks cleared from TasKoord.");
 		return Constants.MESSAGE_TASK_CLEARED;
 	}
-
+	
+	//@author A0111705W
 	/*
 	 * searching a task by keyword
 	 * only consider the description
@@ -144,7 +146,8 @@ public class Logic {
 		LOGGER.info("Tasks with keyword found.");
 		return searchResults;
 	}
-
+	
+	//@author A0112068N
 	private ArrayList<Task> sort(ArrayList<Task> list) {
 		Collections.sort(list, new Comparator<Task>() {
 	        @Override
@@ -246,6 +249,7 @@ public class Logic {
 		return formatter.format(time.getTime());
 	}
 	
+	//@author A0111705W
 	// this is to check if a task already existing. using description and location to check.
 	private boolean isExistingTask(Task task) {
 		ArrayList<Task> queryList = storage.load();
@@ -375,7 +379,8 @@ public class Logic {
 		LOGGER.info("Task does not exist.");
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
 	}
-
+	
+	//@author A0112068N
 	public ArrayList<Task> load() {
 		return storage.load();
 	}

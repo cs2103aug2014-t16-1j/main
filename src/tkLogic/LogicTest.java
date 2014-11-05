@@ -1,3 +1,4 @@
+//@author A0111705W
 package tkLogic;
 
 import static org.junit.Assert.*;
@@ -75,23 +76,20 @@ public class LogicTest {
 			message = testLogic.edit(task, editedTask);
 			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
 			
-			/**test for delete
-			userCommand = "delete meeting";
-			userInput = parser.format(userCommand);
-			Task deletedTask = userInput.getTask();
-			ArrayList<Task> actualDeletedTasks = testLogic.delete(deletedTask);
-			ArrayList<Task> expectedDeletedTasks = new ArrayList<Task>();
-			expectedDeletedTasks.add(deletedTask);
-			assertEquals(expectedDeletedTasks, actualDeletedTasks);
-			**/
-			
-			//test for search
+			//test for searching an existing task
 			userCommand = "search play";
 			userInput = parser.format(userCommand);
 			task = userInput.getTask();
 			ArrayList<Task> expectedResults = testLogic.search(task.getDescription());
 			Task actualResult = editedTask;
 			assertTrue(expectedResults.get(0).equals(actualResult));
+			
+			//test for searching a task that does not exist
+			userCommand = "search ball";
+			userInput = parser.format(userCommand);
+			task = userInput.getTask();
+			expectedResults = testLogic.search(task.getDescription());
+			assertTrue(expectedResults.isEmpty());
 			
 		}catch (Exception e) {
 			System.out.println("test: ");
