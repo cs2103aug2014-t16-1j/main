@@ -12,6 +12,7 @@ import tkLibrary.Constants;
 import tkLibrary.Task;
 import tkLibrary.LogFile;
 
+
 /*
  * Basically the logic functions should be very clear and simple.
  * So that UserInterface have to parse the command and call the logic.
@@ -26,9 +27,6 @@ public class Logic {
 		LogFile.newLogger();
 	}
 	
-	public void setSynced() {
-		storage.setSynced();
-	}
 	public String add(Task task) {		
 		if (isExistingTask(task)) {
 			return Constants.MESSAGE_DUPLICATED_TASK;
@@ -69,10 +67,6 @@ public class Logic {
 		} else {
 			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
 		}
-	}
-	
-	public ArrayList<Task> load() {
-		return storage.load();
 	}
 	
 	/*
@@ -275,14 +269,19 @@ public class Logic {
 		// for deadline tasks, the time when it is due is start time instead of deadline for efficiency in sorting
 		if(isDeadlineTask(task)){
 			for(Task queriedTask: queryList){
-				if(isSameStartTime(task, queriedTask)){
-					return true;
+				if(isDeadlineTask(queriedTask)){
+					if(isSameStartTime(task, queriedTask)){
+						return false;
+					}
 				}
-				if(isBeforeQueriedTaskStartTime(task, queriedTask)){
-					return true;
+				if(isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
+					return false;
+				}
+				if(isSameEndTime(task, queriedTask)){
+					return false;
 				}
 			}
-			return false;
+			return true;
 		}
 		
 		for(Task queriedTask: queryList){
@@ -318,8 +317,8 @@ public class Logic {
 		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
 	}
 	
-	private boolean isBeforeQueriedTaskStartTime(Task task, Task queriedTask){
-		return (task.getStartTime().compareTo(queriedTask.getStartTime()) < 0);
+	private boolean isSameEndTime(Task task, Task queriedTask){
+		return (task.getStartTime().compareTo(queriedTask.getEndTime()) == 0);
 	}
 	
 	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
@@ -358,5 +357,13 @@ public class Logic {
 		}
 		LOGGER.info("Task does not exist.");
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
+	}
+
+	public ArrayList<Task> load() {
+		return storage.load();
+	}
+
+	public void setSynced() {
+		storage.setSynced();
 	}
 }
