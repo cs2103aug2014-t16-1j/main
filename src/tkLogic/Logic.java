@@ -31,6 +31,10 @@ public class Logic {
 		if (isExistingTask(task)) {
 			return Constants.MESSAGE_DUPLICATED_TASK;
 		}
+		
+		if (isWithoutStartTime(task)){
+			return Constants.MESSAGE_NO_START_TIME;
+		}
 		if (isFreeTimeslots(task)) {
 			storage.add(task);
 			LOGGER.info("Task added.");
@@ -246,6 +250,10 @@ public class Logic {
 			}
 		}
 		return false;
+	}
+	
+	private boolean isWithoutStartTime(Task task){
+		return (task.getStartTime() == null);
 	}
 	
 	private boolean isFreeTimeslots(Task task){
