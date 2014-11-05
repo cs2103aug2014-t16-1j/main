@@ -26,20 +26,20 @@ public class Task {
         this.sync = 0;
         this.blocked = false;
     }
-    
+
     public Task(Task task) {
-    	if (task.getStartTime() == null) {
-    		this.startTime = null;
-    	} else {
-    		this.startTime = (Calendar) task.getStartTime().clone();
-    	}
-    	
-    	if (task.getEndTime() == null) {
-    		this.endTime = null;
-    	} else {
-    		this.endTime = (Calendar) task.getEndTime().clone();
-    	}
-    	
+        if (task.getStartTime() == null) {
+            this.startTime = null;
+        } else {
+            this.startTime = (Calendar) task.getStartTime().clone();
+        }
+
+        if (task.getEndTime() == null) {
+            this.endTime = null;
+        } else {
+            this.endTime = (Calendar) task.getEndTime().clone();
+        }
+
         this.location = task.getLocation();
         this.description = task.getDescription();
         this.priorityLevel = task.getPriorityLevel();
@@ -47,85 +47,87 @@ public class Task {
         this.sync = task.getSyncedValue();
         this.blocked = task.isBlocked();
     }
-    
+
     public void block() {
-    	this.blocked = true;
+        this.blocked = true;
     }
-    
+
     public void free() {
-    	this.blocked = false;
+        this.blocked = false;
     }
-    
+
     public boolean isBlocked() {
-    	return this.blocked;
+        return this.blocked;
     }
-    
-    public boolean isSynced(){
-    	return this.sync == 1;
+
+    public boolean isSynced() {
+        return this.sync == 1;
     }
-    
+
     public void update(Task task) {
-    	if (task.getStartTime() != null) {
-    		this.startTime = (Calendar) task.getStartTime().clone();
-    	}
-    	if (task.getEndTime() != null) {
-    		this.endTime = (Calendar) task.getEndTime().clone();
-    	}
-    	
-    	if (task.getStartTime() != null && task.getEndTime() == null) {
-    		this.startTime = (Calendar) task.getStartTime().clone();
-    		this.endTime = null;
-    	}
-    	
+        if (task.getStartTime() != null) {
+            this.startTime = (Calendar) task.getStartTime().clone();
+        }
+        if (task.getEndTime() != null) {
+            this.endTime = (Calendar) task.getEndTime().clone();
+        }
+
+        if (task.getStartTime() != null && task.getEndTime() == null) {
+            this.startTime = (Calendar) task.getStartTime().clone();
+            this.endTime = null;
+        }
+
         if (task.getLocation() != null && task.getLocation() != "") {
-        	this.location = task.getLocation();
+            this.location = task.getLocation();
         }
         if (task.getDescription() != null && task.getDescription() != "") {
-        	this.description = task.getDescription();
+            this.description = task.getDescription();
         }
         if (task.getPriorityLevel() != null) {
-        	this.priorityLevel = task.getPriorityLevel();
+            this.priorityLevel = task.getPriorityLevel();
         }
         if (task.getState() != null) {
-        	this.state = task.getState();
+            this.state = task.getState();
         }
     }
 
     public void setStartTime(Calendar time) {
         this.startTime = time;
     }
-    
+
     public boolean equals(Task task) {
-    	if (task == null) {
-    		return false;
-    	}
-    	if (!convertCalendarToString(this.startTime, Constants.FORMAT_DATE_CMP).equals( 
-    			 convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE_CMP))) {
-    		return false;
-    	}
-    	
-    	if (!convertCalendarToString(this.endTime, Constants.FORMAT_DATE_CMP).equals( 
-   			 convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE_CMP))) {
-    		return false;
-    	}
-    	
-    	if (this.description == null) {
-    		if (task.getDescription() != null) {
-    			return false;
-    		}
-    	} else if (!this.description.equalsIgnoreCase(task.getDescription())) {
-    		return false;
-    	}
-    	
-    	if (this.location == null) {
-    		if (task.getLocation() != null) {
-    			return false;
-    		}
-    	} else if (!this.location.equalsIgnoreCase(task.getLocation())) {
-    		return false;
-    	}
-    	
-    	return true;
+        if (task == null) {
+            return false;
+        }
+        if (!convertCalendarToString(this.startTime, Constants.FORMAT_DATE_CMP)
+                .equals(convertCalendarToString(task.getStartTime(),
+                        Constants.FORMAT_DATE_CMP))) {
+            return false;
+        }
+
+        if (!convertCalendarToString(this.endTime, Constants.FORMAT_DATE_CMP)
+                .equals(convertCalendarToString(task.getEndTime(),
+                        Constants.FORMAT_DATE_CMP))) {
+            return false;
+        }
+
+        if (this.description == null) {
+            if (task.getDescription() != null) {
+                return false;
+            }
+        } else if (!this.description.equalsIgnoreCase(task.getDescription())) {
+            return false;
+        }
+
+        if (this.location == null) {
+            if (task.getLocation() != null) {
+                return false;
+            }
+        } else if (!this.location.equalsIgnoreCase(task.getLocation())) {
+            return false;
+        }
+
+        return true;
     }
 
     public void setStartTime(String time) {
@@ -183,9 +185,10 @@ public class Task {
         } else if (state.equalsIgnoreCase(Constants.STATE_DISCARDED)) {
             this.state = StateType.DISCARDED;
         } else if (state.equalsIgnoreCase(Constants.STATE_NULL)) {
-        	this.state = null;
+            this.state = null;
         } else {
-            throw new Exception("The indicate status: \"" + state + "\" is not recognised.");
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_STATE,
+                    state));
         }
     }
 
@@ -215,16 +218,17 @@ public class Task {
         } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_NULL)) {
             this.priorityLevel = null;
         } else {
-            throw new Exception("The indicate priority: \"" + state + "\" is not recognised.");
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_PRIORITY,
+                    priorityLevel));
         }
     }
-    
+
     public void setSynced() {
-    	this.sync = 1;
+        this.sync = 1;
     }
-    
+
     public void setNotSynced() {
-    	this.sync = 0;
+        this.sync = 0;
     }
 
     public Calendar getStartTime() {
@@ -258,20 +262,20 @@ public class Task {
     public PriorityType getPriorityLevel() {
         return this.priorityLevel;
     }
-    
-	private String convertCalendarToString(Calendar time, String FORMAT) {
-		if (time == null) {
-			return "null";
-		}
-		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);     
-		return formatter.format(time.getTime());
-	}
 
-	public void setSyncedValue(int syncedValue) {
-		this.sync = syncedValue;
-	}
-	
-	public int getSyncedValue() {
-		return this.sync;
-	}
+    private String convertCalendarToString(Calendar time, String FORMAT) {
+        if (time == null) {
+            return "null";
+        }
+        SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+        return formatter.format(time.getTime());
+    }
+
+    public void setSyncedValue(int syncedValue) {
+        this.sync = syncedValue;
+    }
+
+    public int getSyncedValue() {
+        return this.sync;
+    }
 }

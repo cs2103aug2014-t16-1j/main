@@ -61,6 +61,9 @@ public final class Constants {
 	public static final String SYNC_STATUS = "SYNC";
 	public static final String END_OBJECT_SIGNAL = "END";
 
+	// constants for Task
+	public static final String EXCEPTIONS_INVALID_STATE = "The indicate status is invalid: %1$s";
+	public static final String EXCEPTIONS_INVALID_PRIORITY = "The indicate priority is invalid: %1$s";
 	
 	// constants for frequency type
 	public static final String FREQUENCY_DAY = "DAY";
