@@ -35,7 +35,7 @@ public class TasKoordIntegrationTest {
         String nextLine = scanner.nextLine();
         assertEquals(
                 "{\"FREQUENCY\":0,\"LOCATION\":\"Boardroom\",\"DESCRIPTION\":\"Lunch\","
-                        + "\"PRIORITY\":\"MEDIUM\",\"SYNC\":\"true\",\"ENDTIME\":"
+                        + "\"PRIORITY\":\"MEDIUM\",\"SYNC\":0,\"ENDTIME\":"
                         + "\"Oct 25 2015 11:00\",\"STARTTIME\":\"Oct 25 2015 10:00\","
                         + "\"STATE_TYPE\":\"PENDING\"}", nextLine);
         assertEquals(false, scanner.hasNext());
@@ -49,7 +49,7 @@ public class TasKoordIntegrationTest {
         String nextLine = scanner.nextLine();
         assertEquals(
                 "{\"FREQUENCY\":0,\"LOCATION\":\"Boardroom\",\"DESCRIPTION\":\"Meeting\","
-                        + "\"PRIORITY\":\"MEDIUM\",\"SYNC\":\"true\",\"ENDTIME\":"
+                        + "\"PRIORITY\":\"MEDIUM\",\"SYNC\":0,\"ENDTIME\":"
                         + "\"Oct 24 2015 10:00\",\"STARTTIME\":\"Oct 24 2015 09:00\","
                         + "\"STATE_TYPE\":\"PENDING\"}", nextLine);
         assertEquals(false, scanner.hasNext());

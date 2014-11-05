@@ -101,4 +101,9 @@ public final class Constants {
 	public static final String MESSAGE_SYNCING = "Syncing is in process, it may takes minutes to be completed..";
 	public static final String MESSAGE_NO_INTERNET = "No internet connection!";
 	public static final String MESSAGE_SYNC_ERROR = "Cannot sync, please try again!";
+	
+	public static final String EXCEPTIONS_INVALID_USERCOMMAND = "Your input is invalid: %1$s <br>%2$s";
+	
+	// constants for Parser
+	public static final String EXCEPTIONS_INVALID_COMMAND = "The command is invalid: %1$s";
 }

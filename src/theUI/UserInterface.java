@@ -108,8 +108,9 @@ public class UserInterface {
             command = userInput.getCommand();
             task = userInput.getTask();
         } catch (Exception e) {
-            if (e.getMessage().contains("invalid command")) {
-                gui.displayWarning("Invalid command: " + userCommand, false);
+            if (e.getMessage().contains("invalid")) {
+                gui.displayWarning(String.format(Constants.EXCEPTIONS_INVALID_USERCOMMAND, 
+                        userCommand, e.getMessage()), false);
             } else {
                 e.printStackTrace();
             }

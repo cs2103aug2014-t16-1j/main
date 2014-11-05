@@ -46,7 +46,7 @@ public class UITest {
 		ui.executeCommands("  ");
 		assertEquals(
 				ui.getDisplayedMessage(),
-				"<font size = 4 color = #F92672>Invalid command:   </font><br>");
+				"<font size = 4 color = #F92672>Your input is invalid:    <br>The command is invalid: </font><br>");
 
 		/*
 		 * tests for "delete" partition

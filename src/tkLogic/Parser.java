@@ -102,7 +102,8 @@ public class Parser {
         } else if (commandTypeString.equalsIgnoreCase("exit")) {
             return CommandType.EXIT;
         } else {
-            throw new Exception("invalid command: " + commandTypeString);
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_COMMAND,
+                    commandTypeString));
         }
     }
 
@@ -338,10 +339,7 @@ public class Parser {
     }
 
     private void parseTime() throws Exception {
-        if (startTime.length == 0 && endTimeAndDate != null) {
-            throw new Exception(
-                    "invalid time format, you have not entered the start time.");
-        } else if (startTime.length == 0 && endTime.length == 0 && date.length != 0) {
+        if (startTime.length == 0 && endTime.length == 0 && date.length != 0) {
             Calendar.getInstance();
             String[] currentTime = new String[2];
             currentTime[0] = "00";
