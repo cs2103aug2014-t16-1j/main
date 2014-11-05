@@ -276,11 +276,14 @@ public class Logic {
 		if(isDeadlineTask(task)){
 			for(Task queriedTask: queryList){
 				if(isDeadlineTask(queriedTask)){
-					if(isSameStartTime(task,queriedTask)){
+					if(isSameStartTime(task, queriedTask)){
 						return false;
 					}
 				}
 				if(isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
+					return false;
+				}
+				if(isSameEndTime(task, queriedTask)){
 					return false;
 				}
 			}
@@ -318,6 +321,10 @@ public class Logic {
 	
 	private boolean isSameStartTime(Task task, Task queriedTask){
 		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
+	}
+	
+	private boolean isSameEndTime(Task task, Task queriedTask){
+		return (task.getStartTime().compareTo(queriedTask.getEndTime()) == 0);
 	}
 	
 	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
