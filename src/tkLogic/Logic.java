@@ -32,14 +32,14 @@ public class Logic {
 			return Constants.MESSAGE_DUPLICATED_TASK;
 		}
 		
-		if (isWithoutStartTime(task)){
-			return Constants.MESSAGE_NO_START_TIME;
-		}
 		if (isFreeTimeslots(task)) {
 			storage.add(task);
 			LOGGER.info("Task added.");
 			return Constants.MESSAGE_TASK_ADDED;
 		} else {
+			if (isWithoutStartTime(task)){
+				return Constants.MESSAGE_NO_START_TIME;
+			}
 			storage.add(task);
 			LOGGER.info("Task added.");
 			return Constants.MESSAGE_CLASHING_TIMESLOTS;
@@ -262,6 +262,10 @@ public class Logic {
 		
 		if(isFloatingTask(task)){
 			return true;
+		}
+		
+		if (isWithoutStartTime(task)){
+			return false;
 		}
 		
 		for(Task item: allTasks){
