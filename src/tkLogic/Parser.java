@@ -10,9 +10,10 @@ import tkLibrary.UserInput;
 import tkLibrary.CommandKey;
 
 /*
- * receive a string of command
- * and do parse it, return our type of tasks.
- * The string is all information of the command, except the command type.
+ * Parser is a singleton class
+ * 
+ * It formats a string of command and convert it into a UserInput object
+ * containing the CommandType and the Task(s) details
  */
 public class Parser {
     private static Parser theOneParser;
