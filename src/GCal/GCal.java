@@ -5,8 +5,6 @@ import tkLibrary.Constants;
 import storage.Storage;
 //import storage.jsonConverter;
 
-
-
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
@@ -21,8 +19,6 @@ import java.util.Date;
 import java.util.TimeZone;
 
 //import org.json.simple.JSONObject;
-
-
 
 import com.google.api.services.calendar.Calendar;
 //import com.google.api.services.calendar.Calendar.CalendarList;
@@ -81,7 +77,7 @@ public class GCal {
 	public String getURL() {
 		String url = codeFlow.newAuthorizationUrl().setRedirectUri(redirectUrl)
 				.build();
-
+		
 		return url;
 	}
 

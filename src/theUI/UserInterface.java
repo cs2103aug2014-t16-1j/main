@@ -17,6 +17,7 @@ import tkLibrary.UserInput;
 import tkLogic.Logic;
 import tkLogic.Parser;
 
+
 public class UserInterface {
 
 	private final int COLOR_DONE = 1;
@@ -154,6 +155,7 @@ public class UserInterface {
 		gui.displayDone("Please follow the link and type down the access key!", false);
 		try {
 			java.awt.Desktop.getDesktop().browse(new URI(url));
+			
 		} catch (IOException e) {
 			e.printStackTrace();
 		} catch (URISyntaxException e) {
@@ -166,8 +168,7 @@ public class UserInterface {
 		System.out.println(accessToken);
 		try {
 			logic.generateNewToken(accessToken);
-			logic.syncWithGoogle();
-			gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
+			gui.displayDone(logic.syncWithGoogle(), false);
 		} catch (Exception e) {
 			e.printStackTrace();
 			gui.displayWarning("Cannot sync, generate the token again!", false);
@@ -181,8 +182,7 @@ public class UserInterface {
     		isSyncing = false;
     	} else if (logic.WithExistingToken()){
     		try {
-				logic.syncWithGoogle();
-				gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
+				gui.displayDone(logic.syncWithGoogle(), false);
 				isSyncing = false;
 				return;
 			} catch (IOException e) {
