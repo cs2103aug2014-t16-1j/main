@@ -15,6 +15,7 @@ import theUI.UserInterface;
 import tkLogic.LogicTest;
 import tkLogic.ParserTest;
 
+//@author A0110493N
 public class TasKoordIntegrationTest {
     private final String fileName = "IntegrationTest.txt";
     private Scanner scanner;

@@ -10,6 +10,7 @@ import tkLibrary.StateType;
 import tkLibrary.Task;
 import tkLibrary.UserInput;
 
+//@author A0110493N
 public class ParserTest {
     /* This is a boundary case for the optimal partition */
     @Test
