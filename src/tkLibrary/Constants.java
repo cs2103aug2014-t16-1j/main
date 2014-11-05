@@ -77,6 +77,7 @@ public final class Constants {
     public static final String PRIORITY_LOW = "LOW";
     public static final String PRIORITY_MEDIUM = "MEDIUM";
     public static final String PRIORITY_HIGH = "HIGH";
+    public static final String PRIORITY_NULL = "NULL";
     
     // constants for UI
     public static final int LISTUPCOMINGTIME_DEFAULT = 5;

@@ -71,13 +71,12 @@ public class ParserTest {
             assert (false);
         }
     }
-    
+
     /* This is a boundary case for the partition with only date */
     @Test
     public void testParserAddWithDateNotTime() {
         Parser parser = Parser.getInstance();
-        String input =
-                "add Meeting on 11 Sep 2014 at Boardroom";
+        String input = "add Meeting on 11 Sep 2014 at Boardroom";
         UserInput userInput;
         try {
             userInput = parser.format(input);
@@ -130,7 +129,7 @@ public class ParserTest {
             assert (false);
         }
     }
-    
+
     /* This is a boundary case for the partition with date format: dd/mm/yy */
     @Test
     public void testParserAddSpecialDateFormat() {
@@ -163,7 +162,7 @@ public class ParserTest {
             assert (false);
         }
     }
-    
+
     /* This is a boundary case for the partition with no date and time */
     @Test
     public void testParserAddGoodToDo() {
@@ -196,7 +195,7 @@ public class ParserTest {
             assert (false);
         }
     }
-    
+
     /* This is a boundary case for the partition with keyword as description */
     @Test
     public void testParserAddDescriptionWithKeys() {
@@ -343,7 +342,7 @@ public class ParserTest {
             assert (false);
         }
     }
-    
+
     public void testParserClear() {
         Parser parser = Parser.getInstance();
         String input = "clear";

@@ -48,7 +48,7 @@ public class Parser {
         date = new String[0];
         startTimeAndDate = null;
         endTimeAndDate = null;
-        priority = null;
+        priority = Constants.PRIORITY_NULL;
         state = Constants.STATE_NULL;
         isEdit = false;
     }
@@ -97,8 +97,8 @@ public class Parser {
             return CommandType.SET;
         } else if (commandTypeString.equalsIgnoreCase("redo")) {
             return CommandType.REDO;
-        } else if (commandTypeString.equalsIgnoreCase("sync")){
-        	return CommandType.SYNC;
+        } else if (commandTypeString.equalsIgnoreCase("sync")) {
+            return CommandType.SYNC;
         } else if (commandTypeString.equalsIgnoreCase("exit")) {
             return CommandType.EXIT;
         } else {
@@ -127,7 +127,7 @@ public class Parser {
         setTaskFields();
     }
 
-    private void setTaskFields() {
+    private void setTaskFields() throws Exception {
         task.setDescription(completeDescription);
         task.setLocation(completeLocation);
         task.setFrequency(frequencyValue);

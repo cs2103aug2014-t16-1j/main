@@ -175,15 +175,17 @@ public class Task {
         }
     }
 
-    public void setState(String state) {
+    public void setState(String state) throws Exception {
         if (state.equalsIgnoreCase(Constants.STATE_COMPLETED)) {
             this.state = StateType.COMPLETED;
         } else if (state.equalsIgnoreCase(Constants.STATE_PENDING)) {
             this.state = StateType.PENDING;
         } else if (state.equalsIgnoreCase(Constants.STATE_DISCARDED)) {
             this.state = StateType.DISCARDED;
-        } else {
+        } else if (state.equalsIgnoreCase(Constants.STATE_NULL)) {
         	this.state = null;
+        } else {
+            throw new Exception("The indicate status: \"" + state + "\" is not recognised.");
         }
     }
 
@@ -203,16 +205,19 @@ public class Task {
         this.priorityLevel = priorityLevel;
     }
 
-    public void setPriority(String priorityLevel) {
-        if (priorityLevel != null) {
+    public void setPriority(String priorityLevel) throws Exception {
             if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_LOW)) {
                 this.priorityLevel = PriorityType.LOW;
             } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_MEDIUM)) {
                 this.priorityLevel = PriorityType.MEDIUM;
             } else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_HIGH)) {
                 this.priorityLevel = PriorityType.HIGH;
+            }else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_NULL)) {
+                this.priorityLevel = null;
+            } else {
+                throw new Exception("The indicate priority: \"" + state + "\" is not recognised.");
             }
-        }
+        
     }
     
     public void setSync(boolean sync_status){
