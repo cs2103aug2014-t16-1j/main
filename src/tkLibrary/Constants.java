@@ -77,6 +77,7 @@ public final class Constants {
     public static final String PRIORITY_HIGH = "HIGH";
     public static final String PRIORITY_NULL = "NULL";
     
+    //@author A0111705W
     // constants for UI
     public static final int LISTUPCOMINGTIME_DEFAULT = 5;
     public static final String MESSAGE_NO_RESULT = "There is no such task.";
@@ -86,7 +87,7 @@ public final class Constants {
     public static final String MESSAGE_NO_RESULT_LIST = "There is nothing to list.";
     public static final String MESSAGE_UPDATE_STATUS_AND_PRIORITY = "Task status changed to: %s and priority changed to: %s";
 
-	public static final String MESSAGE_ENDTIME_BEFORE_STARTTIME = "The end time can not be before the start time.";
+	public static final String MESSAGE_ENDTIME_BEFORE_STARTTIME = "The end time cannot be before the start time.";
 
 	public static final int HIGHLIGH = 1;
 	public static final int DELETED = 2; 
