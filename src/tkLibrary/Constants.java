@@ -86,7 +86,9 @@ public final class Constants {
     public static final String MESSAGE_NO_DELETE_INFO = "Please specify the task you want to delete!";
     public static final String MESSAGE_NO_RESULT_LIST = "There is nothing to list.";
     public static final String MESSAGE_UPDATE_STATUS_AND_PRIORITY = "Task status changed to: %s and priority changed to: %s";
-
+    
+	//@author A0112068N
+    // more constants for UI
 	public static final String MESSAGE_ENDTIME_BEFORE_STARTTIME = "The end time cannot be before the start time.";
 
 	public static final int HIGHLIGH = 1;

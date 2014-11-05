@@ -72,6 +72,7 @@ public class Logic {
 		}
 	}
 	
+	//@author A0112068N
 	/*
 	 * for listing, only mention the time, the priority and the state.
 	 */
@@ -139,7 +140,8 @@ public class Logic {
 		LOGGER.info("Tasks with keyword found.");
 		return searchResults;
 	}
-
+	
+	//@author A0112068N
 	private ArrayList<Task> sort(ArrayList<Task> list) {
 		Collections.sort(list, new Comparator<Task>() {
 	        @Override
@@ -371,7 +373,8 @@ public class Logic {
 		LOGGER.info("Task does not exist.");
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
 	}
-
+	
+	//@author A0112068N
 	public ArrayList<Task> load() {
 		return storage.load();
 	}
