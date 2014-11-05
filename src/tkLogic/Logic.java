@@ -12,11 +12,10 @@ import tkLibrary.Constants;
 import tkLibrary.Task;
 import tkLibrary.LogFile;
 
-
+//@author A0111705W
 /*
  * Basically the logic functions should be very clear and simple.
  * So that UserInterface have to parse the command and call the logic.
- * This maybe be a little bit more complicated so I can help Ben.
  */
 public class Logic {
 	private Storage storage;
@@ -121,7 +120,8 @@ public class Logic {
 		LOGGER.info("Tasks cleared from TasKoord.");
 		return Constants.MESSAGE_TASK_CLEARED;
 	}
-
+	
+	//@author A0111705W
 	/*
 	 * searching a task by keyword
 	 * only consider the description
@@ -241,6 +241,7 @@ public class Logic {
 		return formatter.format(time.getTime());
 	}
 	
+	//@author A0111705W
 	// this is to check if a task already existing. using description and location to check.
 	private boolean isExistingTask(Task task) {
 		ArrayList<Task> queryList = storage.load();

@@ -12,6 +12,7 @@ public final class Constants {
 	public static final String FORMAT_EEE = "EEE, dd MMM yyyy";
 	public static final String FORMAT_HOUR = "HH:mm";
 	
+	//@author A0111705W
 	// logic constants
 	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, task still added to TasKoord.";
 	public static final String MESSAGE_EDIT_CLASHING_TIMESLOTS = "Warning: timeslot of edited task is taken, task still added to TasKoord.";
@@ -41,13 +42,6 @@ public final class Constants {
 	public static final String MESSAGE_SYNC_NOT_COMPLETE = "Synchronization is not complete";
 	public static final String MESSAGE_USER_NOT_ONLINE = "Please check your internet connection.";
 	public static final String MESSAGE_NOT_UPDATE = "%s is not updated.\n";
-	
-	// logic exceptions constants
-	public static final String EXCEPTIONS_ADD_FAIL = "Unable to add to TasKoord.";
-	public static final String EXCEPTIONS_DELETE_FAIL = "Unable to delete from TasKoord.";
-	public static final String EXCEPTIONS_EDIT_FAIL_BECAUSE_OF_ADD = "Edit failed because of add.";
-	public static final String EXCEPTIONS_EDIT_FAIL_BECAUSE_OF_DELETE = "Edit failed because of delete.";
-	public static final String EXCEPTIONS_EDIT_FAIL_BECAUSE_OF_OTHERS = "Edit failed because of other reason.";
 	
 	// storage constants
 	public static final String STARTTIME = "STARTTIME";
