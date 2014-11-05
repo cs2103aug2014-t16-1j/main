@@ -275,14 +275,16 @@ public class Logic {
 		// for deadline tasks, the time when it is due is start time instead of deadline for efficiency in sorting
 		if(isDeadlineTask(task)){
 			for(Task queriedTask: queryList){
-				if(isSameStartTime(task, queriedTask)){
-					return true;
+				if(isDeadlineTask(queriedTask)){
+					if(isSameStartTime(task,queriedTask)){
+						return false;
+					}
 				}
-				if(isBeforeQueriedTaskStartTime(task, queriedTask)){
-					return true;
+				if(isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
+					return false;
 				}
 			}
-			return false;
+			return true;
 		}
 		
 		for(Task queriedTask: queryList){
@@ -316,10 +318,6 @@ public class Logic {
 	
 	private boolean isSameStartTime(Task task, Task queriedTask){
 		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
-	}
-	
-	private boolean isBeforeQueriedTaskStartTime(Task task, Task queriedTask){
-		return (task.getStartTime().compareTo(queriedTask.getStartTime()) < 0);
 	}
 	
 	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
