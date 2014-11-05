@@ -7,7 +7,6 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
-import GCal.GCal;
 import tkLibrary.CommandType;
 import tkLibrary.Constants;
 import tkLibrary.GcPacket;
@@ -26,7 +25,6 @@ public class UserInterface {
     private Logic logic;
     private Parser parser;
     private Gui gui;
-    private GCal gCal;
     
     private ArrayList<Task> tasksOnScreen;
     private ArrayList<String> statusForUndo;
@@ -49,7 +47,6 @@ public class UserInterface {
     	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
-        gCal = new GCal();
         
         tasksOnScreen = new ArrayList<Task> ();
         statusForUndo = new ArrayList<String> ();
@@ -169,9 +166,9 @@ public class UserInterface {
 	private void syncWithToken() {
 		isSyncing = false;
 		try {
-			gCal.connectByNewToken(accessToken);
+			logic.connectByNewToken(accessToken);
 			gui.displayDone(Constants.MESSAGE_SYNCING, false);
-			GcPacket packet = gCal.sync(logic.load());
+			GcPacket packet = logic.sync(logic.load());
 			gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
 			displayPacket(packet);
 		} catch (Exception e) {
@@ -182,24 +179,24 @@ public class UserInterface {
 	
     private void sync() {
     	isSyncing = true;
-    	if (!GCal.isOnline()) {
+    	if (!logic.isOnline()) {
     		gui.displayWarning(Constants.MESSAGE_NO_INTERNET, false);
     		isSyncing = false;
     	} else {
     		gui.displayDone(Constants.MESSAGE_SYNCING, false);
-    		if (gCal.connectUsingExistingToken()) {
+    		if (logic.connectUsingExistingToken()) {
 	    		try {
-					GcPacket packet = gCal.sync(logic.load());
+					GcPacket packet = logic.sync(logic.load());
 					gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
 					displayPacket(packet);
 					isSyncing = false;
 					return;
 				} catch (IOException e) {
-					getTokenPopup(gCal.getURL());
+					getTokenPopup(logic.getURL());
 					e.printStackTrace();
 				}
 	    	} else {
-	    		getTokenPopup(gCal.getURL());
+	    		getTokenPopup(logic.getURL());
 	    	}
     	}
     }

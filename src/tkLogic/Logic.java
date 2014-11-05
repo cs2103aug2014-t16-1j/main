@@ -11,7 +11,10 @@ import storage.Storage;
 import tkLibrary.Constants;
 import tkLibrary.Task;
 import tkLibrary.LogFile;
+import tkLibrary.GcPacket;
 
+import java.io.IOException;
+import GCal.GCal;
 
 /*
  * Basically the logic functions should be very clear and simple.
@@ -20,10 +23,12 @@ import tkLibrary.LogFile;
  */
 public class Logic {
 	private Storage storage;
+	private GCal gcal;
 	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
 
 	public Logic(String fileName) {
 		storage = new Storage(fileName);
+		gcal = new GCal();
 		LogFile.newLogger();
 	}
 	
@@ -377,5 +382,24 @@ public class Logic {
 
 	public void setSynced() {
 		storage.setSynced();
+	}
+	public boolean isOnline(){
+		return GCal.isOnline();
+	}
+	
+	public String getURL(){
+		return gcal.getURL();
+	}
+	
+	public boolean connectUsingExistingToken(){
+		return gcal.connectUsingExistingToken();
+	}
+
+	public boolean connectByNewToken(String code) throws IOException{
+		return gcal.connectByNewToken(code);
+	}
+	
+	public GcPacket sync(ArrayList<Task> list) throws IOException{
+		return gcal.sync(list);
 	}
 }
