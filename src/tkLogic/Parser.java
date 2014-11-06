@@ -102,6 +102,8 @@ public class Parser {
             return CommandType.SYNC;
         } else if (commandTypeString.equalsIgnoreCase("exit")) {
             return CommandType.EXIT;
+        } else if (commandTypeString.equalsIgnoreCase("help")) {
+        	return CommandType.HELP;
         } else {
             throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_COMMAND,
                     commandTypeString));

@@ -22,7 +22,10 @@ public class UserInterface {
 	private final int COLOR_DONE = 1;
 	private final int COLOR_WARNING = 2;
     private final String NO_COMMAND = "";
-    private final String clientEmail = "658469510712-compute@developer.gserviceaccount.com";
+    
+    private String clientEmail = "658469510712-compute@developer.gserviceaccount.com";
+    private String helpFile = "help.html";
+    
     private Logic logic;
     private Parser parser;
     private Gui gui;
@@ -139,6 +142,8 @@ public class UserInterface {
         	redo();
         } else if (command == CommandType.SYNC) {
         	sync();
+        } else if (command == CommandType.HELP) {
+        	help();
         } else if (command == CommandType.EXIT) {
         	gui.displayDone("Good Bye !!!", false);
         	 try {
@@ -220,6 +225,11 @@ public class UserInterface {
     		logic.add(item);
     	}
     	logic.setSynced();
+    }
+    
+    private void help() {
+    	gui.displayFile(helpFile);
+    	tasksOnScreen.clear();
     }
     
     private void add(Task task) {

@@ -13,9 +13,11 @@ import java.awt.event.KeyListener;
 import javax.swing.*;
 
 import java.awt.*;
+import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.Scanner;
 
 //@author A0112068N
 public class Gui {
@@ -324,6 +326,19 @@ public class Gui {
 			return "<strike>" + res + "</strike>";
 		} else {
 			return res;
+		}
+	}
+
+	public void displayFile(String helpFile) {
+		try {
+			String text = "";
+			Scanner in = new Scanner (new File(helpFile));
+			while (in.hasNextLine()) {
+				text += in.nextLine();
+			}
+			in.close();
+			displayBox.setText(text);
+		} catch (Exception e) {
 		}
 	}
 }
