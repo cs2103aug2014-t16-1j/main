@@ -16,6 +16,7 @@ import tkLibrary.Task;
 import tkLibrary.UserInput;
 import tkLogic.Logic;
 import tkLogic.Parser;
+import GCal.BrowserExecution;;
 
 //@author A0112068N
 public class UserInterface {
@@ -29,6 +30,7 @@ public class UserInterface {
     private Logic logic;
     private Parser parser;
     private Gui gui;
+    private BrowserExecution browser;
     
     private ArrayList<Task> tasksOnScreen;
     private ArrayList<String> statusForUndo;
@@ -51,6 +53,7 @@ public class UserInterface {
     	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
+        browser = new BrowserExecution();
         
         tasksOnScreen = new ArrayList<Task> ();
         statusForUndo = new ArrayList<String> ();
@@ -158,21 +161,20 @@ public class UserInterface {
     }
     
     /* Standard main method to try that test as a standalone application. */
+    
 	public void getTokenPopup(String url)  {
-		gui.displayDone("Please follow the link and type down the access key!", false);
-		try {
-			java.awt.Desktop.getDesktop().browse(new URI(url));
-		} catch (IOException e) {
-			e.printStackTrace();
-		} catch (URISyntaxException e) {
-			e.printStackTrace();
-		}
+		gui.displayDone("Please do not close the browser - press q", false);
+			//java.awt.Desktop.getDesktop().browse(new URI(url));
+			browser.init(url);
+			browser.start();
 	}
     
+	@SuppressWarnings({ "deprecated", "deprecation" })
 	private void syncWithToken() {
 		isSyncing = false;
 		try {
-			logic.connectByNewToken(accessToken);
+			browser.stop();
+			//logic.connectByNewToken(accessToken);
 			gui.displayDone(Constants.MESSAGE_SYNCING, false);
 			gui.displayDone("Make sure that you shared your calendar with: " + clientEmail, true);
 			GcPacket packet = logic.sync(logic.load());

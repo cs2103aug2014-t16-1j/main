@@ -38,7 +38,7 @@ public class GCal {
 	final String MESSAGE_ORIGINAL_CREATOR = "[Task synced with TasKoord]";
 	final String START_OF_DAY = "T00:00:00.000+08:00";
 	
-	String redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
+	String redirectUrl = "urn:ietf:wg:oauth:2.0:oob:auto";
 	String clientName = "TasKoord";
 	String clientEmail = "658469510712-compute@developer.gserviceaccount.com";
 	String clientId = "658469510712-5565en3ob92ou4mvoijl524956l6c1qm.apps.googleusercontent.com";

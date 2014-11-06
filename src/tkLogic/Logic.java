@@ -406,6 +406,10 @@ public class Logic {
 		return gcal.connectByNewToken(code);
 	}
 	
+	public boolean isValidFile(){
+		return GCal.validFile();
+	}
+	
 	public GcPacket sync(ArrayList<Task> list) throws IOException{
 		return gcal.sync(list);
 	}
