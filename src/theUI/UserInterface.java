@@ -24,7 +24,7 @@ public class UserInterface {
     private final String NO_COMMAND = "";
     
     private String clientEmail = "658469510712-compute@developer.gserviceaccount.com";
-    private String helpFile = "help.html";
+    private String helpFile = "help";
     
     private Logic logic;
     private Parser parser;
