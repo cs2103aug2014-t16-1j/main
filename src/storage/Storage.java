@@ -71,15 +71,6 @@ public class Storage {
 		return list;
 	}
 	
-	public void setSynced() {
-		ArrayList<Task> newList = copyList(listOfTasks);
-		for(Task item : newList) {
-			item.setSynced();
-		}
-		listOfTasks.clear();
-		store(newList);
-	}
-	
 	public void add(Task task) {
 		oldTasks = copyList(listOfTasks);
 		if(!oldTasks.isEmpty()){
@@ -104,7 +95,7 @@ public class Storage {
 		closeFileToWrite();
 	}
 	
-	// delete only 1 task with its name and its location(description).
+	//@author A0112068N
 	public void delete(Task taskToBeDeleted) {
 		ArrayList<Task> newList = new ArrayList<Task>();
 		
@@ -120,7 +111,6 @@ public class Storage {
 		store(newList);
 	}
 	
-	//@author A0112068N
 	public void set(Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
 		oldTasks = copyList(listOfTasks);
@@ -134,7 +124,6 @@ public class Storage {
 			newList.add(item);
 		}
 		
-		//deleteFile();
 		listOfTasks.clear();
 		store(newList);
 	}
@@ -148,11 +137,11 @@ public class Storage {
 		for (Task item : listOfTasks) {
 			if (item.equals(oldTask)) {
 				item.update(newTask);
+				item.setSyncedValue(0);
 			}
 			newList.add(item);
 		}
 		
-		//deleteFile();
 		listOfTasks.clear();
 		store(newList);
 	}
@@ -165,6 +154,7 @@ public class Storage {
 		closeFileToWrite();
 	}
 	
+	//@author A0112068N
 	public String undo() {
 		if (currentPos >= 0) {
 			listOfTasks.clear();
@@ -175,7 +165,6 @@ public class Storage {
 		return "Stack is empty";
 	}
 	
-	//@author A0112068N
 	public String redo() {
 		if (currentPos < availablePos) {
 			currentPos ++;
@@ -184,6 +173,15 @@ public class Storage {
 			return Constants.MESSAGE_REDO_DONE;
 		}
 		return "No command to redo.";
+	}
+	
+	public void setSynced() {
+		ArrayList<Task> newList = copyList(listOfTasks);
+		for(Task item : newList) {
+			item.setSynced();
+		}
+		listOfTasks.clear();
+		store(newList);
 	}
 	
 	//@author A0112068N

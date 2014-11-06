@@ -17,11 +17,12 @@ import tkLibrary.UserInput;
 import tkLogic.Logic;
 import tkLogic.Parser;
 
+//@author A0112068N
 public class UserInterface {
-
 	private final int COLOR_DONE = 1;
 	private final int COLOR_WARNING = 2;
     private final String NO_COMMAND = "";
+    private final String clientEmail = "658469510712-compute@developer.gserviceaccount.com";
     private Logic logic;
     private Parser parser;
     private Gui gui;
@@ -168,12 +169,14 @@ public class UserInterface {
 		try {
 			logic.connectByNewToken(accessToken);
 			gui.displayDone(Constants.MESSAGE_SYNCING, false);
+			gui.displayDone("Make sure that you shared your calendar with: " + clientEmail, true);
 			GcPacket packet = logic.sync(logic.load());
 			gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
 			displayPacket(packet);
 		} catch (Exception e) {
 			e.printStackTrace();
 			gui.displayWarning(Constants.MESSAGE_SYNC_ERROR, false);
+			gui.displayWarning("Make sure that you shared your calendar with: " + clientEmail, true);
 		}
 	}
 	
@@ -184,6 +187,7 @@ public class UserInterface {
     		isSyncing = false;
     	} else {
     		gui.displayDone(Constants.MESSAGE_SYNCING, false);
+    		gui.displayDone("Make sure that you shared your calendar with: " + clientEmail, true);
     		if (logic.connectUsingExistingToken()) {
 	    		try {
 					GcPacket packet = logic.sync(logic.load());
