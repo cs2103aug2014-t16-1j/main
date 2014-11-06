@@ -35,8 +35,9 @@ import com.google.api.client.json.jackson2.JacksonFactory;
 import com.google.api.client.util.DateTime;
 
 public class GCal {
-	String MESSAGE_ORIGINAL_CREATOR = "[Task synced with TasKoord]";
-	String START_OF_DAY = "T00:00:00.000+08:00";
+	final String MESSAGE_ORIGINAL_CREATOR = "[Task synced with TasKoord]";
+	final String START_OF_DAY = "T00:00:00.000+08:00";
+	
 	String redirectUrl = "urn:ietf:wg:oauth:2.0:oob";
 	String clientName = "TasKoord";
 	String clientEmail = "658469510712-compute@developer.gserviceaccount.com";

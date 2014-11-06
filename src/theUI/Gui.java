@@ -126,6 +126,8 @@ public class Gui {
 		            	currentPos = commandStack.size();
 		            	commandBox.setText(currentCommand);
 		            }
+		    	} else if (currentPos == commandStack.size()) {
+		    		currentCommand = commandBox.getText();
 		    	}
 		    }
 		    public void keyReleased(KeyEvent keyEvent) {
