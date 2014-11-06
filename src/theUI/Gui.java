@@ -7,6 +7,8 @@ import tkLibrary.Task;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
@@ -15,6 +17,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 
+//@author A0112068N
 public class Gui {
     private final Color COLOR_BACKGROUND = new Color(0x272822);
     private final Color COLOR_FOREGROUND = new Color(0xF8F8F0);
@@ -36,12 +39,17 @@ public class Gui {
 	
 	
     private String NO_COMMAND = "";
+    public String displayText = "";
+    private String userCommand = NO_COMMAND;     
     private JFrame frame = new JFrame("TasKoord");
     private JTextField commandBox = new JTextField();
     private JTextArea historyBox = new JTextArea();
     private JTextPane displayBox = new JTextPane();
-    public String displayText = "";
-    private String userCommand = NO_COMMAND; 
+
+    private ArrayList<String> commandStack = new ArrayList<String>();
+    private int currentPos = 0;
+    private String currentCommand = "";
+    private boolean upDownTyped = false;
     
     public Gui() {
         initialize();
@@ -86,9 +94,45 @@ public class Gui {
         commandBox.addActionListener(new ActionListener() {  
             public void actionPerformed(ActionEvent e) {
                 System.out.println("Text=" + commandBox.getText());
+                commandStack.add(commandBox.getText());
+                currentPos = commandStack.size();
+                upDownTyped = false;
                 setUserCommand(commandBox.getText());
                 clearCommandBox();
             }
+        }
+        );
+        
+        commandBox.addKeyListener(new KeyListener() {
+            public void keyPressed(KeyEvent keyEvent) {
+            	if (keyEvent.getKeyCode() == KeyEvent.VK_UP ) {
+            		if (!upDownTyped) {
+            			currentCommand = commandBox.getText();
+            			upDownTyped = true;
+            		}
+		            if (currentPos - 1 >= 0) {
+		            	currentPos --;
+		            	commandBox.setText(commandStack.get(currentPos));
+		            }
+		    	} else if (keyEvent.getKeyCode() == KeyEvent.VK_DOWN ) {
+		    		if (!upDownTyped) {
+            			currentCommand = commandBox.getText();
+            			upDownTyped = true;
+            		}
+		    		if (currentPos + 1 < commandStack.size()) {
+		    			currentPos ++;
+		            	commandBox.setText(commandStack.get(currentPos));
+		            } else {
+		            	currentPos = commandStack.size();
+		            	commandBox.setText(currentCommand);
+		            }
+		    	}
+		    }
+		    public void keyReleased(KeyEvent keyEvent) {
+		    }
+		    public void keyTyped(KeyEvent keyEvent) {
+		    	
+		    }
         }
         );
     }
