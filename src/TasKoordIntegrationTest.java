@@ -28,17 +28,30 @@ public class TasKoordIntegrationTest {
         testSimpleAdd(ui);
         testDelete(ui);
         testEdit(ui);
+        testUndo(ui);
+    }
+
+    private void testUndo(UserInterface ui) throws FileNotFoundException {
+        ui.executeCommands("undo");
+        readFile(fileName);
+        String nextLine = scanner.nextLine();
+        assertEquals(
+                "{\"FREQUENCY\":0,\"LOCATION\":\"Boardroom\",\"DESCRIPTION\":\"Lunch\","
+                        + "\"PRIORITY\":\"MEDIUM\",\"SYNC\":0,\"ENDTIME\":"
+                        + "\"Oct 25 2015 11:00\",\"STARTTIME\":\"Oct 25 2015 10:00\","
+                        + "\"STATE_TYPE\":\"PENDING\"}", nextLine);
+        assertEquals(false, scanner.hasNext());
+        closeReadFile();
     }
 
     private void testEdit(UserInterface ui) throws FileNotFoundException {
-        ui.executeCommands("Edit Lunch correct dinner from 11am to 12pm on 26 Nov 2015 at Restaurant");
-        ui.executeCommands("delete Meeting");
+        ui.executeCommands("Edit Lunch correct dinner from 6pm to 7pm on 26 Nov 2015 at Restaurant");
         readFile(fileName);
         String nextLine = scanner.nextLine();
         assertEquals(
                 "{\"FREQUENCY\":0,\"LOCATION\":\"Restaurant\",\"DESCRIPTION\":\"dinner\","
                         + "\"PRIORITY\":\"MEDIUM\",\"SYNC\":0,\"ENDTIME\":"
-                        + "\"Nov 26 2015 12:00\",\"STARTTIME\":\"Nov 26 2015 11:00\","
+                        + "\"Nov 26 2015 19:00\",\"STARTTIME\":\"Nov 26 2015 18:00\","
                         + "\"STATE_TYPE\":\"PENDING\"}", nextLine);
         assertEquals(false, scanner.hasNext());
         closeReadFile();
