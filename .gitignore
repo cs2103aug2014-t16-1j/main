@@ -6,6 +6,7 @@ logicTest.txt
 TasKoord.txt
 storeTest.txt
 GToken
+GSyncedTime
 *.log.*
 *.log
 /nbproject/private/
