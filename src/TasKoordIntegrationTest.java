@@ -41,10 +41,9 @@ public class TasKoordIntegrationTest {
                         + "\"Nov 26 2015 12:00\",\"STARTTIME\":\"Nov 26 2015 11:00\","
                         + "\"STATE_TYPE\":\"PENDING\"}", nextLine);
         assertEquals(false, scanner.hasNext());
-        assertEquals(false, scanner.hasNext());
         closeReadFile();
     }
-    
+
     private void testDelete(UserInterface ui) throws FileNotFoundException {
         ui.executeCommands("add Lunch from 10am to 11am on 25 Oct 2015 at Boardroom");
         ui.executeCommands("delete Meeting");
@@ -55,7 +54,6 @@ public class TasKoordIntegrationTest {
                         + "\"PRIORITY\":\"MEDIUM\",\"SYNC\":0,\"ENDTIME\":"
                         + "\"Oct 25 2015 11:00\",\"STARTTIME\":\"Oct 25 2015 10:00\","
                         + "\"STATE_TYPE\":\"PENDING\"}", nextLine);
-        assertEquals(false, scanner.hasNext());
         assertEquals(false, scanner.hasNext());
         closeReadFile();
     }
