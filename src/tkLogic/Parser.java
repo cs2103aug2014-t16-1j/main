@@ -103,7 +103,7 @@ public class Parser {
         } else if (commandTypeString.equalsIgnoreCase("exit")) {
             return CommandType.EXIT;
         } else if (commandTypeString.equalsIgnoreCase("help")) {
-        	return CommandType.HELP;
+            return CommandType.HELP;
         } else {
             throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_COMMAND,
                     commandTypeString));
@@ -213,29 +213,76 @@ public class Parser {
         }
     }
 
-    private void parseStartTime(ArrayList<String> time) {
+    private void parseStartTime(ArrayList<String> time) throws Exception {
         String[] startingTime = new String[2];
         startTime = updateTime(time, startingTime);
     }
 
-    private void parseEndTime(ArrayList<String> time) {
+    private void parseEndTime(ArrayList<String> time) throws Exception {
         String[] endingTime = new String[2];
         endTime = updateTime(time, endingTime);
     }
 
-    private String[] updateTime(ArrayList<String> time, String[] requiredTime) {
-        String newTime = time.get(0);
-        if (newTime.contains("h")) {
+    private String[] updateTime(ArrayList<String> time, String[] requiredTime)
+            throws Exception {
+        String newTime = "";
+        newTime = getInputTime(time, newTime);
+        convertTimeValue(requiredTime, newTime);
+        checkTimeFormat(requiredTime, newTime);
+        return requiredTime;
+    }
+
+    private void checkTimeFormat(String[] requiredTime, String newTime) throws Exception {
+        if (requiredTime[0] == null || Integer.valueOf(requiredTime[0]) < 0
+                || Integer.valueOf(requiredTime[0]) > 23
+                || Integer.valueOf(requiredTime[1]) < 0
+                || Integer.valueOf(requiredTime[1]) > 59) {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_TIME,
+                    newTime));
+        }
+    }
+
+    private void convertTimeValue(String[] requiredTime, String newTime)
+            throws Exception {
+        if (newTime.length() == 5 && newTime.substring(4, 5).equals("h")) {
+            // for the time format: hhmmH
+            try {
+                Integer.valueOf(newTime.substring(0, 4));
+            } catch (NumberFormatException e) {
+                throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_TIME,
+                        newTime));
+            }
             requiredTime[0] = newTime.substring(0, 2);
             requiredTime[1] = newTime.substring(2, 4);
-        } else {
-            Float timeValue =
-                    Float.valueOf(newTime.substring(0, newTime.length() - 2));
-            Float minuteValue = timeValue - Float.valueOf(timeValue.intValue() + "");
-            getMinute(requiredTime, minuteValue);
-            getHour(requiredTime, newTime, timeValue);
+
+        } else if (newTime.contains("m")) {
+            // for the time format ending with am/pm
+            try {
+                Float timeValue =
+                        Float.valueOf(newTime.substring(0, newTime.length() - 2));
+                Float minuteValue =
+                        timeValue - Float.valueOf(timeValue.intValue() + "");
+                getMinute(requiredTime, minuteValue);
+                getHour(requiredTime, newTime, timeValue);
+            } catch (NumberFormatException e) {
+                throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_TIME,
+                        newTime));
+            }
         }
-        return requiredTime;
+    }
+
+    private String getInputTime(ArrayList<String> time, String newTime)
+            throws Exception {
+        if (time.size() == 0) {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_TIME,
+                    newTime));
+        } else {
+            newTime = time.get(0);
+            for (int i = 1; i < time.size(); i++) {
+                newTime += time.get(i);
+            }
+        }
+        return newTime;
     }
 
     private void getMinute(String[] requiredTime, Float minuteValue) {

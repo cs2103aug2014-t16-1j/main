@@ -101,6 +101,8 @@ public final class Constants {
 	
 	public static final String EXCEPTIONS_INVALID_USERCOMMAND = "Your input is invalid: %1$s <br>%2$s";
 	
+	//@author A0110493N
 	// constants for Parser
 	public static final String EXCEPTIONS_INVALID_COMMAND = "The command is invalid: %1$s";
+	public static final String EXCEPTIONS_INVALID_TIME = "The time format is invalid: %1$s";
 }
