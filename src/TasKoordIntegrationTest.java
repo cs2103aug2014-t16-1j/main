@@ -27,8 +27,24 @@ public class TasKoordIntegrationTest {
         testCommandClear(ui);
         testSimpleAdd(ui);
         testDelete(ui);
+        testEdit(ui);
     }
 
+    private void testEdit(UserInterface ui) throws FileNotFoundException {
+        ui.executeCommands("Edit Lunch correct dinner from 11am to 12pm on 26 Nov 2015 at Restaurant");
+        ui.executeCommands("delete Meeting");
+        readFile(fileName);
+        String nextLine = scanner.nextLine();
+        assertEquals(
+                "{\"FREQUENCY\":0,\"LOCATION\":\"Restaurant\",\"DESCRIPTION\":\"dinner\","
+                        + "\"PRIORITY\":\"MEDIUM\",\"SYNC\":0,\"ENDTIME\":"
+                        + "\"Nov 26 2015 12:00\",\"STARTTIME\":\"Nov 26 2015 11:00\","
+                        + "\"STATE_TYPE\":\"PENDING\"}", nextLine);
+        assertEquals(false, scanner.hasNext());
+        assertEquals(false, scanner.hasNext());
+        closeReadFile();
+    }
+    
     private void testDelete(UserInterface ui) throws FileNotFoundException {
         ui.executeCommands("add Lunch from 10am to 11am on 25 Oct 2015 at Boardroom");
         ui.executeCommands("delete Meeting");
