@@ -1,244 +1,128 @@
-<p dir="ltr"><strong>Help</strong></p>
-<p dir="ltr">Welcome to the help section! You can view all of the commands available in this section!</p>
-<p dir="ltr">&nbsp;</p>
-<p dir="ltr"><strong>Command format</strong></p>
-<p dir="ltr">All commands entered in TasKoord have a few keywords that have to be used. They are as follows:</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">Description - any words between the command word and the next key</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">Start time - after &ldquo;from&rdquo;</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">End time - after &ldquo;to&rdquo;</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">Deadline time - after &ldquo;by&rdquo;</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">Date - after &ldquo;on&rdquo;</p>
-</li>
-<li dir="ltr">Location - words after &ldquo;at</li>
-<li dir="ltr">
-<p>Priority - after "priority"</p>
-</li>
-<li dir="ltr">Status - after "status"</li>
-</ol>
-<p dir="ltr"><strong><br /></strong>If you wish to include words such as "from" or "to" in your task description, simply add a&nbsp;<strong>/</strong> in front of the word!</p>
-<p dir="ltr">An example is given as seen below:</p>
-<p dir="ltr">add travel <strong>/from</strong> home <strong>/to</strong> school <strong>/on</strong> a bus <strong>/by</strong> PIE on 14 nov 2014 at Garden <strong>/by</strong> the bay</p>
-<p dir="ltr">&nbsp;</p>
-<p dir="ltr"><strong>Adding timed tasks</strong></p>
-<p dir="ltr">You can add a timed task (a task with a start and end time) using commands 1-2.</p>
-<p dir="ltr">You can also omit the date and the task will be added automatically to the current date using command 3.</p>
-<p dir="ltr">You can also add a task that spans across a few days using command 4.</p>
-<p dir="ltr">You can omit the time and the task will be assigned a time from 12am to 11.59pm of the date specified using command 5.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">add timedTaskA from 3pm to 4pm on 15 nov 2014 at locationA</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">add timedTaskB from 0500h to 0600h on 15/11/14 at locationB</p>
-</li>
-<li>add&nbsp;timedTaskE from 1500h to 1600h at locationE</li>
-<li>
-<p>add&nbsp;timedTaskC from 3pm on 17 nov 2014 to 1600h on 18/11/14 at locationC</p>
-</li>
-<li>add timedTaskD on 18 Nov 2014 at locationD</li>
-</ol>
+<p><span style="font-size: medium; color: #ffff00;"><strong>Help</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">Welcome to the help section! You can view all of the commands available in this section!</span></p>
 <p>&nbsp;</p>
-<p><strong>Adding deadline tasks</strong></p>
-<p>You can add a task with a deadline using command 1.</p>
-<p>You can omit the date and the task will be added to the current date using command 2.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">add deadlineTaskA by 8pm on 16/11/14 at locationA</p>
-</li>
-<li>add deadlineTaskB by 8pm at locationB</li>
-</ol>
+<p><span style="font-size: small; color: #00ffff;">&nbsp;</span><br /><span style="font-size: small; color: #ff0000;"><strong>Command format</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">All commands entered in TasKoord have a few keywords that have to be used. They are as follows:</span></p>
 <p>&nbsp;</p>
-<p><strong>Adding floating tasks</strong></p>
-<p>You can add good-to-do or floating tasks as shown below.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">add floatingTaskA</p>
-</li>
-</ol>
+<p><span style="font-size: small; color: #00ffff;">1. <span style="text-decoration: underline;">Description</span> - any words between the command word and the next key</span></p>
+<p><span style="font-size: small; color: #00ffff;">2. <span style="text-decoration: underline;">Start time</span> - after &ldquo;from&rdquo;</span></p>
+<p><span style="font-size: small; color: #00ffff;">3. <span style="text-decoration: underline;">End time</span> - after &ldquo;to&rdquo;</span></p>
+<p><span style="font-size: small; color: #00ffff;">4. <span style="text-decoration: underline;">Deadline time</span> - after &ldquo;by&rdquo;</span></p>
+<p><span style="font-size: small; color: #00ffff;">5. <span style="text-decoration: underline;">Date</span> - after &ldquo;on&rdquo;</span></p>
+<p><span style="font-size: small; color: #00ffff;">6. <span style="text-decoration: underline;">Location</span> - words after &ldquo;at"</span></p>
+<p><span style="font-size: small; color: #00ffff;">7. <span style="text-decoration: underline;">Priority</span> - after "priority"</span></p>
+<p><span style="font-size: small; color: #00ffff;">8. <span style="text-decoration: underline;">Status</span> - after "status"</span><br /><span style="font-size: small; color: #00ffff;"><strong><br /></strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">If you wish to include words such as "from" or "to" in your task description, simply add a&nbsp;<strong>/</strong>&nbsp;in front of the word!</span></p>
+<p><span style="font-size: small; color: #00ffff;">An example is given as seen below:</span></p>
+<p><span style="font-size: small; color: #00ffff;">add travel&nbsp;<span style="color: #ffcc00;"><strong>/from</strong></span>&nbsp;home&nbsp;<span style="color: #00ffff;"><strong>/to</strong></span>&nbsp;school&nbsp;<span style="color: #ffcc00;"><strong>/on</strong></span>&nbsp;a bus&nbsp;<span style="color: #ffcc00;"><strong>/by</strong>&nbsp;</span>PIE on 14 nov 2014 at Garden&nbsp;<span style="color: #ffcc00;"><strong>/by</strong>&nbsp;</span>the bay</span></p>
 <p>&nbsp;</p>
-<p dir="ltr"><strong>Editing tasks</strong></p>
-<p dir="ltr">You can edit a task using the edit commands show below.</p>
-<p dir="ltr">The standard format of an edit command is shown in 1.</p>
-<p dir="ltr">You can edit a task to change it from a timed task to a deadline task and vice versa using commands 2-3.</p>
-<p dir="ltr">The components of the task (i.e. description, start time, end time, deadline time, date, location, priority and status) can be individually edited as shown from commands 4-12.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">edit timedTaskA correct from 4pm to 5pm on 15/11/14</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">edit timedTaskD correct deadlineTaskA by 3pm on 15/11/14</p>
-</li>
-<li dir="ltr">edit deadlineTaskB correct timedTaskE from 5pm to 6pm on 15/11/14</li>
-<li>
-<p>edit timedTaskB correct timedTaskC from 4pm to 5pm on 15/11/14</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">edit 1 correct timedTaskB</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">edit 2 correct from 3pm to 4pm</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">edit 3 correct by 5pm</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">edit 4 correct on 14/11/14</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">edit 5 correct from 3pm to 4pm on 14/11/14</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">edit 6 correct by 5pm on 14/11/14</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">edit 7 correct priority low (alternative to set)</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">edit 8 correct status completed (alternative to status)</p>
-</li>
-</ol>
-<p dir="ltr">&nbsp;</p>
-<p dir="ltr"><strong>Setting priority level and statuses</strong></p>
-<p dir="ltr">You can set the priority level of a task using commands 1-3. A task's priority can be set to high, medium and low and will be shown as red, teal and grey respectively.</p>
-<p dir="ltr">You can also set the status of a task using commands 4-5. A task's status can be set to discarded, completed and pending and the status of the task will be displayed only when you list on a specific date or if you list a specific status, else the default status (pending) will not be shown when you list normally.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">set 1 priority high</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">set 2 priority low</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">set 2 priority medium</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">set 1 status discarded</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">set 2 status completed</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">set 2 status pending</p>
-</li>
-</ol>
-<p dir="ltr">&nbsp;</p>
-<p dir="ltr"><strong>Clearing and deleting tasks</strong></p>
-<p dir="ltr">You can clear all your tasks in TasKoord using command 1.</p>
-<p dir="ltr">You can also delete the tasks individually using keywords or the numbers that appear next to the task using commands 2-3.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">clear</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">delete &lt;number&gt;</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">delete &lt;task identification&gt;</p>
-</li>
-</ol>
-<p dir="ltr">&nbsp;</p>
-<p dir="ltr"><strong>Undo and redo</strong></p>
-<p dir="ltr">You can undo the previous command you entered using command 1.</p>
-<p dir="ltr">You can also redo the command you just undid using command 2.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">undo</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">redo</p>
-</li>
-</ol>
-<p dir="ltr">&nbsp;</p>
-<p dir="ltr"><strong>Listing tasks</strong></p>
-<p dir="ltr"><strong><br /></strong>You can list all your tasks using command 1.</p>
-<p dir="ltr">You can also list on a specific date or over a period of time using commands 2-3.</p>
-<p dir="ltr">You can list tasks of a specific priority or task using commands 4-9.</p>
-<p dir="ltr">You can list the different types of task (event, deadline and floating) using commands 10-12.</p>
-<p dir="ltr">You can also use a combination of the different types of listing using commands 13-17.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">list</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list on 01/11/14</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list from 1pm on 15 Nov 2014 to 1pm on 16 Nov 2014</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list status completed</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list status pending</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list status discarded</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list priority high (does not show discarded/completed task)</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list priority medium (does not show discarded/completed task)</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list priority low (does not show discarded/completed task)</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list events</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list deadlines</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list floating</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list &lt;a specification&gt; on &lt;date&gt;</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list events and deadlines</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list events and deadlines and floating</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list upcoming deadlines priority high status completed</p>
-</li>
-<li dir="ltr">
-<p dir="ltr">list upcoming &lt;5 days/deadlines/events&gt;</p>
-</li>
-</ol>
-<p dir="ltr">&nbsp;</p>
-<p dir="ltr"><strong>Searching for a task</strong></p>
-<p dir="ltr">You can search for a task using command 1.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">search &lt;keyword&gt;</p>
-</li>
-</ol>
-<p dir="ltr">&nbsp;</p>
-<p dir="ltr"><strong>Sync</strong></p>
-<p dir="ltr">You can carry out synchronisation with Google Calendar using command 1.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">sync</p>
-</li>
-</ol>
-<p dir="ltr">&nbsp;</p>
-<p dir="ltr"><strong>Exit</strong></p>
-<p dir="ltr">You can exit the program using command 1.</p>
-<ol>
-<li dir="ltr">
-<p dir="ltr">exit</p>
-</li>
-</ol>
+<p><br /><span style="font-size: small; color: #ff0000;"><strong>Adding timed tasks</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can add a timed task (a task with a start and end time) using commands 1-2.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can also omit the date and the task will be added automatically to the current date using command 3.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can also add a task that spans across a few days using command 4.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can omit the time and the task will be assigned a time from 12am to 11.59pm of the date specified using command 5.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. add timedTaskA from 3pm to 4pm on 15 nov 2014 at locationA</span></p>
+<p><span style="font-size: small; color: #00ffff;">2. add timedTaskB from 0500h to 0600h on 15/11/14 at locationB</span></p>
+<p><span style="font-size: small; color: #00ffff;">3. add&nbsp;timedTaskE from 1500h to 1600h at locationE</span></p>
+<p><span style="font-size: small; color: #00ffff;">4. add&nbsp;timedTaskC from 3pm on 17 nov 2014 to 1600h on 18/11/14 at locationC</span></p>
+<p><span style="font-size: small; color: #00ffff;">5. add timedTaskD on 18 Nov 2014 at locationD</span></p>
+<p>&nbsp;</p>
+<p><br /><span style="font-size: small; color: #ff0000;"><strong>Adding deadline tasks</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can add a task with a deadline using command 1.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can omit the date and the task will be added to the current date using command 2.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. add deadlineTaskA by 8pm on 16/11/14 at locationA</span></p>
+<p><span style="font-size: small; color: #00ffff;">2. add deadlineTaskB by 8pm at locationB</span></p>
+<p>&nbsp;</p>
+<p><br /><span style="font-size: small; color: #ff0000;"><strong>Adding floating tasks</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can add good-to-do or floating tasks as shown below.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. add floatingTaskA</span></p>
+<p>&nbsp;</p>
+<p><br /><span style="font-size: small; color: #ff0000;"><strong>Editing tasks</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can edit a task using the edit commands show below.</span></p>
+<p><span style="font-size: small; color: #00ffff;">The standard format of an edit command is shown in 1.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can edit a task to change it from a timed task to a deadline task and vice versa using commands 2-3.</span></p>
+<p><span style="font-size: small; color: #00ffff;">The components of the task (i.e. description, start time, end time, deadline time, date, location, priority and status) can be individually edited as shown from commands 4-12.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. edit timedTaskA correct from 4pm to 5pm on 15/11/14</span></p>
+<p><span style="font-size: small; color: #00ffff;">2. edit timedTaskD correct deadlineTaskA by 3pm on 15/11/14</span></p>
+<p><span style="font-size: small; color: #00ffff;">3. edit deadlineTaskB correct timedTaskE from 5pm to 6pm on 15/11/14</span></p>
+<p><span style="font-size: small; color: #00ffff;">4. edit timedTaskB correct timedTaskC from 4pm to 5pm on 15/11/14</span></p>
+<p><span style="font-size: small; color: #00ffff;">5. edit 1 correct timedTaskB</span></p>
+<p><span style="font-size: small; color: #00ffff;">6. edit 2 correct from 3pm to 4pm</span></p>
+<p><span style="font-size: small; color: #00ffff;">7. edit 3 correct by 5pm</span></p>
+<p><span style="font-size: small; color: #00ffff;">8. edit 4 correct on 14/11/14</span></p>
+<p><span style="font-size: small; color: #00ffff;">9. edit 5 correct from 3pm to 4pm on 14/11/14</span></p>
+<p><span style="font-size: small; color: #00ffff;">10. edit 6 correct by 5pm on 14/11/14</span></p>
+<p><span style="font-size: small; color: #00ffff;">11. edit 7 correct priority low (alternative to set)</span></p>
+<p><span style="font-size: small; color: #00ffff;">12. edit 8 correct status completed (alternative to status)</span></p>
+<p>&nbsp;</p>
+<p><br /><span style="font-size: small; color: #ff0000;"><strong>Setting priority level and statuses</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can set the priority level of a task using commands 1-3. A task's priority can be set to high, medium and low and will be shown as red, teal and grey respectively.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can also set the status of a task using commands 4-5. A task's status can be set to discarded, completed and pending and the status of the task will be displayed only when you list on a specific date or if you list a specific status, else the default status (pending) will not be shown when you list normally.</span></p>
+<p>&nbsp;</p>
+<p><span style="color: #00ffff; font-size: small;">1. set 1 priority high</span></p>
+<p><span style="color: #00ffff; font-size: small;">2. set 2 priority low</span></p>
+<p><span style="color: #00ffff; font-size: small;">3. set 2 priority medium</span></p>
+<p><span style="color: #00ffff; font-size: small;">4. set 1 status discarded</span></p>
+<p><span style="color: #00ffff; font-size: small;">5. set 2 status completed</span></p>
+<p><span style="color: #00ffff; font-size: small;">6. set 2 status pending</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #ff0000;"><strong>Clearing and deleting tasks</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can clear all your tasks in TasKoord using command 1.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can also delete the tasks individually using keywords or the numbers that appear next to the task using commands 2-3.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. clear</span></p>
+<p><span style="font-size: small; color: #00ffff;">2. delete &lt;number&gt;</span></p>
+<p><span style="font-size: small; color: #00ffff;">3. delete &lt;task identification&gt;</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small;">&nbsp;</span></p>
+<p><span style="font-size: small; color: #ff0000;"><strong>Undo and redo</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can undo the previous command you entered using command 1.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can also redo the command you just undid using command 2.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. undo</span></p>
+<p><span style="font-size: small; color: #00ffff;">2. redo</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small;">&nbsp;</span></p>
+<p><span style="font-size: small; color: #ff0000;"><strong>Listing tasks</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can list all your tasks using command 1.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can also list on a specific date or over a period of time using commands 2-3.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can list tasks of a specific priority or task using commands 4-9.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can list the different types of task (event, deadline and floating) using commands 10-12.</span></p>
+<p><span style="font-size: small; color: #00ffff;">You can also use a combination of the different types of listing using commands 13-17.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. list</span></p>
+<p><span style="font-size: small; color: #00ffff;">2. list on 01/11/14</span></p>
+<p><span style="font-size: small; color: #00ffff;">3. list from 1pm on 15 Nov 2014 to 1pm on 16 Nov 2014</span></p>
+<p><span style="font-size: small; color: #00ffff;">4. list status completed</span></p>
+<p><span style="font-size: small; color: #00ffff;">5. list status pending</span></p>
+<p><span style="font-size: small; color: #00ffff;">6. list status discarded</span></p>
+<p><span style="font-size: small; color: #00ffff;">7. list priority high (does not show discarded/completed task)</span></p>
+<p><span style="font-size: small; color: #00ffff;">8. list priority medium (does not show discarded/completed task)</span></p>
+<p><span style="font-size: small; color: #00ffff;">9. list priority low (does not show discarded/completed task)</span></p>
+<p><span style="font-size: small; color: #00ffff;">10. list events</span></p>
+<p><span style="font-size: small; color: #00ffff;">11. list deadlines</span></p>
+<p><span style="font-size: small; color: #00ffff;">12. list floating</span></p>
+<p><span style="font-size: small; color: #00ffff;">13. list &lt;a specification&gt; on &lt;date&gt;</span></p>
+<p><span style="font-size: small; color: #00ffff;">14. list events and deadlines</span></p>
+<p><span style="font-size: small; color: #00ffff;">15. list events and deadlines and floating</span></p>
+<p><span style="font-size: small; color: #00ffff;">16. list upcoming deadlines priority high status completed</span></p>
+<p><span style="font-size: small; color: #00ffff;">17. list upcoming &lt;5 days/deadlines/events&gt;</span></p>
+<p>&nbsp;</p>
+<p><br /><span style="font-size: small; color: #ff0000;"><strong>Searching for a task</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can search for a task using command 1.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. search &lt;keyword&gt;</span></p>
+<p>&nbsp;</p>
+<p><br /><span style="font-size: small; color: #ff0000;"><strong>Sync</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can carry out synchronisation with Google Calendar using command 1.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. sync</span></p>
+<p>&nbsp;</p>
+<p><br /><span style="font-size: small; color: #ff0000;"><strong>Exit</strong></span></p>
+<p><span style="font-size: small; color: #00ffff;">You can exit the program using command 1.</span></p>
+<p>&nbsp;</p>
+<p><span style="font-size: small; color: #00ffff;">1. exit</span></p>
