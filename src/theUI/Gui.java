@@ -33,6 +33,7 @@ public class Gui {
     private final String COLOR_DESCRIPTION_HIGH = "#FE2E2E";
     private final String COLOR_DESCRIPTION_LOW = "#A4A4A4";
     private final String COLOR_STATE = "#A6E22E";
+    private final String helpFile = "help.html";
     
     private final String STYLE = "<head><style>"
 							   + "p  { font-family:consolas; font-size:100%; }"
@@ -329,9 +330,9 @@ public class Gui {
 		}
 	}
 
-	public void displayFile(String helpFile) {
+	public void displayFile() {
 		try {
-			InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream(helpFile);
+			InputStream in = Gui.class.getResourceAsStream(helpFile);
 			String text = convertStreamToString(in);
 			displayBox.setText(text);
 		} catch (Exception e) {
