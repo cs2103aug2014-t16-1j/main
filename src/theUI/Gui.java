@@ -181,7 +181,7 @@ public class Gui {
     		}
     	}
     	
-    	if (task.getState() != StateType.PENDING) {
+    	if (task.getState() != StateType.PENDING && task.getState() != null) {
 			res += format("  [" + task.getState() + "]", SIZE_NORMAL, COLOR_STATE, effect);
 		}
     	if (task.getStartTime() != null) {

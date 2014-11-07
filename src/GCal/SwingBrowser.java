@@ -15,6 +15,8 @@ import javax.swing.*;
 import tkLibrary.Constants;
 
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.MalformedURLException;
 import java.net.URL;
 
@@ -55,8 +57,14 @@ public class SwingBrowser {
         frame.getContentPane().add(panel);
 
         frame.setPreferredSize(new Dimension(1024, 600));
-        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
         frame.pack();
+        frame.addWindowListener( new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+            	setCode(Constants.CODE_NO_CODE);
+                frame.setVisible(false);
+            }
+        } );
     }
 
     private void createScene() {

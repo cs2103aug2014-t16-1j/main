@@ -40,9 +40,9 @@ public class GCal {
 	
 	String redirectUrl = "urn:ietf:wg:oauth:2.0:oob:auto";
 	String clientName = "TasKoord";
-	String clientEmail = "658469510712-compute@developer.gserviceaccount.com";
-	String clientId = "658469510712-5565en3ob92ou4mvoijl524956l6c1qm.apps.googleusercontent.com";
-	String clientSecret = "60vxHWIf_PObkRlfUl23TlBO";
+	String clientEmail = "505774929571-compute@developer.gserviceaccount.com";
+	String clientId = "505774929571-43gqh2pn2p7sqh75b1s2besjeleatsf0.apps.googleusercontent.com";
+	String clientSecret = "YiSWNqMyW_WWZW1cKoaXwIuL";
 	String fileToStoreSyncedTime = "GSyncedTime";
 	Event.Creator creator = new Event.Creator();
 	
@@ -79,6 +79,7 @@ public class GCal {
 		codeFlow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
 				jsonFactory, clientId, clientSecret,
 				Arrays.asList(CalendarScopes.CALENDAR)).build();
+		
 	}
 	
 	public String getURL() {
