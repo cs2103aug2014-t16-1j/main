@@ -13,7 +13,7 @@ import java.awt.event.KeyListener;
 import javax.swing.*;
 
 import java.awt.*;
-import java.io.File;
+import java.io.InputStream;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -331,15 +331,18 @@ public class Gui {
 
 	public void displayFile(String helpFile) {
 		try {
-			String text = "";
-			Scanner in = new Scanner (new File(helpFile));
-			while (in.hasNextLine()) {
-				text += in.nextLine();
-			}
-			in.close();
+			InputStream in = ClassLoader.getSystemClassLoader().getResourceAsStream(helpFile);
+			String text = convertStreamToString(in);
 			displayBox.setText(text);
 		} catch (Exception e) {
+			e.printStackTrace();
 		}
+	}
+	
+	private String convertStreamToString(java.io.InputStream is) {
+	    @SuppressWarnings("resource")
+		Scanner s = new Scanner(is).useDelimiter("\\A");
+	    return s.hasNext() ? s.next() : "";
 	}
 }
 
