@@ -160,8 +160,8 @@ public class Gui {
     	setDisplayBox();
     }
     
-    private void display(int no, Task task, int effect) {
-    	String res = format(intToString(no), "3", COLOR_DONE, effect);
+    private void display(int no, Task task, int effect, boolean isIndexed) {
+    	String res = format(intToString(no, isIndexed), "3", COLOR_DONE, effect);
     	
     	if (task.getStartTime() != null) {
     		if (task.getEndTime() == null) {
@@ -209,7 +209,7 @@ public class Gui {
     	displayText += res + "<br>";
     }
 
-	public void display(ArrayList<Task> lists, int pos, int effect, boolean isAppended) {
+	public void display(ArrayList<Task> lists, int pos, int effect, boolean isAppended, boolean isIndexed) {
     	if (!isAppended) {
     		displayText = "";
     	}
@@ -227,9 +227,9 @@ public class Gui {
     					+ "<br><br>";
     			}
     			if (i == pos) {
-    				display(i + 1, curTask, effect);
+    				display(i + 1, curTask, effect, isIndexed);
     			} else {
-    				display(i + 1, curTask, Constants.NO_EFFECT);
+    				display(i + 1, curTask, Constants.NO_EFFECT, isIndexed);
     			}
     			preTask = curTask;
     		}
@@ -253,7 +253,7 @@ public class Gui {
     			} else if (lists.get(i).getPriorityLevel() == PriorityType.LOW) {
     				color = COLOR_DESCRIPTION_LOW;
     			}   
-    			displayText += format(intToString(i + 1), "3", COLOR_DONE);
+    			displayText += format(intToString(i + 1, isIndexed), "3", COLOR_DONE);
     			displayText += format(lists.get(i).getDescription(), SIZE_NORMAL, color, eff);
     			
     			if (lists.get(i).getLocation() != null) 
@@ -270,7 +270,10 @@ public class Gui {
     	setDisplayBox();
     }
 	
-    private String intToString(int no) {
+    private String intToString(int no, boolean isIndexed) {
+    	if (!isIndexed) {
+    		return "";
+    	}
 		if (no < 10) {
 			return "0" + no + ". ";
 		} else {

@@ -18,6 +18,16 @@ import GCal.SwingBrowser;
 
 //@author A0112068N
 public class UserInterface {
+	private static final String TASKS_ADDED_TO_GC = "<br>Tasks added to Google Calendar: ";
+	private static final String TASKS_DELETED_FROM_GC = "<br>Tasks deleted from Google Calendar: ";
+	private static final String TASKS_ADDED_TO_TK = "<br>Tasks added to TasKoord: ";
+	private static final String TASKS_DELETED_FROM_TK = "<br>Tasks deleted from TasKoord: ";
+	
+	private static final boolean APPENDED = true;
+	private static final boolean INSERTED = false;
+	private static final boolean INDEXED = true;
+	private static final boolean NO_INDEX = false;
+	
 	private static final String KEYWORD_UPCOMING_TASK = "upcoming";
 	private static final String KEYWORD_FLOATING_TASK = "floating";
 	private static final String KEYWORD_INVALID_CMD = "invalid";
@@ -130,9 +140,9 @@ public class UserInterface {
 			if (e.getMessage().contains(KEYWORD_INVALID_CMD)) {
 				gui.displayWarning(String.format(
 						Constants.EXCEPTIONS_INVALID_USERCOMMAND, userCommand,
-						e.getMessage()), false);
+						e.getMessage()), INSERTED);
 			} else {
-				gui.displayWarning(MESSAGE_WRONG_CMD, false);
+				gui.displayWarning(MESSAGE_WRONG_CMD, INSERTED);
 				e.printStackTrace();
 			}
 			return;
@@ -162,7 +172,7 @@ public class UserInterface {
 		} else if (command == CommandType.HELP) {
 			help();
 		} else if (command == CommandType.EXIT) {
-			gui.displayDone(MESSAGE_GOODBYE, false);
+			gui.displayDone(MESSAGE_GOODBYE, INSERTED);
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
@@ -170,13 +180,13 @@ public class UserInterface {
 			}
 			System.exit(0);
 		} else {
-			gui.displayWarning(MESSAGE_INFORMAT_CMD, false);
+			gui.displayWarning(MESSAGE_INFORMAT_CMD, INSERTED);
 		}
 	}
 
 	public String getTokenPopup(String url) {
-		gui.displayDone(MESSAGE_WAITING, false);
-		gui.displayDone(MESSAGE_SYNC_REMINDER, true);
+		gui.displayDone(MESSAGE_WAITING, INSERTED);
+		gui.displayDone(MESSAGE_SYNC_REMINDER, APPENDED);
 		browser.runBrowser(url);
 
 		while (true) {
@@ -197,34 +207,34 @@ public class UserInterface {
 		try {
 			String code = getTokenPopup(url);
 			if (code == Constants.CODE_NO_CODE) {
-				gui.displayWarning(Constants.CODE_NO_CODE, false);
+				gui.displayWarning(Constants.CODE_NO_CODE, INSERTED);
 			} else if (code == Constants.CODE_REJECTED) {
-				gui.displayWarning(Constants.CODE_REJECTED, false);
+				gui.displayWarning(Constants.CODE_REJECTED, INSERTED);
 			} else {
-				gui.displayDone(MESSAGE_SYNCING, false);
+				gui.displayDone(MESSAGE_SYNCING, INSERTED);
 
 				logic.connectByNewToken(code);
 				GcPacket packet = logic.sync(logic.load());
 
-				gui.displayDone(MESSAGE_SYNC_COMPLETE, false);
+				gui.displayDone(MESSAGE_SYNC_COMPLETE, INSERTED);
 				displayPacket(packet);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			gui.displayWarning(MESSAGE_SYNC_ERROR, false);
-			gui.displayWarning(MESSAGE_SYNC_REMINDER, true);
+			gui.displayWarning(MESSAGE_SYNC_ERROR, INSERTED);
+			gui.displayWarning(MESSAGE_SYNC_REMINDER, APPENDED);
 		}
 	}
 
 	private void sync() {
 		if (!logic.isOnline()) {
-			gui.displayWarning(MESSAGE_NO_INTERNET, false);
+			gui.displayWarning(MESSAGE_NO_INTERNET, INSERTED);
 		} else {
-			gui.displayDone(MESSAGE_SYNCING, false);
+			gui.displayDone(MESSAGE_SYNCING, INSERTED);
 			if (logic.connectUsingExistingToken()) {
 				try {
 					GcPacket packet = logic.sync(logic.load());
-					gui.displayDone(MESSAGE_SYNC_COMPLETE, false);
+					gui.displayDone(MESSAGE_SYNC_COMPLETE, INSERTED);
 					displayPacket(packet);
 					return;
 				} catch (IOException e) {
@@ -245,8 +255,11 @@ public class UserInterface {
 				list.add(item);
 			}
 		}
-		gui.displayDone("Tasks deleted from TasKoord: ", true);
-		gui.display(list, NO_TASK, Constants.NO_EFFECT, true);
+		
+		if (list.size() != 0) {
+			gui.displayDone(TASKS_DELETED_FROM_TK, APPENDED);
+			gui.display(list, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
+		}
 		
 		list.clear();
 		for (Task item : packet.taskAddedToTK) {
@@ -259,14 +272,20 @@ public class UserInterface {
 				list.add(item);
 			}
 		}
-		gui.displayDone("Tasks added to TasKoord: ", true);
-		gui.display(list, NO_TASK, Constants.NO_EFFECT, true);
+		if (list.size() != 0) {
+			gui.displayDone(TASKS_ADDED_TO_TK, APPENDED);
+			gui.display(list, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
+		}
 		
-		gui.displayDone("Tasks deleted from Google Calendar: ", true);
-		gui.display(packet.taskDeletedFromGC, NO_TASK, Constants.NO_EFFECT, true);
+		if (packet.taskDeletedFromGC.size() != 0) {
+			gui.displayDone(TASKS_DELETED_FROM_GC, APPENDED);
+			gui.display(packet.taskDeletedFromGC, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
+		}
 		
-		gui.displayDone("Tasks added to Google Calendar: ", true);
-		gui.display(packet.taskAddedToGC, NO_TASK, Constants.NO_EFFECT, true);
+		if (packet.taskAddedToGC.size() != 0) {
+			gui.displayDone(TASKS_ADDED_TO_GC, APPENDED);
+			gui.display(packet.taskAddedToGC, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
+		}
 		
 		logic.setSynced();
 	}
@@ -278,7 +297,7 @@ public class UserInterface {
 
 	private void add(Task task) {
 		if (task.getDescription() == null) {
-			gui.displayWarning(Constants.MESSAGE_NO_ADD_INFO, false);
+			gui.displayWarning(Constants.MESSAGE_NO_ADD_INFO, INSERTED);
 			tasksOnScreen.clear();
 			return;
 		}
@@ -286,18 +305,18 @@ public class UserInterface {
 		if (task.getStartTime() != null && task.getEndTime() != null) {
 			if (task.getStartTime().compareTo(task.getEndTime()) >= 0) {
 				gui.displayWarning(Constants.MESSAGE_ENDTIME_BEFORE_STARTTIME,
-						false);
-				gui.displayWarning("<br>", true);
+						INSERTED);
+				gui.displayWarning("<br>", APPENDED);
 				gui.displayWarning(
 						"Start time: "
 								+ convertCalendarToString(task.getStartTime(),
 										Constants.FORMAT_DATE_DATE_AND_HOUR),
-						true);
+						APPENDED);
 				gui.displayWarning(
 						"End time  : "
 								+ convertCalendarToString(task.getEndTime(),
 										Constants.FORMAT_DATE_DATE_AND_HOUR),
-						true);
+						APPENDED);
 				tasksOnScreen.clear();
 				return;
 			}
@@ -318,20 +337,20 @@ public class UserInterface {
 				addToStackForUndoAndRedo(list, task, Constants.DELETED,
 						MESSAGE_TASK_DELETED_FOR_UNDO, COLOR_DONE, list, task,
 						Constants.HIGHLIGH, feedback, COLOR_DONE);
-				gui.displayDone(feedback, false);
-				showToUser(list, task, Constants.HIGHLIGH, true);
+				gui.displayDone(feedback, INSERTED);
+				showToUser(list, task, Constants.HIGHLIGH, APPENDED);
 			} else if (feedback.equals(Constants.MESSAGE_CLASHING_TIMESLOTS)) {
 				addToStackForUndoAndRedo(list, task, Constants.DELETED,
 						MESSAGE_TASK_DELETED_FOR_UNDO, COLOR_DONE, list, task,
 						Constants.HIGHLIGH, feedback, COLOR_WARNING);
-				gui.displayWarning(feedback, false);
-				showToUser(list, task, Constants.HIGHLIGH, true);
+				gui.displayWarning(feedback, INSERTED);
+				showToUser(list, task, Constants.HIGHLIGH, APPENDED);
 			} else if (feedback.equals(Constants.MESSAGE_NO_START_TIME)) {
-				gui.displayWarning(feedback, false);
+				gui.displayWarning(feedback, INSERTED);
 				tasksOnScreen.clear();
 			} else {
-				gui.displayWarning(feedback, false);
-				showToUser(list, task, Constants.HIGHLIGH, true);
+				gui.displayWarning(feedback, INSERTED);
+				showToUser(list, task, Constants.HIGHLIGH, APPENDED);
 			}
 
 		} catch (Exception e) {
@@ -377,10 +396,10 @@ public class UserInterface {
 
 			ArrayList<Task> result = logic.list(task);
 			if (result.size() == 0) {
-				gui.displayDone(Constants.MESSAGE_NO_RESULT_LIST, false);
+				gui.displayDone(Constants.MESSAGE_NO_RESULT_LIST, INSERTED);
 				tasksOnScreen.clear();
 			} else {
-				showToUser(result, false);
+				showToUser(result, INSERTED);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -389,7 +408,7 @@ public class UserInterface {
 
 	private void delete(Task task) {
 		if (task.getDescription() == null) {
-			gui.displayWarning(Constants.MESSAGE_NO_DELETE_INFO, false);
+			gui.displayWarning(Constants.MESSAGE_NO_DELETE_INFO, INSERTED);
 			tasksOnScreen.clear();
 			return;
 		}
@@ -409,11 +428,11 @@ public class UserInterface {
 								MESSAGE_TASK_RESTORED_FOR_UNDO, COLOR_DONE,
 								list, taskToBeDeleted, Constants.DELETED,
 								feedback, COLOR_DONE);
-						gui.displayDone(feedback, false);
+						gui.displayDone(feedback, INSERTED);
 						showToUser(list, taskToBeDeleted, Constants.DELETED,
-								true);
+								APPENDED);
 					} else {
-						gui.displayWarning(feedback, false);
+						gui.displayWarning(feedback, INSERTED);
 						tasksOnScreen.clear();
 					}
 					return;
@@ -423,7 +442,7 @@ public class UserInterface {
 			list = logic.search(task.getDescription());
 
 			if (list.isEmpty()) {
-				gui.displayWarning(Constants.MESSAGE_TASK_DOES_NOT_EXIST, false);
+				gui.displayWarning(Constants.MESSAGE_TASK_DOES_NOT_EXIST, INSERTED);
 				tasksOnScreen.clear();
 			} else if (list.size() == 1) {
 				Task taskToBeDeleted = list.get(0);
@@ -435,16 +454,16 @@ public class UserInterface {
 							Constants.HIGHLIGH, MESSAGE_TASK_RESTORED_FOR_UNDO,
 							COLOR_DONE, list, taskToBeDeleted,
 							Constants.DELETED, feedback, COLOR_DONE);
-					gui.displayDone(feedback, false);
-					showToUser(list, taskToBeDeleted, Constants.DELETED, true);
+					gui.displayDone(feedback, INSERTED);
+					showToUser(list, taskToBeDeleted, Constants.DELETED, APPENDED);
 				} else {
-					gui.displayWarning(feedback, false);
+					gui.displayWarning(feedback, INSERTED);
 					tasksOnScreen.clear();
 				}
 			} else {
 				gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND,
-						false);
-				showToUser(list, true);
+						INSERTED);
+				showToUser(list, APPENDED);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -477,7 +496,7 @@ public class UserInterface {
 
 			list = logic.search(task.getDescription());
 			if (list.size() == 0) {
-				gui.displayDone(Constants.MESSAGE_TASK_DOES_NOT_EXIST, false);
+				gui.displayDone(Constants.MESSAGE_TASK_DOES_NOT_EXIST, INSERTED);
 				tasksOnScreen.clear();
 			} else if (list.size() == 1) {
 				Task taskToBeEdited = new Task(list.get(0));
@@ -494,8 +513,8 @@ public class UserInterface {
 						taskToBeEdited, feedback);
 			} else {
 				gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND,
-						false);
-				showToUser(list, true);
+						INSERTED);
+				showToUser(list, APPENDED);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -508,16 +527,16 @@ public class UserInterface {
 			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH,
 					MESSAGE_TASK_EDITED_FOR_UNDO, COLOR_DONE, list, task,
 					Constants.HIGHLIGH, feedback, COLOR_DONE);
-			gui.displayDone(feedback, false);
-			showToUser(list, task, Constants.HIGHLIGH, true);
+			gui.displayDone(feedback, INSERTED);
+			showToUser(list, task, Constants.HIGHLIGH, APPENDED);
 		} else if (feedback.equals(Constants.MESSAGE_EDIT_CLASHING_TIMESLOTS)) {
 			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH,
 					MESSAGE_TASK_EDITED_FOR_UNDO, COLOR_WARNING, list, task,
 					Constants.HIGHLIGH, feedback, COLOR_WARNING);
-			gui.displayWarning(feedback, false);
-			showToUser(list, task, Constants.HIGHLIGH, true);
+			gui.displayWarning(feedback, INSERTED);
+			showToUser(list, task, Constants.HIGHLIGH, APPENDED);
 		} else {
-			gui.displayWarning(feedback, false);
+			gui.displayWarning(feedback, INSERTED);
 			tasksOnScreen.clear();
 		}
 	}
@@ -527,13 +546,13 @@ public class UserInterface {
 			String feedback = logic.clear();
 			if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
 				ArrayList<Task> list = logic.list(new Task());
-				gui.displayDone(feedback, false);
+				gui.displayDone(feedback, INSERTED);
 				tasksOnScreen.clear();
 				addToStackForUndoAndRedo(list, new Task(), Constants.NO_EFFECT,
 						MESSAGE_TASK_RESTORED, COLOR_DONE, null, null,
 						Constants.NO_EFFECT, feedback, COLOR_DONE);
 			} else {
-				gui.displayWarning(feedback, false);
+				gui.displayWarning(feedback, INSERTED);
 				tasksOnScreen.clear();
 			}
 		} catch (Exception e) {
@@ -548,15 +567,15 @@ public class UserInterface {
 			if (feedback.equals(Constants.MESSAGE_UNDO_DONE) && currentPos >= 0) {
 				UndoAndRedoPack pack = stack.get(currentPos);
 				if (pack.colorForUndo == COLOR_DONE) {
-					gui.displayDone(pack.statusForUndo, false);
+					gui.displayDone(pack.statusForUndo, INSERTED);
 				} else {
-					gui.displayWarning(pack.statusForUndo, false);
+					gui.displayWarning(pack.statusForUndo, INSERTED);
 				}
 				gui.display(pack.tasksForUndo, pack.posToDoEffectForUndo,
-						pack.effectForUndo, true);
+						pack.effectForUndo, APPENDED, INDEXED);
 				currentPos--;
 			} else {
-				gui.displayWarning(MESSAGE_NO_UNDO, false);
+				gui.displayWarning(MESSAGE_NO_UNDO, INSERTED);
 				tasksOnScreen.clear();
 			}
 		} catch (Exception e) {
@@ -572,14 +591,14 @@ public class UserInterface {
 				currentPos++;
 				UndoAndRedoPack pack = stack.get(currentPos);
 				if (pack.colorForRedo == COLOR_DONE) {
-					gui.displayDone(pack.statusForRedo, false);
+					gui.displayDone(pack.statusForRedo, INSERTED);
 				} else {
-					gui.displayWarning(pack.statusForRedo, false);
+					gui.displayWarning(pack.statusForRedo, INSERTED);
 				}
 				gui.display(pack.tasksForRedo, pack.posToDoEffectForRedo,
-						pack.effectForRedo, true);
+						pack.effectForRedo, APPENDED, INDEXED);
 			} else {
-				gui.displayWarning(MESSAGE_NO_REDO, false);
+				gui.displayWarning(MESSAGE_NO_REDO, INSERTED);
 				tasksOnScreen.clear();
 			}
 		} catch (Exception e) {
@@ -623,17 +642,17 @@ public class UserInterface {
 
 	private void search(Task task) {
 		if (task.getDescription() == null) {
-			gui.displayWarning(Constants.MESSAGE_NO_SEARCH_INFO, false);
+			gui.displayWarning(Constants.MESSAGE_NO_SEARCH_INFO, INSERTED);
 			tasksOnScreen.clear();
 			return;
 		}
 		try {
 			ArrayList<Task> result = logic.search(task.getDescription());
 			if (result.size() == 0) {
-				gui.displayDone(Constants.MESSAGE_NO_RESULT, false);
+				gui.displayDone(Constants.MESSAGE_NO_RESULT, INSERTED);
 				tasksOnScreen.clear();
 			} else {
-				showToUser(result, false);
+				showToUser(result, INSERTED);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -655,15 +674,15 @@ public class UserInterface {
 
 			list = logic.search(task.getDescription());
 			if (list.size() == 0) {
-				gui.displayDone(Constants.MESSAGE_NO_RESULT, false);
+				gui.displayDone(Constants.MESSAGE_NO_RESULT, INSERTED);
 				tasksOnScreen.clear();
 			} else if (list.size() == 1) {
 				Task taskToBeEdited = list.get(0);
 				editTheTask(task, taskToBeEdited);
 			} else {
 				gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND,
-						false);
-				showToUser(list, true);
+						INSERTED);
+				showToUser(list, APPENDED);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -693,10 +712,10 @@ public class UserInterface {
 					taskToBeEdited, Constants.HIGHLIGH, messageForUndo,
 					COLOR_DONE);
 
-			gui.displayDone(message, false);
-			showToUser(list, taskToBeEdited, Constants.HIGHLIGH, true);
+			gui.displayDone(message, INSERTED);
+			showToUser(list, taskToBeEdited, Constants.HIGHLIGH, APPENDED);
 		} else {
-			gui.displayWarning(feedback, false);
+			gui.displayWarning(feedback, INSERTED);
 			tasksOnScreen.clear();
 		}
 	}
@@ -712,7 +731,7 @@ public class UserInterface {
 
 	private void showToUser(ArrayList<Task> list, boolean isAppended) {
 		tasksOnScreen = new ArrayList<Task>(list);
-		gui.display(list, -1, Constants.NO_EFFECT, isAppended);
+		gui.display(list, -1, Constants.NO_EFFECT, isAppended, INDEXED);
 	}
 
 	private void showToUser(ArrayList<Task> list, Task task, int effect,
@@ -725,7 +744,7 @@ public class UserInterface {
 				break;
 			}
 		}
-		gui.display(list, i, effect, isAppended);
+		gui.display(list, i, effect, isAppended, INDEXED);
 	}
 
 	public boolean isInteger(String input) {
