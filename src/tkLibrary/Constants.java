@@ -43,6 +43,10 @@ public final class Constants {
 	public static final String MESSAGE_USER_NOT_ONLINE = "Please check your internet connection.";
 	public static final String MESSAGE_NOT_UPDATE = "%s is not updated.\n";
 	
+	//Access Token
+	public static final String CODE_REJECTED = "rejected";
+	public static final String CODE_NO_CODE = "haven't accepted / rejected";
+	
 	// storage constants
 	public static final String STARTTIME = "STARTTIME";
 	public static final String ENDTIME = "ENDTIME";

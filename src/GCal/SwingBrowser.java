@@ -11,70 +11,52 @@ import javafx.scene.web.WebEvent;
 import javafx.scene.web.WebView;
 
 import javax.swing.*;
+
+import tkLibrary.Constants;
+
 import java.awt.*;
-import java.awt.event.*;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.io.IOException;
 
 import static javafx.concurrent.Worker.State.FAILED;
 
-public class SwingBrowser extends JFrame {
-
-    private final JFXPanel jfxPanel = new JFXPanel();
-    private WebEngine engine;
-    private String code = "";
-    private GCal gcal;
+public class SwingBrowser {
     
+    public String code = "";
+    private WebEngine engine;
+    
+    private final JFrame frame = new JFrame();
     private final JPanel panel = new JPanel(new BorderLayout());
     private final JLabel lblStatus = new JLabel();
-
-    private final JButton btnGo = new JButton("Go");
+	private final JFXPanel jfxPanel = new JFXPanel();
     private final JTextField txtURL = new JTextField();
     private final JProgressBar progressBar = new JProgressBar();
     
-    //@author A0118919U 
+    //@author A0118919U
+    
     public SwingBrowser() {
-        super();
-        gcal = new GCal();
         initComponents();
     }
 
     private void initComponents() {
         createScene();
 
-        ActionListener al = new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                loadURL(txtURL.getText());
-            }
-        };
-
-        btnGo.addActionListener(al);
-        txtURL.addActionListener(al);
-
         progressBar.setPreferredSize(new Dimension(150, 18));
         progressBar.setStringPainted(true);
-
-        JPanel topBar = new JPanel(new BorderLayout(5, 0));
-        topBar.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
-        topBar.add(txtURL, BorderLayout.CENTER);
-        topBar.add(btnGo, BorderLayout.EAST);
 
         JPanel statusBar = new JPanel(new BorderLayout(5, 0));
         statusBar.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
         statusBar.add(lblStatus, BorderLayout.CENTER);
         statusBar.add(progressBar, BorderLayout.EAST);
 
-        panel.add(topBar, BorderLayout.NORTH);
         panel.add(jfxPanel, BorderLayout.CENTER);
         panel.add(statusBar, BorderLayout.SOUTH);
 
-        getContentPane().add(panel);
+        frame.getContentPane().add(panel);
 
-        setPreferredSize(new Dimension(1024, 600));
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        pack();
+        frame.setPreferredSize(new Dimension(1024, 600));
+        frame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+        frame.pack();
     }
 
     private void createScene() {
@@ -92,14 +74,13 @@ public class SwingBrowser extends JFrame {
                         SwingUtilities.invokeLater(new Runnable() {
                             @Override
                             public void run() {
-                                SwingBrowser.this.setTitle(newValue);
-                                if(newValue.contains("Success")){
-                                	code = newValue.substring(13);
-                                	try{
-                                		gcal.connectByNewToken(code);
-                                	}catch(IOException e){
-                                		e.printStackTrace();
-                                	}
+                                frame.setTitle(newValue);
+                                if (newValue != null && newValue.contains("Success")) {
+                                	setCode(newValue.substring(13));
+                                	frame.setVisible(false);
+                                } else if (newValue != null && newValue.contains("Denied")) {
+                                	setCode(Constants.CODE_REJECTED);
+                                	frame.setVisible(false);
                                 }
                             }
                         });
@@ -194,13 +175,11 @@ public class SwingBrowser extends JFrame {
     }
 
     public void runBrowser(String url) {
-        SwingUtilities.invokeLater(new Runnable() {
-
-            public void run() {
-	                SwingBrowser browser = new SwingBrowser();
-	                browser.setVisible(true);
-	                browser.loadURL(url);
-            }
-        });
+        frame.setVisible(true);
+        loadURL(url);
+    }
+    
+    public void setCode(String code) {
+    	this.code = code;
     }
 }

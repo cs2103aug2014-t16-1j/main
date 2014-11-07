@@ -1,8 +1,6 @@
 package theUI;
 
 import java.io.IOException;
-import java.net.URI;
-import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -16,7 +14,7 @@ import tkLibrary.Task;
 import tkLibrary.UserInput;
 import tkLogic.Logic;
 import tkLogic.Parser;
-import GCal.BrowserExecution;;
+import GCal.SwingBrowser;
 
 //@author A0112068N
 public class UserInterface {
@@ -30,7 +28,7 @@ public class UserInterface {
     private Logic logic;
     private Parser parser;
     private Gui gui;
-    private BrowserExecution browser;
+    private SwingBrowser browser;
     
     private ArrayList<Task> tasksOnScreen;
     private ArrayList<String> statusForUndo;
@@ -46,14 +44,11 @@ public class UserInterface {
     private int currentPos;
     private int availablePos;
     
-    private boolean isSyncing;
-    private String accessToken;
-    
     public UserInterface(String fileName) {
     	parser = Parser.getInstance();
         logic = new Logic(fileName);
         gui = new Gui();
-        browser = new BrowserExecution();
+        browser = new SwingBrowser();
         
         tasksOnScreen = new ArrayList<Task> ();
         statusForUndo = new ArrayList<String> ();
@@ -67,9 +62,6 @@ public class UserInterface {
         colorForUndo = new ArrayList<Integer> ();
         colorForRedo = new ArrayList<Integer> ();
         currentPos = availablePos = -1;
-        
-        isSyncing = false;
-        accessToken = "";
     }
     
     public void run() {
@@ -82,12 +74,6 @@ public class UserInterface {
             
             String userCommand = gui.getUserCommand();
             if (!userCommand.equals(NO_COMMAND)) {
-            	if (isSyncing) {
-            		gui.setUserCommand(NO_COMMAND);
-            		accessToken = userCommand;
-            		syncWithToken();
-            		continue;
-            	}
                 try {
                 	gui.setUserCommand(NO_COMMAND);
                     executeCommands(userCommand);
@@ -160,26 +146,42 @@ public class UserInterface {
         }
     }
     
-    /* Standard main method to try that test as a standalone application. */
-    
-	public void getTokenPopup(String url)  {
-		gui.displayDone("Please do not close the browser - press q", false);
-			//java.awt.Desktop.getDesktop().browse(new URI(url));
-			browser.init(url);
-			browser.start();
+	public String getTokenPopup(String url)  {
+		gui.displayDone("Please follow the link and accept it!!", false);
+		browser.runBrowser(url);
+		
+		while (true) {
+			try {
+	            Thread.sleep(100);
+	            String code = browser.code;
+	            if (!code.equals(NO_COMMAND)) {
+	            	browser.setCode(NO_COMMAND);
+	            	return code;
+	            }
+	        } catch(InterruptedException e) {
+	            Thread.currentThread().interrupt();
+	        }
+		}
 	}
     
-	@SuppressWarnings({ "deprecated", "deprecation" })
-	private void syncWithToken() {
-		isSyncing = false;
+	private void syncWithNewToken(String url) {
 		try {
-			browser.stop();
-			//logic.connectByNewToken(accessToken);
-			gui.displayDone(Constants.MESSAGE_SYNCING, false);
-			gui.displayDone("Make sure that you shared your calendar with: " + clientEmail, true);
-			GcPacket packet = logic.sync(logic.load());
-			gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
-			displayPacket(packet);
+			String code = getTokenPopup(url);
+			gui.displayDone(code, false);
+			if (code == Constants.CODE_NO_CODE) {
+				gui.displayWarning(Constants.CODE_NO_CODE, false);
+			} else if (code == Constants.CODE_REJECTED) {
+				gui.displayWarning(Constants.CODE_REJECTED, false);
+			} else {
+				gui.displayDone(Constants.MESSAGE_SYNCING, false);
+				gui.displayDone("Make sure that you shared your calendar with: " + clientEmail, true);
+				
+				logic.connectByNewToken(code);
+				GcPacket packet = logic.sync(logic.load());
+				
+				gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
+				displayPacket(packet);
+			}
 		} catch (Exception e) {
 			e.printStackTrace();
 			gui.displayWarning(Constants.MESSAGE_SYNC_ERROR, false);
@@ -188,10 +190,8 @@ public class UserInterface {
 	}
 	
     private void sync() {
-    	isSyncing = true;
     	if (!logic.isOnline()) {
     		gui.displayWarning(Constants.MESSAGE_NO_INTERNET, false);
-    		isSyncing = false;
     	} else {
     		gui.displayDone(Constants.MESSAGE_SYNCING, false);
     		gui.displayDone("Make sure that you shared your calendar with: " + clientEmail, true);
@@ -200,14 +200,13 @@ public class UserInterface {
 					GcPacket packet = logic.sync(logic.load());
 					gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
 					displayPacket(packet);
-					isSyncing = false;
 					return;
 				} catch (IOException e) {
-					getTokenPopup(logic.getURL());
+					syncWithNewToken(logic.getURL());
 					e.printStackTrace();
 				}
 	    	} else {
-	    		getTokenPopup(logic.getURL());
+	    		syncWithNewToken(logic.getURL());
 	    	}
     	}
     }
