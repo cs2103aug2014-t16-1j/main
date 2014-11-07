@@ -73,9 +73,7 @@ public class Storage {
 	
 	public void add(Task task) {
 		oldTasks = copyList(listOfTasks);
-		if(!oldTasks.isEmpty()){
-			push(oldTasks);
-		}
+		push(oldTasks);
 		openFileToWrite(true);
 		store(task);
 		closeFileToWrite();
@@ -175,16 +173,6 @@ public class Storage {
 		return "No command to redo.";
 	}
 	
-	public void setSynced() {
-		ArrayList<Task> newList = copyList(listOfTasks);
-		for(Task item : newList) {
-			item.setSynced();
-		}
-		listOfTasks.clear();
-		store(newList);
-	}
-	
-	//@author A0112068N
 	private void push(ArrayList<Task> list) {
 		currentPos ++; availablePos = currentPos;
     	if (currentPos >= stackForUndo.size()) {
@@ -192,6 +180,15 @@ public class Storage {
     	} else {
     		stackForUndo.set(currentPos, list);
     	}
+	}
+	
+	public void setSynced() {
+		ArrayList<Task> newList = copyList(listOfTasks);
+		for(Task item : newList) {
+			item.setSynced();
+		}
+		listOfTasks.clear();
+		store(newList);
 	}
 	
 	//@author A0118919U

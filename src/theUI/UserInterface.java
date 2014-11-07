@@ -18,27 +18,66 @@ import GCal.SwingBrowser;
 
 //@author A0112068N
 public class UserInterface {
-	private final int COLOR_DONE = 1;
-	private final int COLOR_WARNING = 2;
-    private final String NO_COMMAND = "";
-    private final String clientEmail = "658469510712-compute@developer.gserviceaccount.com";
+	private static final String KEYWORD_UPCOMING_TASK = "upcoming";
+	private static final String KEYWORD_FLOATING_TASK = "floating";
+	private static final String KEYWORD_INVALID_CMD = "invalid";
+	
+	private static final String MESSAGE_SYNCING = "Syncing is in process, it may takes minutes to be completed..";
+	private static final String MESSAGE_NO_INTERNET = "No internet connection!";
+	private static final String MESSAGE_SYNC_ERROR = "Cannot sync, please try again!";
+	private static final String MESSAGE_WAITING = "Please follow the link and accept it!!";
+	private static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete";
+	
+	private static final String MESSAGE_TASK_EDITED_FOR_UNDO = "Task edited.";
+	private static final String MESSAGE_TASK_RESTORED_FOR_UNDO = "Task restored.";
+	private static final String MESSAGE_TASK_DELETED_FOR_UNDO = "Task deleted.";
+	private static final String MESSAGE_NO_UNDO = "No command for undoing";
+	private static final String MESSAGE_NO_REDO = "No command for redoing";
+	private static final String MESSAGE_TASK_RESTORED = "All tasks restored.";
+	private static final String MESSAGE_INFORMAT_CMD = "Informat command";
+	private static final String MESSAGE_WRONG_CMD = "Cannot understand the command!";
+	private static final String MESSAGE_GOODBYE = "Good Bye !!!";
+	
+	private static final String NO_COMMAND = "";
+    private static final String clientEmail = "658469510712-compute@developer.gserviceaccount.com";
+	private static final String MESSAGE_SYNC_REMINDER = "Make sure that you shared your calendar with: " + clientEmail;
+    
+	private static final int COLOR_DONE = 1;
+	private static final int COLOR_WARNING = 2;
     
     private Logic logic;
     private Parser parser;
     private Gui gui;
     private SwingBrowser browser;
     
+    private static class UndoAndRedoPack {
+    	
+    	public String statusForUndo, statusForRedo;
+    	public ArrayList<Task> tasksForUndo, tasksForRedo;
+    	public Integer effectForUndo, effectForRedo;
+    	public Integer posToDoEffectForUndo, posToDoEffectForRedo;
+    	public Integer colorForUndo, colorForRedo;
+
+		public UndoAndRedoPack(int posForUndo, ArrayList<Task> listForUndo,
+				int undoEffect, String messageForUndo, int ucolor,
+				int posForRedo, ArrayList<Task> listForRedo, int redoEffect,
+				String messageForRedo, int rcolor) {
+			this.posToDoEffectForUndo = posForUndo;
+			this.tasksForUndo = listForUndo;
+			this.effectForUndo = undoEffect;
+			this.statusForUndo = messageForUndo;
+			this.colorForUndo = ucolor;
+			
+			this.posToDoEffectForRedo = posForRedo;
+			this.tasksForRedo = listForRedo;
+			this.effectForRedo = redoEffect;
+			this.statusForRedo = messageForRedo;
+			this.colorForRedo = rcolor;
+		}
+    }
+    
+    private ArrayList<UndoAndRedoPack> stack;
     private ArrayList<Task> tasksOnScreen;
-    private ArrayList<String> statusForUndo;
-    private ArrayList<String> statusForRedo;
-    private ArrayList<ArrayList<Task>> tasksForUndo;
-    private ArrayList<ArrayList<Task>> tasksForRedo;
-    private ArrayList<Integer> effectForUndo;
-    private ArrayList<Integer> effectForRedo;
-    private ArrayList<Integer> posToDoEffectForUndo;
-    private ArrayList<Integer> posToDoEffectForRedo;
-    private ArrayList<Integer> colorForUndo;
-    private ArrayList<Integer> colorForRedo;
     private int currentPos;
     private int availablePos;
     
@@ -47,18 +86,8 @@ public class UserInterface {
         logic = new Logic(fileName);
         gui = new Gui();
         browser = new SwingBrowser();
-        
         tasksOnScreen = new ArrayList<Task> ();
-        statusForUndo = new ArrayList<String> ();
-        statusForRedo = new ArrayList<String> ();
-        tasksForUndo = new ArrayList<ArrayList<Task>> ();
-        tasksForRedo = new ArrayList<ArrayList<Task>> ();
-        effectForUndo = new ArrayList<Integer> ();
-        effectForRedo = new ArrayList<Integer> ();
-        posToDoEffectForUndo = new ArrayList<Integer> ();
-        posToDoEffectForRedo = new ArrayList<Integer> ();
-        colorForUndo = new ArrayList<Integer> ();
-        colorForRedo = new ArrayList<Integer> ();
+        stack = new ArrayList<UndoAndRedoPack> ();
         currentPos = availablePos = -1;
     }
     
@@ -96,11 +125,11 @@ public class UserInterface {
             command = userInput.getCommand();
             task = userInput.getTask();
         } catch (Exception e) {
-            if (e.getMessage().contains("invalid")) {
+            if (e.getMessage().contains(KEYWORD_INVALID_CMD)) {
                 gui.displayWarning(String.format(Constants.EXCEPTIONS_INVALID_USERCOMMAND, 
                         userCommand, e.getMessage()), false);
             } else {
-            	gui.displayWarning("Cannot understand the command!", false);
+            	gui.displayWarning(MESSAGE_WRONG_CMD, false);
                 e.printStackTrace();
             }
             return;
@@ -123,8 +152,6 @@ public class UserInterface {
             search(task);
         } else if (command == CommandType.SET){
         	set(task);
-        } else if (command == CommandType.BLOCK) {
-        	block(task);
         } else if (command == CommandType.REDO) {
         	redo();
         } else if (command == CommandType.SYNC) {
@@ -132,7 +159,7 @@ public class UserInterface {
         } else if (command == CommandType.HELP) {
         	help();
         } else if (command == CommandType.EXIT) {
-        	gui.displayDone("Good Bye !!!", false);
+        	gui.displayDone(MESSAGE_GOODBYE, false);
         	 try {
                  Thread.sleep(100);
              } catch(InterruptedException e) {
@@ -140,12 +167,13 @@ public class UserInterface {
              }
         	System.exit(0);
         } else {
-            gui.displayWarning("Informat command", false);
+            gui.displayWarning(MESSAGE_INFORMAT_CMD, false);
         }
     }
     
 	public String getTokenPopup(String url)  {
-		gui.displayDone("Please follow the link and accept it!!", false);
+		gui.displayDone(MESSAGE_WAITING, false);
+		gui.displayDone(MESSAGE_SYNC_REMINDER, true);
 		browser.runBrowser(url);
 		
 		while (true) {
@@ -165,38 +193,35 @@ public class UserInterface {
 	private void syncWithNewToken(String url) {
 		try {
 			String code = getTokenPopup(url);
-			gui.displayDone(code, false);
 			if (code == Constants.CODE_NO_CODE) {
 				gui.displayWarning(Constants.CODE_NO_CODE, false);
 			} else if (code == Constants.CODE_REJECTED) {
 				gui.displayWarning(Constants.CODE_REJECTED, false);
 			} else {
-				gui.displayDone(Constants.MESSAGE_SYNCING, false);
-				gui.displayDone("Make sure that you shared your calendar with: " + clientEmail, true);
+				gui.displayDone(MESSAGE_SYNCING, false);
 				
 				logic.connectByNewToken(code);
 				GcPacket packet = logic.sync(logic.load());
 				
-				gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
+				gui.displayDone(MESSAGE_SYNC_COMPLETE, false);
 				displayPacket(packet);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
-			gui.displayWarning(Constants.MESSAGE_SYNC_ERROR, false);
-			gui.displayWarning("Make sure that you shared your calendar with: " + clientEmail, true);
+			gui.displayWarning(MESSAGE_SYNC_ERROR, false);
+			gui.displayWarning(MESSAGE_SYNC_REMINDER, true);
 		}
 	}
 	
     private void sync() {
     	if (!logic.isOnline()) {
-    		gui.displayWarning(Constants.MESSAGE_NO_INTERNET, false);
+    		gui.displayWarning(MESSAGE_NO_INTERNET, false);
     	} else {
-    		gui.displayDone(Constants.MESSAGE_SYNCING, false);
-    		gui.displayDone("Make sure that you shared your calendar with: " + clientEmail, true);
+    		gui.displayDone(MESSAGE_SYNCING, false);
     		if (logic.connectUsingExistingToken()) {
 	    		try {
 					GcPacket packet = logic.sync(logic.load());
-					gui.displayDone(Constants.MESSAGE_SYNC_COMPLETE, false);
+					gui.displayDone(MESSAGE_SYNC_COMPLETE, false);
 					displayPacket(packet);
 					return;
 				} catch (IOException e) {
@@ -259,12 +284,12 @@ public class UserInterface {
             ArrayList<Task> list = searchTaskOfSameDay(task);
             
             if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
-            	addToStackForUndoAndRedo(list, task, Constants.DELETED, "Task deleted.", COLOR_DONE,
+            	addToStackForUndoAndRedo(list, task, Constants.DELETED, MESSAGE_TASK_DELETED_FOR_UNDO, COLOR_DONE,
             			list, task, Constants.HIGHLIGH, feedback, COLOR_DONE);
             	gui.displayDone(feedback, false);
             	showToUser(list, task, Constants.HIGHLIGH, true);
             } else if (feedback.equals(Constants.MESSAGE_CLASHING_TIMESLOTS)) {
-            	addToStackForUndoAndRedo(list, task, Constants.DELETED, "Task deleted.", COLOR_DONE,
+            	addToStackForUndoAndRedo(list, task, Constants.DELETED, MESSAGE_TASK_DELETED_FOR_UNDO, COLOR_DONE,
             			list, task, Constants.HIGHLIGH, feedback, COLOR_WARNING);
             	gui.displayWarning(feedback, false);
             	showToUser(list, task, Constants.HIGHLIGH, true);
@@ -285,15 +310,11 @@ public class UserInterface {
 		taskToSearch.setStartTime(task.getStartTime());
 		taskToSearch.setEndTime(task.getEndTime());
 		if (taskToSearch.getStartTime() == null) {
-			taskToSearch.setDescription("floating");
+			taskToSearch.setDescription(KEYWORD_FLOATING_TASK);
 		}
 		ArrayList<Task> list = logic.list(taskToSearch);
 		return list;
 	}
-    
-    private void block(Task task) {
-    	
-    }
 
     private void list(Task task) {
         try {
@@ -306,7 +327,7 @@ public class UserInterface {
             	task.setState(StateType.PENDING);
             }
 
-            if (cmdInfo != null && cmdInfo.contains("upcoming") && task.getStartTime() == null) {
+            if (cmdInfo != null && cmdInfo.contains(KEYWORD_UPCOMING_TASK) && task.getStartTime() == null) {
                 int time = Constants.LISTUPCOMINGTIME_DEFAULT;
                 String s = getFirstInt(cmdInfo);
                 if (!s.equals("")) {
@@ -346,7 +367,7 @@ public class UserInterface {
 	        		
 	        		String feedback = logic.delete(taskToBeDeleted);
 	        		if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
-	        			addToStackForUndoAndRedo(list, taskToBeDeleted, Constants.HIGHLIGH, "Task restored.", COLOR_DONE,
+	        			addToStackForUndoAndRedo(list, taskToBeDeleted, Constants.HIGHLIGH, MESSAGE_TASK_RESTORED_FOR_UNDO, COLOR_DONE,
 	        					list, taskToBeDeleted, Constants.DELETED, feedback, COLOR_DONE);
 	        			gui.displayDone(feedback, false);
 	        			showToUser(list, taskToBeDeleted, Constants.DELETED, true);
@@ -367,7 +388,7 @@ public class UserInterface {
         		
         		String feedback = logic.delete(taskToBeDeleted);
         		if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
-        			addToStackForUndoAndRedo(list, taskToBeDeleted, Constants.HIGHLIGH, "Task restored.", COLOR_DONE,
+        			addToStackForUndoAndRedo(list, taskToBeDeleted, Constants.HIGHLIGH, MESSAGE_TASK_RESTORED_FOR_UNDO, COLOR_DONE,
         					list, taskToBeDeleted, Constants.DELETED, feedback, COLOR_DONE);
         			gui.displayDone(feedback, false);
         			showToUser(list, taskToBeDeleted, Constants.DELETED, true);
@@ -432,12 +453,12 @@ public class UserInterface {
 	private void displayFeedbackForEditing(ArrayList<Task> oldList, Task oldTask, ArrayList<Task> list, Task task,
 			String feedback) {
 		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
-			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH, "Task edited.", COLOR_DONE,
+			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH, MESSAGE_TASK_EDITED_FOR_UNDO, COLOR_DONE,
 					list, task, Constants.HIGHLIGH, feedback, COLOR_DONE);
 			gui.displayDone(feedback, false);
 			showToUser(list, task, Constants.HIGHLIGH, true);
 		} else if (feedback.equals(Constants.MESSAGE_EDIT_CLASHING_TIMESLOTS)) {
-			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH, "Task edited.", COLOR_WARNING,
+			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH, MESSAGE_TASK_EDITED_FOR_UNDO, COLOR_WARNING,
 					list, task, Constants.HIGHLIGH, feedback, COLOR_WARNING);
 			gui.displayWarning(feedback, false);
 			showToUser(list, task, Constants.HIGHLIGH, true);
@@ -452,7 +473,7 @@ public class UserInterface {
             if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
             	ArrayList<Task> list = logic.list(new Task()); 
                 gui.displayDone(feedback, false);
-                addToStackForUndoAndRedo(list, new Task(), Constants.NO_EFFECT, "All tasks restored.", COLOR_DONE,
+                addToStackForUndoAndRedo(list, new Task(), Constants.NO_EFFECT, MESSAGE_TASK_RESTORED, COLOR_DONE,
                 		null, null, Constants.NO_EFFECT, feedback, COLOR_DONE);
             } else {
                 gui.displayWarning(feedback, false);
@@ -465,16 +486,18 @@ public class UserInterface {
     private void undo() {
         try {
             String feedback = logic.undo();
+            
             if (feedback.equals(Constants.MESSAGE_UNDO_DONE) && currentPos >= 0) {
-            	if (colorForUndo.get(currentPos) == COLOR_DONE) {
-            		gui.displayDone(statusForUndo.get(currentPos), false);
+            	UndoAndRedoPack pack = stack.get(currentPos);
+            	if (pack.colorForUndo== COLOR_DONE) {
+            		gui.displayDone(pack.statusForUndo, false);
             	} else {
-            		gui.displayWarning(statusForUndo.get(currentPos), false);
+            		gui.displayWarning(pack.statusForUndo, false);
             	}
-            	gui.display(tasksForUndo.get(currentPos), posToDoEffectForUndo.get(currentPos), effectForUndo.get(currentPos), true);
+            	gui.display(pack.tasksForUndo, pack.posToDoEffectForUndo, pack.effectForUndo, true);
             	currentPos --;
             } else {
-            	gui.displayWarning("No command for undoing", false);
+            	gui.displayWarning(MESSAGE_NO_UNDO, false);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -486,14 +509,15 @@ public class UserInterface {
             String feedback = logic.redo();
             if (feedback.equals(Constants.MESSAGE_REDO_DONE) && currentPos < availablePos) {
             	currentPos ++;
-            	if (colorForRedo.get(currentPos) == COLOR_DONE) {
-            		gui.displayDone(statusForRedo.get(currentPos), false);
+            	UndoAndRedoPack pack = stack.get(currentPos);
+            	if (pack.colorForRedo == COLOR_DONE) {
+            		gui.displayDone(pack.statusForRedo, false);
             	} else {
-            		gui.displayWarning(statusForRedo.get(currentPos), false);
+            		gui.displayWarning(pack.statusForRedo, false);
             	}
-            	gui.display(tasksForRedo.get(currentPos), posToDoEffectForRedo.get(currentPos), effectForRedo.get(currentPos), true);
+            	gui.display(pack.tasksForRedo, pack.posToDoEffectForRedo, pack.effectForRedo, true);
             } else {
-            	gui.displayWarning("No command for redoing", false);
+            	gui.displayWarning(MESSAGE_NO_REDO, false);
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -519,29 +543,14 @@ public class UserInterface {
 	    	}
     	}
     	
+    	UndoAndRedoPack pack = new UndoAndRedoPack(posForUndo, listForUndo, undoEffect, messageForUndo, ucolor,
+    			posForRedo, listForRedo, redoEffect, messageForRedo, rcolor);
+    	
     	currentPos ++; availablePos = currentPos;
-    	if (currentPos >= statusForUndo.size()) {
-	    	statusForUndo.add(messageForUndo);
-	    	statusForRedo.add(messageForRedo);
-	    	tasksForUndo.add(listForUndo);
-	    	tasksForRedo.add(listForRedo);
-	    	effectForUndo.add(undoEffect);
-	    	effectForRedo.add(redoEffect);
-	    	posToDoEffectForUndo.add(posForUndo);
-	    	posToDoEffectForRedo.add(posForRedo);
-	    	colorForUndo.add(ucolor);
-	    	colorForRedo.add(rcolor);
+    	if (currentPos >= stack.size()) {
+    		stack.add(pack);
     	} else {
-    		statusForUndo.set(currentPos, messageForUndo);
-	    	statusForRedo.set(currentPos, messageForRedo);
-	    	tasksForUndo.set(currentPos, listForUndo);
-	    	tasksForRedo.set(currentPos, listForRedo);
-	    	effectForUndo.set(currentPos, undoEffect);
-	    	effectForRedo.set(currentPos, redoEffect);
-	    	posToDoEffectForUndo.set(currentPos, posForUndo);
-	    	posToDoEffectForRedo.set(currentPos, posForRedo);
-	    	colorForUndo.set(currentPos, ucolor);
-	    	colorForRedo.set(currentPos, rcolor);
+    		stack.set(currentPos, pack);
     	}
     }
     

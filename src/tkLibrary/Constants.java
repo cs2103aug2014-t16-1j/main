@@ -33,15 +33,6 @@ public final class Constants {
 	public static final String MESSAGE_STATE_PENDING = "State changed to 'pending'.";
 	public static final String MESSAGE_MORE_THAN_ONE_TASK_FOUND = "There are more than 1 task found. Specify the task.";
 	public static final String MESSAGE_NO_START_TIME = "Please indicate a start time for your task.";
-
-	//Gcal constants
-	public static final String MESSAGE_USER_OFFLINE = "User is Offline.";
-	public static final String MESSAGE_CRED_CORRECT = "The credentials are correct.";
-	public static final String MESSAGE_CRED_NOT_CORRECT = "The credentials are not correct.";
-	public static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete";
-	public static final String MESSAGE_SYNC_NOT_COMPLETE = "Synchronization is not complete";
-	public static final String MESSAGE_USER_NOT_ONLINE = "Please check your internet connection.";
-	public static final String MESSAGE_NOT_UPDATE = "%s is not updated.\n";
 	
 	//Access Token
 	public static final String CODE_REJECTED = "rejected";
@@ -90,18 +81,14 @@ public final class Constants {
     public static final String MESSAGE_NO_DELETE_INFO = "Please specify the task you want to delete!";
     public static final String MESSAGE_NO_RESULT_LIST = "There is nothing to list.";
     public static final String MESSAGE_UPDATE_STATUS_AND_PRIORITY = "Task status changed to: %s and priority changed to: %s";
+    public static final String MESSAGE_ENDTIME_BEFORE_STARTTIME = "The end time cannot be before the start time.";
     
 	//@author A0112068N
     // more constants for UI
-	public static final String MESSAGE_ENDTIME_BEFORE_STARTTIME = "The end time cannot be before the start time.";
 
 	public static final int HIGHLIGH = 1;
 	public static final int DELETED = 2; 
 	public static final int NO_EFFECT = 0;
-
-	public static final String MESSAGE_SYNCING = "Syncing is in process, it may takes minutes to be completed..";
-	public static final String MESSAGE_NO_INTERNET = "No internet connection!";
-	public static final String MESSAGE_SYNC_ERROR = "Cannot sync, please try again!";
 	
 	public static final String EXCEPTIONS_INVALID_USERCOMMAND = "Your input is invalid: %1$s <br>%2$s";
 	
