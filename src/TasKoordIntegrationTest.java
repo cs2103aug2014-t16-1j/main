@@ -36,8 +36,8 @@ public class TasKoordIntegrationTest {
         readFile(fileName);
         String nextLine = scanner.nextLine();
         assertEquals(
-        		"{\"LOCATION\":\"Boardroom\",\"STARTTIME\":\"Oct 25 2015 10:00\",\"STATE_TYPE\":\"PENDING\","
-                		+ "\"DESCRIPTION\":\"Lunch\",\"ENDTIME\":\"Oct 25 2015 11:00\","
+        		"{\"LOCATION\":\"Boardroom\",\"STARTTIME\":\"Oct 25 2015 10:00\",\"FREQUENCY_TYPE\":null,"
+                		+ "\"STATE_TYPE\":\"PENDING\",\"DESCRIPTION\":\"Lunch\",\"ENDTIME\":\"Oct 25 2015 11:00\","
                 		+ "\"FREQUENCY\":0,\"PRIORITY\":\"MEDIUM\","
                 		+ "\"SYNC\":0}", nextLine);
         assertEquals(false, scanner.hasNext());
@@ -49,8 +49,8 @@ public class TasKoordIntegrationTest {
         readFile(fileName);
         String nextLine = scanner.nextLine();
         assertEquals(
-        		"{\"LOCATION\":\"Restaurant\",\"STARTTIME\":\"Nov 26 2015 18:00\",\"STATE_TYPE\":\"PENDING\","
-                		+ "\"DESCRIPTION\":\"dinner\",\"ENDTIME\":\"Nov 26 2015 19:00\","
+        		"{\"LOCATION\":\"Restaurant\",\"STARTTIME\":\"Nov 26 2015 18:00\",\"FREQUENCY_TYPE\":null,"
+                		+ "\"STATE_TYPE\":\"PENDING\",\"DESCRIPTION\":\"dinner\",\"ENDTIME\":\"Nov 26 2015 19:00\","
                 		+ "\"FREQUENCY\":0,\"PRIORITY\":\"MEDIUM\","
                 		+ "\"SYNC\":0}", nextLine);
         assertEquals(false, scanner.hasNext());
@@ -63,8 +63,8 @@ public class TasKoordIntegrationTest {
         readFile(fileName);
         String nextLine = scanner.nextLine();
         assertEquals(
-        		"{\"LOCATION\":\"Boardroom\",\"STARTTIME\":\"Oct 25 2015 10:00\",\"STATE_TYPE\":\"PENDING\","
-                		+ "\"DESCRIPTION\":\"Lunch\",\"ENDTIME\":\"Oct 25 2015 11:00\","
+        		"{\"LOCATION\":\"Boardroom\",\"STARTTIME\":\"Oct 25 2015 10:00\",\"FREQUENCY_TYPE\":null,"
+                		+ "\"STATE_TYPE\":\"PENDING\",\"DESCRIPTION\":\"Lunch\",\"ENDTIME\":\"Oct 25 2015 11:00\","
                 		+ "\"FREQUENCY\":0,\"PRIORITY\":\"MEDIUM\","
                 		+ "\"SYNC\":0}", nextLine);
         assertEquals(false, scanner.hasNext());
@@ -76,8 +76,8 @@ public class TasKoordIntegrationTest {
         readFile(fileName);
         String nextLine = scanner.nextLine();
         assertEquals(
-        		"{\"LOCATION\":\"Boardroom\",\"STARTTIME\":\"Oct 24 2015 09:00\",\"STATE_TYPE\":\"PENDING\","
-                		+ "\"DESCRIPTION\":\"Meeting\",\"ENDTIME\":\"Oct 24 2015 10:00\","
+        		"{\"LOCATION\":\"Boardroom\",\"STARTTIME\":\"Oct 24 2015 09:00\",\"FREQUENCY_TYPE\":null,"
+                		+ "\"STATE_TYPE\":\"PENDING\",\"DESCRIPTION\":\"Meeting\",\"ENDTIME\":\"Oct 24 2015 10:00\","
                 		+ "\"FREQUENCY\":0,\"PRIORITY\":\"MEDIUM\","
                 		+ "\"SYNC\":0}", nextLine);
         assertEquals(false, scanner.hasNext());

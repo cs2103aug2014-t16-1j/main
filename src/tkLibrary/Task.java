@@ -176,6 +176,10 @@ public class Task {
             this.frequencyType = FrequencyType.YEAR;
         }
     }
+    
+    public void setState(StateType state) {
+        this.state = state;
+    }
 
     public void setState(String state) throws Exception {
         if (state.equalsIgnoreCase(Constants.STATE_COMPLETED)) {
@@ -190,10 +194,6 @@ public class Task {
             throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_STATE,
                     state));
         }
-    }
-
-    public void setState(StateType state) {
-        this.state = state;
     }
 
     public void setLocation(String location) {
