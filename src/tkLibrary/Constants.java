@@ -95,4 +95,8 @@ public final class Constants {
 	// constants for Parser
 	public static final String EXCEPTIONS_INVALID_COMMAND = "The command is invalid: %1$s";
 	public static final String EXCEPTIONS_INVALID_TIME = "The time format is invalid: %1$s";
+	public static final String EXCEPTIONS_INVALID_DATE = "The date format is invalid: %1$s";
+	public static final String EXCEPTIONS_INVALID_MONTH = "The month format is invalid: %1$s";
+	public static final String EXCEPTIONS_INVALID_DAY = "The month format is invalid: %1$s";
+	public static final String EXCEPTIONS_INVALID_YEAR = "The month format is invalid: %1$s";
 }

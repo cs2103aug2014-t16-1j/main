@@ -324,17 +324,19 @@ public class Parser {
         }
     }
 
-    private void parseDate(ArrayList<String> day) {
+    private void parseDate(ArrayList<String> day) throws Exception {
         String[] date = getDateValue(day);
         determineDate(date);
     }
 
-    private String[] getDateValue(ArrayList<String> day) throws Error {
+    private String[] getDateValue(ArrayList<String> day) throws Exception {
         String[] date = new String[3];
         if (day.size() == 1) {
             String enteredDate = day.get(0);
+            checkForSlash(enteredDate);
             date[0] = enteredDate.substring(0, enteredDate.indexOf("/"));
             enteredDate = enteredDate.replaceFirst(date[0] + "/", "");
+            checkForSlash(enteredDate);
             date[1] = enteredDate.substring(0, enteredDate.indexOf("/"));
             enteredDate = enteredDate.replaceFirst(date[1] + "/", "");
             date[1] = determineMonth(date[1]);
@@ -351,7 +353,34 @@ public class Parser {
             date[1] = determineMonth(day.get(1));
             date[2] = day.get(2);
         }
+        checkDay(date[0]);
+        checkYear(date[2]);
         return date;
+    }
+
+    private void checkYear(String day) throws Exception {
+        try {
+            Integer.valueOf(day);
+        } catch (NumberFormatException e) {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_YEAR,
+                    day));
+        }
+    }
+
+    private void checkDay(String year) throws Exception {
+        try {
+            Integer.valueOf(year);
+        } catch (NumberFormatException e) {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_DAY,
+                    year));
+        }
+    }
+
+    private void checkForSlash(String enteredDate) throws Exception {
+        if (!enteredDate.contains("/")) {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_DATE,
+                    enteredDate));
+        }
     }
 
     private void determineDate(String[] date) {
@@ -374,34 +403,62 @@ public class Parser {
         }
     }
 
-    private String determineMonth(String month) throws Error {
+    private String determineMonth(String month) throws Exception {
         if (month.length() == 3) {
-            return month;
-        } else if (Integer.valueOf(month) - 1 == 0) {
-            return "Jan";
-        } else if (Integer.valueOf(month) - 1 == 1) {
-            return "Feb";
-        } else if (Integer.valueOf(month) - 1 == 2) {
-            return "Mar";
-        } else if (Integer.valueOf(month) - 1 == 3) {
-            return "Apr";
-        } else if (Integer.valueOf(month) - 1 == 4) {
-            return "May";
-        } else if (Integer.valueOf(month) - 1 == 5) {
-            return "Jun";
-        } else if (Integer.valueOf(month) - 1 == 6) {
-            return "Jul";
-        } else if (Integer.valueOf(month) - 1 == 7) {
-            return "Aug";
-        } else if (Integer.valueOf(month) - 1 == 8) {
-            return "Sep";
-        } else if (Integer.valueOf(month) - 1 == 9) {
-            return "Oct";
-        } else if (Integer.valueOf(month) - 1 == 10) {
-            return "Nov";
+            if (month.equalsIgnoreCase("jan") || month.equalsIgnoreCase("feb")
+                    || month.equalsIgnoreCase("mar")
+                    || month.equalsIgnoreCase("apr")
+                    || month.equalsIgnoreCase("may")
+                    || month.equalsIgnoreCase("jun")
+                    || month.equalsIgnoreCase("jul")
+                    || month.equalsIgnoreCase("aug")
+                    || month.equalsIgnoreCase("sep")
+                    || month.equalsIgnoreCase("oct")
+                    || month.equalsIgnoreCase("nov")
+                    || month.equalsIgnoreCase("dec")) {
+                return month;
+            } else {
+                throw new Exception(String.format(
+                        Constants.EXCEPTIONS_INVALID_MONTH, month));
+            }
         } else {
-            return "Dec";
+            try {
+                int monthValue = Integer.valueOf(month) - 1;
+                if (monthValue == 0) {
+                    return "Jan";
+                } else if (monthValue == 1) {
+                    return "Feb";
+                } else if (monthValue == 2) {
+                    return "Mar";
+                } else if (monthValue == 3) {
+                    return "Apr";
+                } else if (monthValue == 4) {
+                    return "May";
+                } else if (monthValue == 5) {
+                    return "Jun";
+                } else if (monthValue == 6) {
+                    return "Jul";
+                } else if (monthValue == 7) {
+                    return "Aug";
+                } else if (monthValue == 8) {
+                    return "Sep";
+                } else if (monthValue == 9) {
+                    return "Oct";
+                } else if (monthValue == 10) {
+                    return "Nov";
+                } else if (monthValue == 11) {
+                    return "Dec";
+                } else {
+                    throw new Exception(String.format(
+                            Constants.EXCEPTIONS_INVALID_MONTH, month));
+                }
+            } catch (NumberFormatException e) {
+                throw new Exception(String.format(
+                        Constants.EXCEPTIONS_INVALID_MONTH, month));
+            }
+
         }
+
     }
 
     private void parseLocation(ArrayList<String> location) {
@@ -456,7 +513,7 @@ public class Parser {
         }
     }
 
-    private void setDateToToday() throws Error {
+    private void setDateToToday() throws Exception {
         Calendar calendar = Calendar.getInstance();
         String[] date = new String[3];
         date[0] = "" + calendar.get(5);
