@@ -35,8 +35,8 @@ public final class Constants {
 	public static final String MESSAGE_NO_START_TIME = "Please indicate a start time for your task.";
 	
 	//Access Token
-	public static final String CODE_REJECTED = "You have just denied the request, cannot sync.";
-	public static final String CODE_NO_CODE = "You haven't accepted the request, cannot sync.";
+	public static final String CODE_REJECTED = "You have denied the request, unable to sync.";
+	public static final String CODE_NO_CODE = "You have not accepted the request, unable to sync.";
 	
 	// storage constants
 	public static final String STARTTIME = "STARTTIME";

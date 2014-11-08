@@ -32,17 +32,17 @@ public class UserInterface {
 	private static final String KEYWORD_FLOATING_TASK = "floating";
 	private static final String KEYWORD_INVALID_CMD = "invalid";
 
-	private static final String MESSAGE_SYNCING = "Syncing is in process, it may takes minutes to be completed..";
-	private static final String MESSAGE_NO_INTERNET = "No internet connection!";
-	private static final String MESSAGE_SYNC_ERROR = "Cannot sync, please try again!";
-	private static final String MESSAGE_WAITING = "Please follow the link and accept it!!";
+	private static final String MESSAGE_SYNCING = "Syncing is in process, it may take a minutes to complete...";
+	private static final String MESSAGE_NO_INTERNET = "No internet connection available!";
+	private static final String MESSAGE_SYNC_ERROR = "Unable to sync, please try again!";
+	private static final String MESSAGE_WAITING = "Please follow the link and accept it!";
 	private static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete";
 
 	private static final String MESSAGE_TASK_EDITED_FOR_UNDO = "Task edited.";
 	private static final String MESSAGE_TASK_RESTORED_FOR_UNDO = "Task restored.";
 	private static final String MESSAGE_TASK_DELETED_FOR_UNDO = "Task deleted.";
-	private static final String MESSAGE_NO_UNDO = "No command for undoing";
-	private static final String MESSAGE_NO_REDO = "No command for redoing";
+	private static final String MESSAGE_NO_UNDO = "No command to undoing";
+	private static final String MESSAGE_NO_REDO = "No command to redoing";
 	private static final String MESSAGE_TASK_RESTORED = "All tasks restored.";
 	private static final String MESSAGE_INFORMAT_CMD = "Informat command";
 	private static final String MESSAGE_WRONG_CMD = "Cannot understand the command!";
@@ -50,7 +50,7 @@ public class UserInterface {
 
 	private static final String NO_COMMAND = "";
 	private static final String clientEmail = "505774929571-compute@developer.gserviceaccount.com";
-	private static final String MESSAGE_SYNC_REMINDER = "Make sure that you shared your calendar with: "
+	private static final String MESSAGE_SYNC_REMINDER = "Please ensure that you have shared your calendar with: "
 			+ clientEmail;
 
 	private static final int COLOR_DONE = 1;
