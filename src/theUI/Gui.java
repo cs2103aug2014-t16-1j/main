@@ -22,17 +22,17 @@ import java.util.Scanner;
 /**
  * @author A0112068N
  * 
- * This class used to communicate with user.
+ *         This class used to communicate with user.
  */
 public class Gui {
-	
+
 	private static final String HEADER_GOOD_TO_DO_TASKS = "===GOOD-TO-DO TASKS===";
 	private static final String NEW_LINE = "<br>";
 	private static final String SPACE = "&nbsp";
 	private static final String HTML_TYPE = "text/html";
 	private static final String NO_COMMAND = "";
-	
-	// constants for color, size. 
+
+	// constants for color, size.
 	private static final int HEIGHT = 800;
 	private static final int WIDTH = 500;
 	private static final Color COLOR_CARET = Color.white;
@@ -45,7 +45,7 @@ public class Gui {
 	private static final String COLOR_LOCATION = "#CECEF6";
 	private static final String COLOR_DATE = "#FD971F";
 	private static final String SIZE_NORMAL = "4";
-	private static final String SIZE_NUMBER = "3";	
+	private static final String SIZE_NUMBER = "3";
 	private static final String COLOR_DESCRIPTION_HIGH = "#FE2E2E";
 	private static final String COLOR_DESCRIPTION_LOW = "#A4A4A4";
 	private static final String COLOR_STATE = "#A6E22E";
@@ -53,9 +53,9 @@ public class Gui {
 	private static final String STYLE = "<head><style>"
 			+ "p  { font-family:consolas; font-size:100%; }"
 			+ "</style></head>";
-	private static final Font COMMAND_FONT = new Font("consolas", Font.TRUETYPE_FONT,
-			19);
-	
+	private static final Font COMMAND_FONT = new Font("consolas",
+			Font.TRUETYPE_FONT, 19);
+
 	// graphic components.
 	private JFrame frame = new JFrame("TasKoord");
 	private JTextField commandBox = new JTextField();
@@ -66,7 +66,7 @@ public class Gui {
 	private int currentPos = 0;
 	private String currentCommand = "";
 	private boolean upDownTyped = false;
-	
+
 	public String displayText = "";
 	private String userCommand = NO_COMMAND;
 
@@ -75,7 +75,7 @@ public class Gui {
 		listenToUserCommand();
 		addToFrame();
 	}
-	
+
 	// initialize the color, size, .. of components.
 	public void initialize() {
 		commandBox.setEditable(true);
@@ -108,8 +108,8 @@ public class Gui {
 		frame.pack();
 		frame.setVisible(true);
 	}
-	
-	// listen to user action. 
+
+	// listen to user action.
 	public void listenToUserCommand() {
 		commandBox.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent e) {
@@ -178,7 +178,8 @@ public class Gui {
 	}
 
 	private void display(int no, Task task, int effect, boolean isIndexed) {
-		String res = format(intToString(no, isIndexed), SIZE_NUMBER, COLOR_DONE, effect);
+		String res = format(intToString(no, isIndexed), SIZE_NUMBER,
+				COLOR_DONE, effect);
 
 		if (task.getStartTime() != null) {
 			if (task.getEndTime() == null) {
@@ -300,8 +301,8 @@ public class Gui {
 				} else if (lists.get(i).getPriorityLevel() == PriorityType.LOW) {
 					color = COLOR_DESCRIPTION_LOW;
 				}
-				displayText += format(intToString(i + 1, isIndexed), SIZE_NUMBER,
-						COLOR_DONE);
+				displayText += format(intToString(i + 1, isIndexed),
+						SIZE_NUMBER, COLOR_DONE);
 				displayText += format(lists.get(i).getDescription(),
 						SIZE_NORMAL, color, eff);
 

@@ -19,12 +19,12 @@ import GCal.SwingBrowser;
 /**
  * @author A0112068
  * 
- * This is UI Controller. That takes commands from GUI,
- * implements commands using Parser and Logic, then sends GUI the feedbacks 
+ *         This is UI Controller. That takes commands from GUI, implements
+ *         commands using Parser and Logic, then sends GUI the feedbacks
  *
  */
 public class UserInterface {
-	//Constants for google calendar integration
+	// Constants for google calendar integration
 	private static final String TASKS_ADDED_TO_GC = "<br>Tasks added to Google Calendar: ";
 	private static final String TASKS_DELETED_FROM_GC = "<br>Tasks deleted from Google Calendar: ";
 	private static final String TASKS_ADDED_TO_TK = "<br>Tasks added to TasKoord: ";
@@ -37,8 +37,8 @@ public class UserInterface {
 	private static final String clientEmail = "505774929571-compute@developer.gserviceaccount.com";
 	private static final String MESSAGE_SYNC_REMINDER = "Please ensure that you have shared your calendar with: "
 			+ clientEmail;
-	
-	//Local constants
+
+	// Local constants
 	private static final boolean APPENDED = true;
 	private static final boolean INSERTED = false;
 	private static final boolean INDEXED = true;
@@ -46,13 +46,13 @@ public class UserInterface {
 	private static final int COLOR_DONE = 1;
 	private static final int COLOR_WARNING = 2;
 	private static final int NO_TASK = -1;
-	
-	//Constants for keywords
+
+	// Constants for keywords
 	private static final String KEYWORD_UPCOMING_TASK = "upcoming";
 	private static final String KEYWORD_FLOATING_TASK = "floating";
 	private static final String KEYWORD_INVALID_CMD = "invalid";
 
-	//Some local messages that will be shown to user.
+	// Some local messages that will be shown to user.
 	private static final String MESSAGE_TASK_EDITED_FOR_UNDO = "Task edited.";
 	private static final String MESSAGE_TASK_RESTORED_FOR_UNDO = "Task restored.";
 	private static final String MESSAGE_TASK_DELETED_FOR_UNDO = "Task deleted.";
@@ -65,7 +65,7 @@ public class UserInterface {
 	private static final String MESSAGE_WELCOME = "Welcome to TasKoord!! <br> If this is your first time using TasKoord, "
 			+ "please type 'help' for more information.";
 	private static final String NO_COMMAND = "";
-	
+
 	// Components that interact with UI
 	private Logic logic;
 	private Parser parser;
@@ -97,7 +97,7 @@ public class UserInterface {
 			this.colorForRedo = rcolor;
 		}
 	}
-	
+
 	// Stack used for undo and redo
 	private ArrayList<UndoAndRedoPack> stack;
 	private ArrayList<Task> tasksOnScreen;
@@ -109,12 +109,12 @@ public class UserInterface {
 		logic = new Logic(fileName);
 		gui = new Gui();
 		browser = new SwingBrowser();
-		
+
 		tasksOnScreen = new ArrayList<Task>();
 		stack = new ArrayList<UndoAndRedoPack>();
 		currentPos = availablePos = -1;
 	}
-	
+
 	public void run() {
 		showBeginScreen();
 		while (true) {
@@ -135,7 +135,7 @@ public class UserInterface {
 			}
 		}
 	}
-	
+
 	// Show welcome message and all tasks at the beginning
 	private void showBeginScreen() {
 		gui.displayDone(MESSAGE_WELCOME, INSERTED);
@@ -144,7 +144,7 @@ public class UserInterface {
 			gui.display(list, NO_TASK, Constants.NO_EFFECT, APPENDED, INDEXED);
 		}
 	}
-	
+
 	// execute command received from GUI.
 	public void executeCommands(String userCommand) {
 		UserInput userInput;
@@ -224,7 +224,7 @@ public class UserInterface {
 			}
 		}
 	}
-	
+
 	private void syncWithNewToken(String url) {
 		try {
 			String code = getTokenPopup(url);
@@ -247,7 +247,7 @@ public class UserInterface {
 			gui.displayWarning(MESSAGE_SYNC_REMINDER, APPENDED);
 		}
 	}
-	
+
 	// open browser to get authority from user.
 	public String getTokenPopup(String url) {
 		gui.displayDone(MESSAGE_WAITING, INSERTED);
@@ -270,19 +270,19 @@ public class UserInterface {
 
 	// display what were changed after syncing.
 	private void displayPacket(GcPacket packet) {
-		ArrayList<Task> list = new ArrayList<Task> ();
-		
+		ArrayList<Task> list = new ArrayList<Task>();
+
 		for (Task item : packet.taskDeletedFromTK) {
 			if (logic.delete(item).equals(Constants.MESSAGE_TASK_DELETED)) {
 				list.add(item);
 			}
 		}
-		
+
 		if (list.size() != 0) {
 			gui.displayDone(TASKS_DELETED_FROM_TK, APPENDED);
 			gui.display(list, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
 		}
-		
+
 		list.clear();
 		for (Task item : packet.taskAddedToTK) {
 			try {
@@ -298,17 +298,19 @@ public class UserInterface {
 			gui.displayDone(TASKS_ADDED_TO_TK, APPENDED);
 			gui.display(list, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
 		}
-		
+
 		if (packet.taskDeletedFromGC.size() != 0) {
 			gui.displayDone(TASKS_DELETED_FROM_GC, APPENDED);
-			gui.display(packet.taskDeletedFromGC, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
+			gui.display(packet.taskDeletedFromGC, NO_TASK, Constants.NO_EFFECT,
+					APPENDED, NO_INDEX);
 		}
-		
+
 		if (packet.taskAddedToGC.size() != 0) {
 			gui.displayDone(TASKS_ADDED_TO_GC, APPENDED);
-			gui.display(packet.taskAddedToGC, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
+			gui.display(packet.taskAddedToGC, NO_TASK, Constants.NO_EFFECT,
+					APPENDED, NO_INDEX);
 		}
-		
+
 		logic.setSynced();
 	}
 
@@ -464,7 +466,8 @@ public class UserInterface {
 			list = logic.search(task.getDescription());
 
 			if (list.isEmpty()) {
-				gui.displayWarning(Constants.MESSAGE_TASK_DOES_NOT_EXIST, INSERTED);
+				gui.displayWarning(Constants.MESSAGE_TASK_DOES_NOT_EXIST,
+						INSERTED);
 				tasksOnScreen.clear();
 			} else if (list.size() == 1) {
 				Task taskToBeDeleted = list.get(0);
@@ -477,7 +480,8 @@ public class UserInterface {
 							COLOR_DONE, list, taskToBeDeleted,
 							Constants.DELETED, feedback, COLOR_DONE);
 					gui.displayDone(feedback, INSERTED);
-					showToUser(list, taskToBeDeleted, Constants.DELETED, APPENDED);
+					showToUser(list, taskToBeDeleted, Constants.DELETED,
+							APPENDED);
 				} else {
 					gui.displayWarning(feedback, INSERTED);
 					tasksOnScreen.clear();
@@ -807,8 +811,7 @@ public class UserInterface {
 		}
 		return result;
 	}
-	
-	
+
 	// this is for unit testing.
 	public String getDisplayedMessage() {
 		return gui.displayText;
