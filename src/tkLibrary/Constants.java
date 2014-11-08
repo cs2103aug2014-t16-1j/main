@@ -85,7 +85,6 @@ public final class Constants {
     
 	//@author A0112068N
     // more constants for UI
-
 	public static final int HIGHLIGH = 1;
 	public static final int DELETED = 2; 
 	public static final int NO_EFFECT = 0;

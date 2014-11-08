@@ -22,10 +22,24 @@ import java.net.URL;
 
 import static javafx.concurrent.Worker.State.FAILED;
 
+/**
+ * @author A0118919U
+ * 
+ *         This is Simple Browser for the purpose of google authentication
+ *         That takes in user input and authenticates using oauth2 protocol.
+ *         The authentication code is then returned back to the UI Controller for further processing
+ */
 public class SwingBrowser {
-    
+	
+	//@author A0118919U
     public String code = "";
     private WebEngine engine;
+    
+    private static final String MESSAGE_SUCCESS = "Success";
+    private static final String MESSAGE_DENIED = "Denied";
+    private static final String MESSAGE_ERROR_UNEXPECTED = "Unexpected error.";
+    private static final String MESSAGE_ERROR_LOADING = "Loading error...";
+    
     
     private final JFrame frame = new JFrame();
     private final JPanel panel = new JPanel(new BorderLayout());
@@ -33,8 +47,6 @@ public class SwingBrowser {
 	private final JFXPanel jfxPanel = new JFXPanel();
     private final JTextField txtURL = new JTextField();
     private final JProgressBar progressBar = new JProgressBar();
-    
-    //@author A0118919U
     
     public SwingBrowser() {
         initComponents();
@@ -83,10 +95,10 @@ public class SwingBrowser {
                             @Override
                             public void run() {
                                 frame.setTitle(newValue);
-                                if (newValue != null && newValue.contains("Success")) {
+                                if (newValue != null && newValue.contains(MESSAGE_SUCCESS)) {
                                 	setCode(newValue.substring(13));
                                 	frame.setVisible(false);
-                                } else if (newValue != null && newValue.contains("Denied")) {
+                                } else if (newValue != null && newValue.contains(MESSAGE_DENIED)) {
                                 	setCode(Constants.CODE_REJECTED);
                                 	frame.setVisible(false);
                                 }
@@ -144,8 +156,8 @@ public class SwingBrowser {
                                             panel,
                                             (value != null)
                                             ? engine.getLocation() + "\n" + value.getMessage()
-                                            : engine.getLocation() + "\nUnexpected error.",
-                                            "Loading error...",
+                                            : engine.getLocation() + "\n" + MESSAGE_ERROR_UNEXPECTED,
+                                            MESSAGE_ERROR_LOADING,
                                             JOptionPane.ERROR_MESSAGE);
                                         }
                                     });

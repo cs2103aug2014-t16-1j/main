@@ -18,12 +18,10 @@ import tkLibrary.UserInput;
 import tkLogic.Parser;
 
 public class StorageTest {
-	public Storage store  = new Storage("storeTest.txt");
+	
 	//@author A0118919U
-	/*
-    /* This is a boundary case for the optimal partition */
-    /* First, clear the file
-    /* Then adds the tasks one by one and checks them */
+	public Storage store  = new Storage("storeTest.txt");
+
 	@Test
 	public void testStorageAdd(){
 		Parser parser = Parser.getInstance();
@@ -56,7 +54,6 @@ public class StorageTest {
 		}
 	}
 	
-	/*First add, then deletes and then undo the task to check if the both functions work*/
 	@Test
 	public void testStorageDeleteandUndo() {
         Parser parser = Parser.getInstance();
@@ -84,7 +81,6 @@ public class StorageTest {
         }
     }
     
-	/*The edit test works by first adding and then edit and test*/
     @Test
     public void testStorageEdit() {
         Parser parser = Parser.getInstance();
@@ -114,8 +110,6 @@ public class StorageTest {
         }
     }
 	
-    /*
-     * */
     @Test
     public void testStorageSet() {
         Parser parser = Parser.getInstance();
