@@ -24,6 +24,7 @@ import GCal.SwingBrowser;
  *
  */
 public class UserInterface {
+	
 	// Constants for google calendar integration
 	private static final String TASKS_ADDED_TO_GC = "<br>Tasks added to Google Calendar: ";
 	private static final String TASKS_DELETED_FROM_GC = "<br>Tasks deleted from Google Calendar: ";
