@@ -27,7 +27,8 @@ public class Parser {
     private int frequencyValue;
     private String[] startTime;
     private String[] endTime;
-    private String[] date;
+    private String[] startDate;
+    private String[] endDate;
     private String startTimeAndDate;
     private String endTimeAndDate;
     private String priority;
@@ -46,7 +47,8 @@ public class Parser {
         frequencyValue = 0;
         startTime = new String[0];
         endTime = new String[0];
-        date = new String[0];
+        startDate = new String[0];
+        endDate = new String[0];
         startTimeAndDate = null;
         endTimeAndDate = null;
         priority = Constants.PRIORITY_NULL;
@@ -145,9 +147,10 @@ public class Parser {
     private CommandKey determineCommandKey(String commandKeyString) {
         if (commandKeyString.equalsIgnoreCase("description")) {
             return CommandKey.DESCRIPTION;
-        } else if (commandKeyString.equalsIgnoreCase("from")
-                || commandKeyString.equalsIgnoreCase("by")) {
+        } else if (commandKeyString.equalsIgnoreCase("from")) {
             return CommandKey.FROM;
+        } else if (commandKeyString.equalsIgnoreCase("by")) {
+            return CommandKey.BY;
         } else if (commandKeyString.equalsIgnoreCase("to")) {
             return CommandKey.TO;
         } else if (commandKeyString.equalsIgnoreCase("at")) {
@@ -181,7 +184,9 @@ public class Parser {
                 break;
             case ON:
                 parseDate(word);
-                parseTime();
+                break;
+            case BY:
+                parseDeadline(word);
                 break;
             case AT:
                 parseLocation(word);
@@ -218,6 +223,11 @@ public class Parser {
         startTime = updateTime(time, startingTime);
     }
 
+    private void parseDeadline(ArrayList<String> time) throws Exception {
+        parseStartTime(time);
+        endDate = new String[0];
+    }
+
     private void parseEndTime(ArrayList<String> time) throws Exception {
         String[] endingTime = new String[2];
         endTime = updateTime(time, endingTime);
@@ -232,7 +242,8 @@ public class Parser {
         return requiredTime;
     }
 
-    private void checkTimeFormat(String[] requiredTime, String newTime) throws Exception {
+    private void checkTimeFormat(String[] requiredTime, String newTime)
+            throws Exception {
         if (requiredTime[0] == null || Integer.valueOf(requiredTime[0]) < 0
                 || Integer.valueOf(requiredTime[0]) > 23
                 || Integer.valueOf(requiredTime[1]) < 0
@@ -314,7 +325,12 @@ public class Parser {
     }
 
     private void parseDate(ArrayList<String> day) {
-        date = new String[3];
+        String[] date = getDateValue(day);
+        determineDate(date);
+    }
+
+    private String[] getDateValue(ArrayList<String> day) throws Error {
+        String[] date = new String[3];
         if (day.size() == 1) {
             String enteredDate = day.get(0);
             date[0] = enteredDate.substring(0, enteredDate.indexOf("/"));
@@ -334,6 +350,27 @@ public class Parser {
             date[0] = day.get(0);
             date[1] = determineMonth(day.get(1));
             date[2] = day.get(2);
+        }
+        return date;
+    }
+
+    private void determineDate(String[] date) {
+        if (startTime.length != 0) {
+            if (endTime.length != 0) {
+                if (startDate.length == 0) {
+                    startDate = date;
+                }
+                if (endDate.length == 0) {
+                    endDate = date;
+                }
+            } else {
+                startDate = date;
+            }
+        } else if (endTime.length != 0) {
+            endDate = date;
+        } else {
+            startDate = date;
+            endDate = date;
         }
     }
 
@@ -389,36 +426,63 @@ public class Parser {
     }
 
     private void parseTime() throws Exception {
-        if (startTime.length == 0 && endTime.length == 0 && date.length != 0) {
-            Calendar.getInstance();
-            String[] currentTime = new String[2];
-            currentTime[0] = "00";
-            currentTime[1] = "00";
-            startTime = currentTime;
-            startTimeAndDate = getTime(currentTime);
-            currentTime = new String[2];
-            currentTime[0] = "23";
-            currentTime[1] = "59";
-            endTime = currentTime;
-            endTimeAndDate = getTime(currentTime);
+        if (startTime.length == 0 && startDate.length != 0) {
+            setStartTime0000();
         }
-        if (date.length == 0) {
-            Calendar calendar = Calendar.getInstance();
-            date = new String[3];
-            date[0] = "" + calendar.get(5);
-            date[1] = determineMonth("" + (calendar.get(2) + 1));
-            date[2] = "" + calendar.get(1);
+        if (endTime.length == 0 && endDate.length != 0) {
+            setEndTime2359();
+        }
+        if (startDate.length == 0 && endDate.length == 0) {
+            setDateToToday();
         }
         if (endTime.length != 0 && endTimeAndDate == null) {
-            endTimeAndDate = getTime(endTime);
+            setEndTimeAndDate();
         }
         if (startTime.length != 0 && startTimeAndDate == null) {
-            startTimeAndDate = getTime(startTime);
+            setStartTimeAndDate();
         }
 
     }
 
-    private String getTime(String[] time) {
+    private void setStartTimeAndDate() {
+        startTimeAndDate = getTime(startTime, startDate);
+    }
+
+    private void setEndTimeAndDate() {
+        if (endDate.length == 0) {
+            endTimeAndDate = getTime(endTime, startDate);
+        } else {
+            endTimeAndDate = getTime(endTime, endDate);
+        }
+    }
+
+    private void setDateToToday() throws Error {
+        Calendar calendar = Calendar.getInstance();
+        String[] date = new String[3];
+        date[0] = "" + calendar.get(5);
+        date[1] = determineMonth("" + (calendar.get(2) + 1));
+        date[2] = "" + calendar.get(1);
+        startDate = date;
+        endDate = date;
+    }
+
+    private void setEndTime2359() {
+        Calendar.getInstance();
+        String[] currentTime = new String[2];
+        currentTime[0] = "23";
+        currentTime[1] = "59";
+        endTime = currentTime;
+    }
+
+    private void setStartTime0000() {
+        Calendar.getInstance();
+        String[] currentTime = new String[2];
+        currentTime[0] = "00";
+        currentTime[1] = "00";
+        startTime = currentTime;
+    }
+
+    private String getTime(String[] time, String[] date) {
         return date[1] + " " + date[0] + " " + date[2] + " " + time[0] + ":"
                 + time[1] + ":00";
     }
