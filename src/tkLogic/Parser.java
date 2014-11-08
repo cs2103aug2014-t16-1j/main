@@ -220,17 +220,46 @@ public class Parser {
 
     private void parseStartTime(ArrayList<String> time) throws Exception {
         String[] startingTime = new String[2];
-        startTime = updateTime(time, startingTime);
+        try {
+            startTime = updateTime(time, startingTime);
+        } catch (Exception e) {
+            try {
+                String[] date = getDateValue(time);
+                startDate = date;
+                startingTime[0] = "00";
+                startingTime[1] = "00";
+                startTime = startingTime;
+            } catch (Exception f) {
+                throw e;
+            }
+        }
     }
 
     private void parseDeadline(ArrayList<String> time) throws Exception {
         parseStartTime(time);
+        if (startTime[0] == "00" && startTime[1] == "00") {
+            startTime[0] = "23";
+            startTime[1] = "59";
+        }
+        endTime = new String[0];
         endDate = new String[0];
     }
 
     private void parseEndTime(ArrayList<String> time) throws Exception {
         String[] endingTime = new String[2];
-        endTime = updateTime(time, endingTime);
+        try {
+            endTime = updateTime(time, endingTime);
+        } catch (Exception e) {
+            try {
+                String[] date = getDateValue(time);
+                endDate = date;
+                endingTime[0] = "23";
+                endingTime[1] = "59";
+                endTime = endingTime;
+            } catch (Exception f) {
+                throw e;
+            }
+        }
     }
 
     private String[] updateTime(ArrayList<String> time, String[] requiredTime)
@@ -362,8 +391,8 @@ public class Parser {
         try {
             Integer.valueOf(day);
         } catch (NumberFormatException e) {
-            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_YEAR,
-                    day));
+            throw new Exception(
+                    String.format(Constants.EXCEPTIONS_INVALID_YEAR, day));
         }
     }
 
@@ -371,8 +400,8 @@ public class Parser {
         try {
             Integer.valueOf(year);
         } catch (NumberFormatException e) {
-            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_DAY,
-                    year));
+            throw new Exception(
+                    String.format(Constants.EXCEPTIONS_INVALID_DAY, year));
         }
     }
 
