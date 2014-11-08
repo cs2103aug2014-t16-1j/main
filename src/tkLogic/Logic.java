@@ -137,7 +137,7 @@ public class Logic {
 		ArrayList<Task> allTasks = storage.load();
 		ArrayList<Task> searchResults = new ArrayList<Task>();
 		
-		for(Task item : allTasks){
+		for (Task item : allTasks){
 			if (item.getDescription().toLowerCase().contains(keyword.toLowerCase())){
 				searchResults.add(item);
 			}
@@ -206,8 +206,10 @@ public class Logic {
 				featureEndTime = featureStartTime;
 			}
 			
-			String startTime = convertCalendarToString(task.getStartTime(), Constants.FORMAT_DATE);
-			String endTime = convertCalendarToString(task.getEndTime(), Constants.FORMAT_DATE);
+			String startTime = convertCalendarToString(task.getStartTime(), 
+					Constants.FORMAT_DATE);
+			String endTime = convertCalendarToString(task.getEndTime(), 
+					Constants.FORMAT_DATE);
 	
 			if (startTime == null && endTime == null) {
 				return false;
@@ -216,9 +218,11 @@ public class Logic {
 						|| featureStartTime.compareTo(endTime) > 0) {
 					return false;
 				}
-			} else if (startTime != null && (startTime.compareTo(featureStartTime) < 0 || startTime.compareTo(featureEndTime) > 0)) {
+			} else if (startTime != null && (startTime.compareTo(featureStartTime) < 0 
+					|| startTime.compareTo(featureEndTime) > 0)) {
 				return false;
-			} else if (endTime != null && (endTime.compareTo(featureStartTime) < 0 || endTime.compareTo(featureEndTime) > 0)) {
+			} else if (endTime != null && (endTime.compareTo(featureStartTime) < 0 
+					|| endTime.compareTo(featureEndTime) > 0)) {
 				return false;
 			}
 		}
@@ -250,7 +254,7 @@ public class Logic {
 	}
 	
 	//@author A0111705W
-	// this is to check if a task already existing. using description and location to check.
+	// this is to check if a task already exists using description and location to check
 	private boolean isExistingTask(Task task) {
 		ArrayList<Task> queryList = storage.load();
 		for (Task item : queryList) {
@@ -269,7 +273,7 @@ public class Logic {
 		ArrayList<Task> allTasks = storage.load();
 		ArrayList<Task> queryList = new ArrayList<Task>();
 		
-		if(isFloatingTask(task)){
+		if (isFloatingTask(task)){
 			return true;
 		}
 		
@@ -287,35 +291,41 @@ public class Logic {
 			return true;
 		}
 		
-		// for deadline tasks, the time when it is due is start time instead of deadline for efficiency in sorting
-		if(isDeadlineTask(task)){
-			for(Task queriedTask: queryList){
-				if(isDeadlineTask(queriedTask)){
-					if(isSameStartTime(task, queriedTask)){
+		/*
+		 * for deadline tasks, the time when it is due is start time
+		 * instead of deadline for efficiency in sorting
+		 */
+		if (isDeadlineTask(task)){
+			for (Task queriedTask: queryList){
+				if (isDeadlineTask(queriedTask)){
+					if (isSameStartTime(task, queriedTask)){
 						return false;
 					}
 				}
-				if(isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
+				if (isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
 					return false;
 				}
-				if(isSameEndTime(task, queriedTask)){
+				if (isSameEndTime(task, queriedTask)){
 					return false;
 				}
 			}
 			return true;
 		}
 		
-		for(Task queriedTask: queryList){
-			if(isSameStartTime(task, queriedTask)){
+		for (Task queriedTask: queryList){
+			if (isSameStartTime(task, queriedTask)){
 				return false;
 			}
-			if(isBetweenStartAndEndTimeForTaskEndTime(task, queriedTask)){
+			//checks if task's end time is between an existing task's time period
+			if (isBetweenStartAndEndTimeForTaskEndTime(task, queriedTask)){
 				return false;
 			}
-			if(isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
+			//checks if task's start time is between an existing task's time period
+			if (isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
 				return false;
 			}
-			if(isBetweenStartAndEndTimeForTaskStartTime(task, queriedTask)){
+			//checks if task's time period is longer than an existing task's time period
+			if (isBetweenStartAndEndTimeForTaskStartTime(task, queriedTask)){
 				return false;
 			}
 		}
@@ -343,15 +353,17 @@ public class Logic {
 	}
 	
 	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
-		return (task.getEndTime().compareTo(queriedTask.getEndTime()) < 0) && (task.getEndTime().compareTo(queriedTask.getStartTime()) > 0);
+		return (task.getEndTime().compareTo(queriedTask.getEndTime()) < 0)
+				&& (task.getEndTime().compareTo(queriedTask.getStartTime()) > 0);
 	}
 		
 	private boolean isBetweenStartAndEndTimeForTaskStartTime(Task task, Task queriedTask){
-		return (queriedTask.getStartTime().compareTo(task.getStartTime()) > 0) && (queriedTask.getStartTime().compareTo(task.getEndTime()) < 0);
+		return (queriedTask.getStartTime().compareTo(task.getStartTime()) > 0) 
+				&& (queriedTask.getStartTime().compareTo(task.getEndTime()) < 0);
 	}
 
 	public String setPriorityLevel(Task task){
-		if(isExistingTask(task)){
+		if (isExistingTask(task)){
 			task.setPriority(task.getPriorityLevel());
 			LOGGER.info("Task priority changed.");
 			return Constants.MESSAGE_PRIORITY_SET;
@@ -361,7 +373,7 @@ public class Logic {
 	}
 	
 	public String setState(Task task){
-		if(isExistingTask(task)) {
+		if (isExistingTask(task)) {
 			task.setState(task.getState());
 			LOGGER.info("Task state changed.");
 			switch (task.getState()){
