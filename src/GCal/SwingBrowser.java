@@ -22,16 +22,14 @@ import java.net.URL;
 
 import static javafx.concurrent.Worker.State.FAILED;
 
+//@author A0118919U
 /**
- * @author A0118919U
- * 
  *         This is Simple Browser for the purpose of google authentication
  *         That takes in user input and authenticates using oauth2 protocol.
  *         The authentication code is then returned back to the UI Controller for further processing
  */
 public class SwingBrowser {
 	
-	//@author A0118919U
     public String code = "";
     private WebEngine engine;
     

@@ -8,15 +8,14 @@ import tkLibrary.Constants;
 
 import org.json.simple.JSONObject;
 
+//@author A0118919U
 /**
- * @author A0118919U
  * This Converter facilitates a two way conversion between <Task> and jsonObject
  * task can be converted to jsonObject for storage to file
  * Alternatively the retrieved jsonObject from file can be converted to <Task>       
  */
 public class jsonConverter {
 	
-	//@author A0118919U
 	@SuppressWarnings("unchecked")
 	public static JSONObject taskToJSON(Task task)
 	{

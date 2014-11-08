@@ -25,17 +25,17 @@ public class StorageTest {
 	@Test
 	public void testStorageAdd(){
 		Parser parser = Parser.getInstance();
-        String input = "add Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
-        String input1 = "add playing from 6pm to 7pm on 29 Oct 2014 at Court";
+        String input1 = "add Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
+        String input2 = "add playing from 6pm to 7pm on 29 Oct 2014 at Court";
         UserInput userInput;
 		try{
-			userInput = parser.format(input);
-			Task task = userInput.getTask();
-			store.clear();
-			store.add(task);
 			userInput = parser.format(input1);
 			Task task1 = userInput.getTask();
+			store.clear();
 			store.add(task1);
+			userInput = parser.format(input2);
+			Task task2 = userInput.getTask();
+			store.add(task2);
 			ArrayList<Task> list = store.loadFromFile();
 			assertEquals("Test if task description was added successfully", "Meeting", list.get(0).getDescription());
 			assertEquals("Test if task description was added successfully", "Boardroom", list.get(0).getLocation());
