@@ -5,6 +5,11 @@ import static org.junit.Assert.*;
 import org.junit.Before;
 import org.junit.Test;
 
+/**
+ * 
+ * @author A0112068N
+ *
+ */
 public class UITest {
 
 	private UserInterface ui;
@@ -16,6 +21,9 @@ public class UITest {
 
 	@Test
 	public void testAddCommand() {
+		/*
+		 * test for "clear"
+		 */
 		ui.executeCommands("clear");
 		assertEquals(ui.getDisplayedMessage(),
 				"<font size = 4 color = #A6E22E>All tasks cleared from TasKoord.</font><br>");
@@ -82,6 +90,5 @@ public class UITest {
 		assertEquals(
 				ui.getDisplayedMessage(),
 				"<br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[09:00</font><font size = 4 color = #E6DB74> - 10:00]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>Meeting</font><font size = 4 color = #CECEF6> @ Boardroom</font><br>");
-
 	}
 }
