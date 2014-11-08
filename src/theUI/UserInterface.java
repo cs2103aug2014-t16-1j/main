@@ -16,28 +16,43 @@ import tkLogic.Logic;
 import tkLogic.Parser;
 import GCal.SwingBrowser;
 
-//@author A0112068N
+/**
+ * @author A0112068
+ * 
+ * This is UI Controller. That takes commands from GUI,
+ * implements commands using Parser and Logic, then sends GUI the feedbacks 
+ *
+ */
 public class UserInterface {
+	//Constants for google calendar integration
 	private static final String TASKS_ADDED_TO_GC = "<br>Tasks added to Google Calendar: ";
 	private static final String TASKS_DELETED_FROM_GC = "<br>Tasks deleted from Google Calendar: ";
 	private static final String TASKS_ADDED_TO_TK = "<br>Tasks added to TasKoord: ";
 	private static final String TASKS_DELETED_FROM_TK = "<br>Tasks deleted from TasKoord: ";
-	
-	private static final boolean APPENDED = true;
-	private static final boolean INSERTED = false;
-	private static final boolean INDEXED = true;
-	private static final boolean NO_INDEX = false;
-	
-	private static final String KEYWORD_UPCOMING_TASK = "upcoming";
-	private static final String KEYWORD_FLOATING_TASK = "floating";
-	private static final String KEYWORD_INVALID_CMD = "invalid";
-
 	private static final String MESSAGE_SYNCING = "Syncing is in process, it may take a minutes to complete...";
 	private static final String MESSAGE_NO_INTERNET = "No internet connection available!";
 	private static final String MESSAGE_SYNC_ERROR = "Unable to sync, please try again!";
 	private static final String MESSAGE_WAITING = "Please follow the link and accept it!";
 	private static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete";
+	private static final String clientEmail = "505774929571-compute@developer.gserviceaccount.com";
+	private static final String MESSAGE_SYNC_REMINDER = "Please ensure that you have shared your calendar with: "
+			+ clientEmail;
+	
+	//Local constants
+	private static final boolean APPENDED = true;
+	private static final boolean INSERTED = false;
+	private static final boolean INDEXED = true;
+	private static final boolean NO_INDEX = false;
+	private static final int COLOR_DONE = 1;
+	private static final int COLOR_WARNING = 2;
+	private static final int NO_TASK = -1;
+	
+	//Constants for keywords
+	private static final String KEYWORD_UPCOMING_TASK = "upcoming";
+	private static final String KEYWORD_FLOATING_TASK = "floating";
+	private static final String KEYWORD_INVALID_CMD = "invalid";
 
+	//Some local messages that will be shown to user.
 	private static final String MESSAGE_TASK_EDITED_FOR_UNDO = "Task edited.";
 	private static final String MESSAGE_TASK_RESTORED_FOR_UNDO = "Task restored.";
 	private static final String MESSAGE_TASK_DELETED_FOR_UNDO = "Task deleted.";
@@ -47,23 +62,18 @@ public class UserInterface {
 	private static final String MESSAGE_INFORMAT_CMD = "Informat command";
 	private static final String MESSAGE_WRONG_CMD = "Cannot understand the command!";
 	private static final String MESSAGE_GOODBYE = "Good Bye !!!";
-
+	private static final String MESSAGE_WELCOME = "Welcome to TasKoord!! <br> If this is your first time using TasKoord, "
+			+ "please type 'help' for more information.";
 	private static final String NO_COMMAND = "";
-	private static final String clientEmail = "505774929571-compute@developer.gserviceaccount.com";
-	private static final String MESSAGE_SYNC_REMINDER = "Please ensure that you have shared your calendar with: "
-			+ clientEmail;
-
-	private static final int COLOR_DONE = 1;
-	private static final int COLOR_WARNING = 2;
-	private static final int NO_TASK = -1;
-
+	
+	// Components that interact with UI
 	private Logic logic;
 	private Parser parser;
 	private Gui gui;
 	private SwingBrowser browser;
 
+	// The special packet for implementing undo and redo.
 	private static class UndoAndRedoPack {
-
 		public String statusForUndo, statusForRedo;
 		public ArrayList<Task> tasksForUndo, tasksForRedo;
 		public Integer effectForUndo, effectForRedo;
@@ -87,7 +97,8 @@ public class UserInterface {
 			this.colorForRedo = rcolor;
 		}
 	}
-
+	
+	// Stack used for undo and redo
 	private ArrayList<UndoAndRedoPack> stack;
 	private ArrayList<Task> tasksOnScreen;
 	private int currentPos;
@@ -98,12 +109,14 @@ public class UserInterface {
 		logic = new Logic(fileName);
 		gui = new Gui();
 		browser = new SwingBrowser();
+		
 		tasksOnScreen = new ArrayList<Task>();
 		stack = new ArrayList<UndoAndRedoPack>();
 		currentPos = availablePos = -1;
 	}
-
+	
 	public void run() {
+		showBeginScreen();
 		while (true) {
 			try {
 				Thread.sleep(100);
@@ -122,11 +135,17 @@ public class UserInterface {
 			}
 		}
 	}
-
-	public String getDisplayedMessage() {
-		return gui.displayText;
+	
+	// Show welcome message and all tasks at the beginning
+	private void showBeginScreen() {
+		gui.displayDone(MESSAGE_WELCOME, INSERTED);
+		ArrayList<Task> list = logic.load();
+		if (!list.isEmpty()) {
+			gui.display(list, NO_TASK, Constants.NO_EFFECT, APPENDED, INDEXED);
+		}
 	}
-
+	
+	// execute command received from GUI.
 	public void executeCommands(String userCommand) {
 		UserInput userInput;
 		CommandType command;
@@ -184,25 +203,28 @@ public class UserInterface {
 		}
 	}
 
-	public String getTokenPopup(String url) {
-		gui.displayDone(MESSAGE_WAITING, INSERTED);
-		gui.displayDone(MESSAGE_SYNC_REMINDER, APPENDED);
-		browser.runBrowser(url);
-
-		while (true) {
-			try {
-				Thread.sleep(100);
-				String code = browser.code;
-				if (!code.equals(NO_COMMAND)) {
-					browser.setCode(NO_COMMAND);
-					return code;
+	// sync with google calendar
+	private void sync() {
+		if (!logic.isOnline()) {
+			gui.displayWarning(MESSAGE_NO_INTERNET, INSERTED);
+		} else {
+			gui.displayDone(MESSAGE_SYNCING, INSERTED);
+			if (logic.connectUsingExistingToken()) {
+				try {
+					GcPacket packet = logic.sync(logic.load());
+					gui.displayDone(MESSAGE_SYNC_COMPLETE, INSERTED);
+					displayPacket(packet);
+					return;
+				} catch (IOException e) {
+					syncWithNewToken(logic.getURL());
+					e.printStackTrace();
 				}
-			} catch (InterruptedException e) {
-				Thread.currentThread().interrupt();
+			} else {
+				syncWithNewToken(logic.getURL());
 			}
 		}
 	}
-
+	
 	private void syncWithNewToken(String url) {
 		try {
 			String code = getTokenPopup(url);
@@ -225,28 +247,28 @@ public class UserInterface {
 			gui.displayWarning(MESSAGE_SYNC_REMINDER, APPENDED);
 		}
 	}
+	
+	// open browser to get authority from user.
+	public String getTokenPopup(String url) {
+		gui.displayDone(MESSAGE_WAITING, INSERTED);
+		gui.displayDone(MESSAGE_SYNC_REMINDER, APPENDED);
+		browser.runBrowser(url);
 
-	private void sync() {
-		if (!logic.isOnline()) {
-			gui.displayWarning(MESSAGE_NO_INTERNET, INSERTED);
-		} else {
-			gui.displayDone(MESSAGE_SYNCING, INSERTED);
-			if (logic.connectUsingExistingToken()) {
-				try {
-					GcPacket packet = logic.sync(logic.load());
-					gui.displayDone(MESSAGE_SYNC_COMPLETE, INSERTED);
-					displayPacket(packet);
-					return;
-				} catch (IOException e) {
-					syncWithNewToken(logic.getURL());
-					e.printStackTrace();
+		while (true) {
+			try {
+				Thread.sleep(100);
+				String code = browser.code;
+				if (!code.equals(NO_COMMAND)) {
+					browser.setCode(NO_COMMAND);
+					return code;
 				}
-			} else {
-				syncWithNewToken(logic.getURL());
+			} catch (InterruptedException e) {
+				Thread.currentThread().interrupt();
 			}
 		}
 	}
 
+	// display what were changed after syncing.
 	private void displayPacket(GcPacket packet) {
 		ArrayList<Task> list = new ArrayList<Task> ();
 		
@@ -784,5 +806,11 @@ public class UserInterface {
 			}
 		}
 		return result;
+	}
+	
+	
+	// this is for unit testing.
+	public String getDisplayedMessage() {
+		return gui.displayText;
 	}
 }
