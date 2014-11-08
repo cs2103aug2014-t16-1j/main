@@ -28,6 +28,8 @@ public class Storage {
 	private ArrayList<ArrayList<Task>> stackForUndo;
 	private int currentPos;
 	private int availablePos;
+	private boolean undo_status = false;
+	private boolean redo_status = false;
 	
 	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
 	
@@ -154,6 +156,18 @@ public class Storage {
 	//@author A0112068N
 	public String undo() {
 		if (currentPos >= 0) {
+			undo_status = true ;
+			if((currentPos + 2) <= stackForUndo.size()){
+				ArrayList<Task> list = copyList(listOfTasks);
+				stackForUndo.set((currentPos+1), list);
+				if((currentPos + 2) == stackForUndo.size()){
+					availablePos ++ ;
+				}
+			}else{
+				availablePos++;
+				ArrayList<Task> list = copyList(listOfTasks);
+				stackForUndo.add(list);
+			}
 			listOfTasks.clear();
 			store(stackForUndo.get(currentPos));
 			currentPos --;
@@ -164,21 +178,34 @@ public class Storage {
 	
 	public String redo() {
 		if (currentPos < availablePos) {
-			currentPos ++;
+			redo_status = true;
+			currentPos++;
 			listOfTasks.clear();
-			store(stackForUndo.get(currentPos));
+			store(stackForUndo.get(currentPos + 1));
+			if(availablePos == (currentPos+1)){
+				availablePos--;
+			}
 			return Constants.MESSAGE_REDO_DONE;
 		}
 		return "No command to redo.";
 	}
 	
 	private void push(ArrayList<Task> list) {
-		currentPos ++; availablePos = currentPos;
-    	if (currentPos >= stackForUndo.size()) {
-    		stackForUndo.add(list);
-    	} else {
-    		stackForUndo.set(currentPos, list);
-    	}
+		if(undo_status && redo_status){
+			stackForUndo.set(currentPos + 1, list);
+			undo_status = false;
+			redo_status = false;
+			currentPos ++;
+			availablePos = currentPos;
+		}else{
+			currentPos ++; 
+			availablePos = currentPos;
+	    	if (currentPos >= stackForUndo.size()) {
+	    		stackForUndo.add(list);
+	    	} else {
+	    		stackForUndo.set(currentPos, list);
+	    	}
+		}
 	}
 	
 	public void setSynced() {
