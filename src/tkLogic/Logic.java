@@ -98,11 +98,14 @@ public class Logic {
 		
 		for (Task item : list) {
 			if (isIncluded(task, item)) {
-				if (isDeadline && item.getStartTime() != null && item.getEndTime() == null) {
+				if (isDeadline && item.getStartTime() != null 
+						&& item.getEndTime() == null) {
 					res.add(item);
-				} else if (isEvent && item.getStartTime() != null && item.getEndTime() != null) {
+				} else if (isEvent && item.getStartTime() != null 
+						&& item.getEndTime() != null) {
 					res.add(item);
-				} else if (isFloating && item.getStartTime() == null && item.getEndTime() == null) {
+				} else if (isFloating && item.getStartTime() == null 
+						&& item.getEndTime() == null) {
 					res.add(item);
 				} 
 			}
@@ -152,10 +155,14 @@ public class Logic {
 		Collections.sort(list, new Comparator<Task>() {
 	        @Override
 	        public int compare(Task  task1, Task  task2) {
-	        	String s1 = convertCalendarToString(task1.getStartTime(), Constants.FORMAT_DATE_CMP);
-	        	String s2 = convertCalendarToString(task2.getStartTime(), Constants.FORMAT_DATE_CMP);
-	        	String e1 = convertCalendarToString(task1.getEndTime(), Constants.FORMAT_DATE_CMP);
-	        	String e2 = convertCalendarToString(task2.getEndTime(), Constants.FORMAT_DATE_CMP);
+	        	String s1 = convertCalendarToString(task1.getStartTime(), 
+	        			Constants.FORMAT_DATE_CMP);
+	        	String s2 = convertCalendarToString(task2.getStartTime(), 
+	        			Constants.FORMAT_DATE_CMP);
+	        	String e1 = convertCalendarToString(task1.getEndTime(), 
+	        			Constants.FORMAT_DATE_CMP);
+	        	String e2 = convertCalendarToString(task2.getEndTime(), 
+	        			Constants.FORMAT_DATE_CMP);
 	        	String n1 = task1.getDescription().toLowerCase();
 	        	String n2 = task2.getDescription().toLowerCase();
 	        			
@@ -200,8 +207,10 @@ public class Logic {
 	
 	private boolean isIncluded(Task feature, Task task) {
 		if (feature.getStartTime() != null) {
-			String featureStartTime = convertCalendarToString(feature.getStartTime(), Constants.FORMAT_DATE);
-			String featureEndTime = convertCalendarToString(feature.getEndTime(), Constants.FORMAT_DATE);
+			String featureStartTime = convertCalendarToString(feature.getStartTime(), 
+					Constants.FORMAT_DATE);
+			String featureEndTime = convertCalendarToString(feature.getEndTime(), 
+					Constants.FORMAT_DATE);
 			if (featureEndTime == null) {
 				featureEndTime = featureStartTime;
 			}
