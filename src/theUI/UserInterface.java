@@ -19,9 +19,8 @@ import tkLogic.Logic;
 import tkLogic.Parser;
 import GCal.SwingBrowser;
 
+//@author A0112068N
 /**
- * @author A0112068
- * 
  *         This is UI Controller. That takes commands from GUI, implements
  *         commands using Parser and Logic, then sends GUI the feedbacks
  *
@@ -33,11 +32,11 @@ public class UserInterface {
 	private static final String TASKS_DELETED_FROM_GC = "<br>Tasks deleted from Google Calendar: ";
 	private static final String TASKS_ADDED_TO_TK = "<br>Tasks added to TasKoord: ";
 	private static final String TASKS_DELETED_FROM_TK = "<br>Tasks deleted from TasKoord: ";
-	private static final String MESSAGE_SYNCING = "Syncing is in process, it may take a minutes to complete...";
+	private static final String MESSAGE_SYNCING = "Syncing is in progress, it may take a few minutes to complete...";
 	private static final String MESSAGE_NO_INTERNET = "No internet connection available!";
 	private static final String MESSAGE_SYNC_ERROR = "Unable to sync, please try again!";
 	private static final String MESSAGE_WAITING = "Please follow the link and accept it!";
-	private static final String MESSAGE_SYNC_COMPLETE = "Synchronization is completed.";
+	private static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete.";
 	private static final String clientEmail = "505774929571-compute@developer.gserviceaccount.com";
 	private static final String MESSAGE_SYNC_REMINDER = "Please ensure that you have shared your calendar with: "
 			+ clientEmail;
@@ -60,8 +59,8 @@ public class UserInterface {
 	private static final String MESSAGE_TASK_EDITED_FOR_UNDO = "Task edited.";
 	private static final String MESSAGE_TASK_RESTORED_FOR_UNDO = "Task restored.";
 	private static final String MESSAGE_TASK_DELETED_FOR_UNDO = "Task deleted.";
-	private static final String MESSAGE_NO_UNDO = "No command to undoing";
-	private static final String MESSAGE_NO_REDO = "No command to redoing";
+	private static final String MESSAGE_NO_UNDO = "No command to undo";
+	private static final String MESSAGE_NO_REDO = "No command to redo";
 	private static final String MESSAGE_TASK_RESTORED = "All tasks restored.";
 	private static final String MESSAGE_INFORMAT_CMD = "Informat command";
 	private static final String MESSAGE_WRONG_CMD = "Cannot understand the command!";

@@ -19,9 +19,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Scanner;
 
+//@author A0112068N
 /**
- * @author A0112068N
- * 
  *         This class used to communicate with user.
  */
 public class Gui {
