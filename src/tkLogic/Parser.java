@@ -496,7 +496,7 @@ public class Parser {
     }
 
     private void parseLocation(ArrayList<String> location) {
-        if (completeLocation.length() != 0) {
+        if (location.size() != 0) {
             completeLocation = location.get(0);
             for (int i = 1; i < location.size(); i++) {
                 completeLocation += " " + location.get(i);
