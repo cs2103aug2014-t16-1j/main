@@ -40,9 +40,9 @@ public class GCal {
 	
 	String redirectUrl = "urn:ietf:wg:oauth:2.0:oob:auto";
 	String clientName = "TasKoord";
-	String clientEmail = "505774929571-compute@developer.gserviceaccount.com";
-	String clientId = "505774929571-43gqh2pn2p7sqh75b1s2besjeleatsf0.apps.googleusercontent.com";
-	String clientSecret = "YiSWNqMyW_WWZW1cKoaXwIuL";
+	String clientEmail = "914087031259-compute@developer.gserviceaccount.com";
+	String clientId = "914087031259-fbuolislmpf6i5vt4tcp0humaln9pdm4.apps.googleusercontent.com";
+	String clientSecret = "mtsV4fkXY3wz8O2LKlWkOywi";
 	String fileToStoreSyncedTime = "GSyncedTime";
 	Event.Creator creator = new Event.Creator();
 	
