@@ -21,22 +21,57 @@ public class Parser {
     private UserInput userInput;
     private Task task;
 
+    // Variables for the Task
     private String completeDescription;
     private String completeLocation;
     // private String frequencyType;
     // private int frequencyValue;
-    private String[] startTime;
-    private String[] endTime;
-    private String[] startDate;
-    private String[] endDate;
     private String startTimeAndDate;
     private String endTimeAndDate;
     private String priority;
     private String state;
 
+    // Temporary time and date variables
+    private String[] startTime;
+    private String[] endTime;
+    private String[] startDate;
+    private String[] endDate;
+
     private boolean isEdit;
 
     private Parser() {
+    }
+
+    /*
+     * getInstance
+     * 
+     * @return a Parser object
+     */
+    public static Parser getInstance() {
+        if (theOneParser == null) {
+            theOneParser = new Parser();
+        }
+        return theOneParser;
+    }
+
+    /*
+     * format
+     * 
+     * @param string of input from user
+     * 
+     * @return user instruction and task(s) details
+     */
+    public UserInput format(String userCommand) throws Exception {
+        resetParser();
+        String[] userInputArray = splitUserInput(userCommand);
+        userInput = new UserInput(determineCommandType(userInputArray[0]), task);
+        if (userInputArray.length > 1) {
+            parseAll(userInputArray);
+            if (isEdit) {
+                userInput.setEditedTask(task);
+            }
+        }
+        return userInput;
     }
 
     private void resetParser() {
@@ -54,26 +89,6 @@ public class Parser {
         priority = Constants.PRIORITY_NULL;
         state = Constants.STATE_NULL;
         isEdit = false;
-    }
-
-    public static Parser getInstance() {
-        if (theOneParser == null) {
-            theOneParser = new Parser();
-        }
-        return theOneParser;
-    }
-
-    public UserInput format(String userCommand) throws Exception {
-        resetParser();
-        String[] userInputArray = splitUserInput(userCommand);
-        userInput = new UserInput(determineCommandType(userInputArray[0]), task);
-        if (userInputArray.length > 1) {
-            parseAll(userInputArray);
-            if (isEdit) {
-                userInput.setEditedTask(task);
-            }
-        }
-        return userInput;
     }
 
     private String[] splitUserInput(String userCommand) {
@@ -113,6 +128,12 @@ public class Parser {
     }
 
     private void parseAll(String[] userInputArray) throws Exception {
+        parseInput(userInputArray);
+        parseTime();
+        setTaskFields();
+    }
+
+    private void parseInput(String[] userInputArray) throws Exception {
         ArrayList<String> word = new ArrayList<String>();
         String newWord;
         CommandKey newCommandKey;
@@ -129,8 +150,24 @@ public class Parser {
             }
         }
         executeCmdKey(word, commandKey);
-        parseTime();
-        setTaskFields();
+    }
+
+    private void parseTime() throws Exception {
+        if (startTime.length == 0 && startDate.length != 0) {
+            setStartTime0000();
+        }
+        if (endTime.length == 0 && endDate.length != 0) {
+            setEndTime2359();
+        }
+        if (startDate.length == 0 && endDate.length == 0) {
+            setDateToToday();
+        }
+        if (endTime.length != 0 && endTimeAndDate == null) {
+            setEndTimeAndDate();
+        }
+        if (startTime.length != 0 && startTimeAndDate == null) {
+            setStartTimeAndDate();
+        }
     }
 
     private void setTaskFields() throws Exception {
@@ -207,6 +244,44 @@ public class Parser {
         }
     }
 
+    private void setStartTime0000() {
+        Calendar.getInstance();
+        String[] currentTime = new String[2];
+        currentTime[0] = "00";
+        currentTime[1] = "00";
+        startTime = currentTime;
+    }
+
+    private void setEndTime2359() {
+        Calendar.getInstance();
+        String[] currentTime = new String[2];
+        currentTime[0] = "23";
+        currentTime[1] = "59";
+        endTime = currentTime;
+    }
+
+    private void setDateToToday() throws Exception {
+        Calendar calendar = Calendar.getInstance();
+        String[] date = new String[3];
+        date[0] = "" + calendar.get(5);
+        date[1] = determineMonth("" + (calendar.get(2) + 1));
+        date[2] = "" + calendar.get(1);
+        startDate = date;
+        endDate = date;
+    }
+
+    private void setEndTimeAndDate() {
+        if (endDate.length == 0) {
+            endTimeAndDate = getTime(endTime, startDate);
+        } else {
+            endTimeAndDate = getTime(endTime, endDate);
+        }
+    }
+
+    private void setStartTimeAndDate() {
+        startTimeAndDate = getTime(startTime, startDate);
+    }
+
     private void parseDescription(ArrayList<String> description) {
         if (description.size() != 0) {
             completeDescription = description.get(0);
@@ -234,16 +309,6 @@ public class Parser {
         }
     }
 
-    private void parseDeadline(ArrayList<String> time) throws Exception {
-        parseStartTime(time);
-        if (startTime[0] == "00" && startTime[1] == "00") {
-            startTime[0] = "23";
-            startTime[1] = "59";
-        }
-        endTime = new String[0];
-        endDate = new String[0];
-    }
-
     private void parseEndTime(ArrayList<String> time) throws Exception {
         String[] endingTime = new String[2];
         try {
@@ -261,6 +326,75 @@ public class Parser {
         }
     }
 
+    private void parseDate(ArrayList<String> day) throws Exception {
+        String[] date = getDateValue(day);
+        determineDate(date);
+    }
+
+    private void parseDeadline(ArrayList<String> time) throws Exception {
+        parseStartTime(time);
+        if (startTime[0] == "00" && startTime[1] == "00") {
+            startTime[0] = "23";
+            startTime[1] = "59";
+        }
+        endTime = new String[0];
+        endDate = new String[0];
+    }
+
+    private void parseLocation(ArrayList<String> location) {
+        if (location.size() != 0) {
+            completeLocation = location.get(0);
+            for (int i = 1; i < location.size(); i++) {
+                completeLocation += " " + location.get(i);
+            }
+            completeLocation = completeLocation.replaceAll("/", "");
+        }
+    }
+
+    // private void parseFrequency(ArrayList<String> frequency) {
+    // frequencyType = frequency.get(1);
+    // frequencyValue = Integer.valueOf(frequency.get(0));
+    // }
+
+    private void changeTaskObject(ArrayList<String> word) throws Exception {
+        parseTime();
+        setTaskFields();
+        resetParser();
+        executeCmdKey(word, determineCommandKey("description"));
+        isEdit = true;
+    }
+
+    private void parsePriority(ArrayList<String> priorityLevel) throws Exception {
+        if (priorityLevel.size() == 1) {
+            priority = priorityLevel.get(0);
+        } else {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_PRIORITY,
+                    priorityLevel));
+        }
+    }
+
+    private void parseState(ArrayList<String> status) throws Exception {
+        if (status.size() == 1) {
+            state = status.get(0);
+        } else {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_STATE,
+                    status));
+        }
+    }
+
+    private String determineMonth(String month) throws Exception {
+        if (month.length() == 3) {
+            return check3LettersMonth(month);
+        } else {
+            return checkNumericalMonth(month);
+        }
+    }
+
+    private String getTime(String[] time, String[] date) {
+        return date[1] + " " + date[0] + " " + date[2] + " " + time[0] + ":"
+                + time[1] + ":00";
+    }
+
     private String[] updateTime(ArrayList<String> time, String[] requiredTime)
             throws Exception {
         String newTime = "";
@@ -270,15 +404,105 @@ public class Parser {
         return requiredTime;
     }
 
-    private void checkTimeFormat(String[] requiredTime, String newTime)
-            throws Exception {
-        if (requiredTime[0] == null || Integer.valueOf(requiredTime[0]) < 0
-                || Integer.valueOf(requiredTime[0]) > 23
-                || Integer.valueOf(requiredTime[1]) < 0
-                || Integer.valueOf(requiredTime[1]) > 59) {
-            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_TIME,
-                    newTime));
+    private String[] getDateValue(ArrayList<String> day) throws Exception {
+        String[] date = new String[3];
+        if (day.size() == 1) {
+            convertSingleLineDate(day, date);
+        } else if (day.size() == 3) {
+            convert3WordsDate(day, date);
+        } else {
+            String originalDate = getOriginalDate(day);
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_DATE,
+                    originalDate));
         }
+        checkDay(date[0]);
+        checkYear(date[2]);
+        return date;
+    }
+
+    private void determineDate(String[] date) {
+        if (startTime.length != 0) {
+            if (endTime.length != 0) {
+                if (startDate.length == 0) {
+                    startDate = date;
+                }
+                if (endDate.length == 0) {
+                    endDate = date;
+                }
+            } else {
+                startDate = date;
+            }
+        } else if (endTime.length != 0) {
+            endDate = date;
+        } else {
+            startDate = date;
+            endDate = date;
+        }
+    }
+
+    private String check3LettersMonth(String month) throws Exception {
+        if (month.equalsIgnoreCase("jan") || month.equalsIgnoreCase("feb")
+                || month.equalsIgnoreCase("mar") || month.equalsIgnoreCase("apr")
+                || month.equalsIgnoreCase("may") || month.equalsIgnoreCase("jun")
+                || month.equalsIgnoreCase("jul") || month.equalsIgnoreCase("aug")
+                || month.equalsIgnoreCase("sep") || month.equalsIgnoreCase("oct")
+                || month.equalsIgnoreCase("nov") || month.equalsIgnoreCase("dec")) {
+            return month;
+        } else {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_MONTH,
+                    month));
+        }
+    }
+
+    private String checkNumericalMonth(String month) throws Exception {
+        try {
+            int monthValue = Integer.valueOf(month) - 1;
+            if (monthValue == 0) {
+                return "Jan";
+            } else if (monthValue == 1) {
+                return "Feb";
+            } else if (monthValue == 2) {
+                return "Mar";
+            } else if (monthValue == 3) {
+                return "Apr";
+            } else if (monthValue == 4) {
+                return "May";
+            } else if (monthValue == 5) {
+                return "Jun";
+            } else if (monthValue == 6) {
+                return "Jul";
+            } else if (monthValue == 7) {
+                return "Aug";
+            } else if (monthValue == 8) {
+                return "Sep";
+            } else if (monthValue == 9) {
+                return "Oct";
+            } else if (monthValue == 10) {
+                return "Nov";
+            } else if (monthValue == 11) {
+                return "Dec";
+            } else {
+                throw new Exception(String.format(
+                        Constants.EXCEPTIONS_INVALID_MONTH, month));
+            }
+        } catch (NumberFormatException e) {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_MONTH,
+                    month));
+        }
+    }
+
+    private String getInputTime(ArrayList<String> time, String newTime)
+            throws Exception {
+        if (time.size() == 0) {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_TIME,
+                    time));
+        } else {
+            newTime = time.get(0);
+            for (int i = 1; i < time.size(); i++) {
+                newTime += time.get(i);
+            }
+        }
+        return newTime;
     }
 
     private void convertTimeValue(String[] requiredTime, String newTime)
@@ -310,18 +534,69 @@ public class Parser {
         }
     }
 
-    private String getInputTime(ArrayList<String> time, String newTime)
+    private void checkTimeFormat(String[] requiredTime, String newTime)
             throws Exception {
-        if (time.size() == 0) {
+        if (requiredTime[0] == null || Integer.valueOf(requiredTime[0]) < 0
+                || Integer.valueOf(requiredTime[0]) > 23
+                || Integer.valueOf(requiredTime[1]) < 0
+                || Integer.valueOf(requiredTime[1]) > 59) {
             throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_TIME,
                     newTime));
-        } else {
-            newTime = time.get(0);
-            for (int i = 1; i < time.size(); i++) {
-                newTime += time.get(i);
+        }
+    }
+
+    private void convertSingleLineDate(ArrayList<String> day, String[] date)
+            throws Exception {
+        String enteredDate = day.get(0);
+        checkForSlash(enteredDate, day.get(0));
+        date[0] = enteredDate.substring(0, enteredDate.indexOf("/"));
+        enteredDate = enteredDate.replaceFirst(date[0] + "/", "");
+        checkForSlash(enteredDate, day.get(0));
+        date[1] = enteredDate.substring(0, enteredDate.indexOf("/"));
+        enteredDate = enteredDate.replaceFirst(date[1] + "/", "");
+        date[1] = determineMonth(date[1]);
+        date[2] = enteredDate;
+        if (date[2].length() == 2) {
+            if (Integer.valueOf(date[2]) > 50) {
+                date[2] = "19" + date[2];
+            } else {
+                date[2] = "20" + date[2];
             }
         }
-        return newTime;
+    }
+
+    private void convert3WordsDate(ArrayList<String> day, String[] date)
+            throws Exception {
+        date[0] = day.get(0);
+        date[1] = determineMonth(day.get(1));
+        date[2] = day.get(2);
+    }
+
+    private String getOriginalDate(ArrayList<String> day) {
+        String originalDate = "";
+        originalDate = day.get(0);
+        for (int i = 1; i < day.size(); i++) {
+            originalDate += " " + day.get(i);
+        }
+        return originalDate;
+    }
+
+    private void checkDay(String year) throws Exception {
+        try {
+            Integer.valueOf(year);
+        } catch (NumberFormatException e) {
+            throw new Exception(
+                    String.format(Constants.EXCEPTIONS_INVALID_DAY, year));
+        }
+    }
+
+    private void checkYear(String day) throws Exception {
+        try {
+            Integer.valueOf(day);
+        } catch (NumberFormatException e) {
+            throw new Exception(
+                    String.format(Constants.EXCEPTIONS_INVALID_YEAR, day));
+        }
     }
 
     private void getMinute(String[] requiredTime, Float minuteValue) {
@@ -357,244 +632,11 @@ public class Parser {
         }
     }
 
-    private void parseDate(ArrayList<String> day) throws Exception {
-        String[] date = getDateValue(day);
-        determineDate(date);
-    }
-
-    private String[] getDateValue(ArrayList<String> day) throws Exception {
-        String[] date = new String[3];
-        if (day.size() == 1) {
-            String enteredDate = day.get(0);
-            checkForSlash(enteredDate, day.get(0));
-            date[0] = enteredDate.substring(0, enteredDate.indexOf("/"));
-            enteredDate = enteredDate.replaceFirst(date[0] + "/", "");
-            checkForSlash(enteredDate, day.get(0));
-            date[1] = enteredDate.substring(0, enteredDate.indexOf("/"));
-            enteredDate = enteredDate.replaceFirst(date[1] + "/", "");
-            date[1] = determineMonth(date[1]);
-            date[2] = enteredDate;
-            if (date[2].length() == 2) {
-                if (Integer.valueOf(date[2]) > 50) {
-                    date[2] = "19" + date[2];
-                } else {
-                    date[2] = "20" + date[2];
-                }
-            }
-        } else {
-            date[0] = day.get(0);
-            date[1] = determineMonth(day.get(1));
-            date[2] = day.get(2);
-        }
-        checkDay(date[0]);
-        checkYear(date[2]);
-        return date;
-    }
-
-    private void checkYear(String day) throws Exception {
-        try {
-            Integer.valueOf(day);
-        } catch (NumberFormatException e) {
-            throw new Exception(
-                    String.format(Constants.EXCEPTIONS_INVALID_YEAR, day));
-        }
-    }
-
-    private void checkDay(String year) throws Exception {
-        try {
-            Integer.valueOf(year);
-        } catch (NumberFormatException e) {
-            throw new Exception(
-                    String.format(Constants.EXCEPTIONS_INVALID_DAY, year));
-        }
-    }
-
     private void checkForSlash(String checkingDate, String originalDate)
             throws Exception {
         if (!checkingDate.contains("/")) {
             throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_DATE,
                     originalDate));
-        }
-    }
-
-    private void determineDate(String[] date) {
-        if (startTime.length != 0) {
-            if (endTime.length != 0) {
-                if (startDate.length == 0) {
-                    startDate = date;
-                }
-                if (endDate.length == 0) {
-                    endDate = date;
-                }
-            } else {
-                startDate = date;
-            }
-        } else if (endTime.length != 0) {
-            endDate = date;
-        } else {
-            startDate = date;
-            endDate = date;
-        }
-    }
-
-    private String determineMonth(String month) throws Exception {
-        if (month.length() == 3) {
-            if (month.equalsIgnoreCase("jan") || month.equalsIgnoreCase("feb")
-                    || month.equalsIgnoreCase("mar")
-                    || month.equalsIgnoreCase("apr")
-                    || month.equalsIgnoreCase("may")
-                    || month.equalsIgnoreCase("jun")
-                    || month.equalsIgnoreCase("jul")
-                    || month.equalsIgnoreCase("aug")
-                    || month.equalsIgnoreCase("sep")
-                    || month.equalsIgnoreCase("oct")
-                    || month.equalsIgnoreCase("nov")
-                    || month.equalsIgnoreCase("dec")) {
-                return month;
-            } else {
-                throw new Exception(String.format(
-                        Constants.EXCEPTIONS_INVALID_MONTH, month));
-            }
-        } else {
-            try {
-                int monthValue = Integer.valueOf(month) - 1;
-                if (monthValue == 0) {
-                    return "Jan";
-                } else if (monthValue == 1) {
-                    return "Feb";
-                } else if (monthValue == 2) {
-                    return "Mar";
-                } else if (monthValue == 3) {
-                    return "Apr";
-                } else if (monthValue == 4) {
-                    return "May";
-                } else if (monthValue == 5) {
-                    return "Jun";
-                } else if (monthValue == 6) {
-                    return "Jul";
-                } else if (monthValue == 7) {
-                    return "Aug";
-                } else if (monthValue == 8) {
-                    return "Sep";
-                } else if (monthValue == 9) {
-                    return "Oct";
-                } else if (monthValue == 10) {
-                    return "Nov";
-                } else if (monthValue == 11) {
-                    return "Dec";
-                } else {
-                    throw new Exception(String.format(
-                            Constants.EXCEPTIONS_INVALID_MONTH, month));
-                }
-            } catch (NumberFormatException e) {
-                throw new Exception(String.format(
-                        Constants.EXCEPTIONS_INVALID_MONTH, month));
-            }
-
-        }
-
-    }
-
-    private void parseLocation(ArrayList<String> location) {
-        if (location.size() != 0) {
-            completeLocation = location.get(0);
-            for (int i = 1; i < location.size(); i++) {
-                completeLocation += " " + location.get(i);
-            }
-            completeLocation = completeLocation.replaceAll("/", "");
-        }
-    }
-
-    // private void parseFrequency(ArrayList<String> frequency) {
-    // frequencyType = frequency.get(1);
-    // frequencyValue = Integer.valueOf(frequency.get(0));
-    // }
-
-    private void changeTaskObject(ArrayList<String> word) throws Exception {
-        parseTime();
-        setTaskFields();
-        resetParser();
-        executeCmdKey(word, determineCommandKey("description"));
-        isEdit = true;
-    }
-
-    private void parseTime() throws Exception {
-        if (startTime.length == 0 && startDate.length != 0) {
-            setStartTime0000();
-        }
-        if (endTime.length == 0 && endDate.length != 0) {
-            setEndTime2359();
-        }
-        if (startDate.length == 0 && endDate.length == 0) {
-            setDateToToday();
-        }
-        if (endTime.length != 0 && endTimeAndDate == null) {
-            setEndTimeAndDate();
-        }
-        if (startTime.length != 0 && startTimeAndDate == null) {
-            setStartTimeAndDate();
-        }
-
-    }
-
-    private void setStartTimeAndDate() {
-        startTimeAndDate = getTime(startTime, startDate);
-    }
-
-    private void setEndTimeAndDate() {
-        if (endDate.length == 0) {
-            endTimeAndDate = getTime(endTime, startDate);
-        } else {
-            endTimeAndDate = getTime(endTime, endDate);
-        }
-    }
-
-    private void setDateToToday() throws Exception {
-        Calendar calendar = Calendar.getInstance();
-        String[] date = new String[3];
-        date[0] = "" + calendar.get(5);
-        date[1] = determineMonth("" + (calendar.get(2) + 1));
-        date[2] = "" + calendar.get(1);
-        startDate = date;
-        endDate = date;
-    }
-
-    private void setEndTime2359() {
-        Calendar.getInstance();
-        String[] currentTime = new String[2];
-        currentTime[0] = "23";
-        currentTime[1] = "59";
-        endTime = currentTime;
-    }
-
-    private void setStartTime0000() {
-        Calendar.getInstance();
-        String[] currentTime = new String[2];
-        currentTime[0] = "00";
-        currentTime[1] = "00";
-        startTime = currentTime;
-    }
-
-    private String getTime(String[] time, String[] date) {
-        return date[1] + " " + date[0] + " " + date[2] + " " + time[0] + ":"
-                + time[1] + ":00";
-    }
-
-    private void parsePriority(ArrayList<String> priorityLevel) throws Exception {
-        if (priorityLevel.size() == 1) {
-            priority = priorityLevel.get(0);
-        } else {
-            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_PRIORITY,
-                    priorityLevel));
-        }
-    }
-
-    private void parseState(ArrayList<String> status) throws Exception {
-        if (status.size() == 1) {
-            state = status.get(0);
-        } else {
-            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_STATE,
-                    status));
         }
     }
 }
