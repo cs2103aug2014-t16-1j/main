@@ -10,7 +10,7 @@ import tkLibrary.UserInput;
 import tkLibrary.CommandKey;
 
 //@author A0110493N
-/*
+/**
  * Parser is a singleton class
  * 
  * It formats a string of command and convert it into a UserInput object
@@ -42,7 +42,7 @@ public class Parser {
     private Parser() {
     }
 
-    /*
+    /**
      * getInstance
      * 
      * @return a Parser object
@@ -54,12 +54,14 @@ public class Parser {
         return theOneParser;
     }
 
-    /*
+    /**
      * format
      * 
-     * @param string of input from user
+     * @param userCommand string of input from user
      * 
      * @return user instruction and task(s) details
+     * 
+     * @throws Exception invalid formats
      */
     public UserInput format(String userCommand) throws Exception {
         resetParser();
