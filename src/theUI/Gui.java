@@ -12,6 +12,8 @@ import java.awt.event.KeyListener;
 
 import javax.swing.*;
 
+import GCal.SwingBrowser;
+
 import java.awt.*;
 import java.io.InputStream;
 import java.text.SimpleDateFormat;
@@ -59,6 +61,7 @@ public class Gui {
 	private JFrame frame = new JFrame("TasKoord");
 	private JTextField commandBox = new JTextField();
 	private JTextPane displayBox = new JTextPane();
+	private SwingBrowser browser = new SwingBrowser();
 
 	// stack and variables for calling previous command.
 	private ArrayList<String> commandStack = new ArrayList<String>();
@@ -156,6 +159,18 @@ public class Gui {
 
 			}
 		});
+	}
+	
+	public void runBrowser(String url) {
+		browser.runBrowser(url);
+	}
+	
+	public void setBrowserCode(String code) {
+		browser.setCode(code);
+	}
+	
+	public String getBrowserCode() {
+		return browser.code;
 	}
 
 	public void displayWarning(String text, boolean isAppended) {

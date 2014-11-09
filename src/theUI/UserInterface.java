@@ -17,7 +17,6 @@ import tkLibrary.Task;
 import tkLibrary.UserInput;
 import tkLogic.Logic;
 import tkLogic.Parser;
-import GCal.SwingBrowser;
 
 //@author A0112068N
 /**
@@ -73,7 +72,6 @@ public class UserInterface {
 	private Logic logic;
 	private Parser parser;
 	private Gui gui;
-	private SwingBrowser browser;
 	
 	// logger
 	private static Logger LOGGER = Logger.getLogger(".TasKoordUILogFile.log");
@@ -114,7 +112,6 @@ public class UserInterface {
 		parser = Parser.getInstance();
 		logic = new Logic(fileName);
 		gui = new Gui();
-		browser = new SwingBrowser();
 		
 		LogFile.newLogger();
 
@@ -263,14 +260,14 @@ public class UserInterface {
 	public String getTokenPopup(String url) {
 		gui.displayDone(MESSAGE_WAITING, INSERTED);
 		gui.displayDone(MESSAGE_SYNC_REMINDER, APPENDED);
-		browser.runBrowser(url);
-
+		
+		gui.runBrowser(url);
 		while (true) {
 			try {
 				Thread.sleep(100);
-				String code = browser.code;
+				String code = gui.getBrowserCode();
 				if (!code.equals(NO_COMMAND)) {
-					browser.setCode(NO_COMMAND);
+					gui.setBrowserCode(NO_COMMAND);
 					return code;
 				}
 			} catch (InterruptedException e) {
