@@ -260,7 +260,6 @@ public class UserInterface {
 	public String getTokenPopup(String url) {
 		gui.displayDone(MESSAGE_WAITING, INSERTED);
 		gui.displayDone(MESSAGE_SYNC_REMINDER, APPENDED);
-		
 		gui.runBrowser(url);
 		while (true) {
 			try {
