@@ -98,6 +98,6 @@ public final class Constants {
 	public static final String EXCEPTIONS_INVALID_TIME = "The time format is invalid: %1$s";
 	public static final String EXCEPTIONS_INVALID_DATE = "The date format is invalid: %1$s";
 	public static final String EXCEPTIONS_INVALID_MONTH = "The month format is invalid: %1$s";
-	public static final String EXCEPTIONS_INVALID_DAY = "The month format is invalid: %1$s";
-	public static final String EXCEPTIONS_INVALID_YEAR = "The month format is invalid: %1$s";
+	public static final String EXCEPTIONS_INVALID_DAY = "The day format is invalid: %1$s";
+	public static final String EXCEPTIONS_INVALID_YEAR = "The year format is invalid: %1$s";
 }
