@@ -584,7 +584,7 @@ public class UserInterface {
 
 	private void clear() {
 		try {
-			ArrayList<Task> list = logic.list(new Task());
+			ArrayList<Task> list = logic.load();
 			String feedback = logic.clear();
 			if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
 				gui.displayDone(feedback, INSERTED);
