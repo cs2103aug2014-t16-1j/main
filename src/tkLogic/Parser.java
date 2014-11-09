@@ -23,8 +23,8 @@ public class Parser {
 
     private String completeDescription;
     private String completeLocation;
-    private String frequencyType;
-    private int frequencyValue;
+    // private String frequencyType;
+    // private int frequencyValue;
     private String[] startTime;
     private String[] endTime;
     private String[] startDate;
@@ -43,8 +43,8 @@ public class Parser {
         task = new Task();
         completeDescription = null;
         completeLocation = null;
-        frequencyType = null;
-        frequencyValue = 0;
+        // frequencyType = null;
+        // frequencyValue = 0;
         startTime = new String[0];
         endTime = new String[0];
         startDate = new String[0];
@@ -136,8 +136,8 @@ public class Parser {
     private void setTaskFields() throws Exception {
         task.setDescription(completeDescription);
         task.setLocation(completeLocation);
-        task.setFrequency(frequencyValue);
-        task.setFrequencyType(frequencyType);
+        // task.setFrequency(frequencyValue);
+        // task.setFrequencyType(frequencyType);
         task.setStartTime(startTimeAndDate);
         task.setEndTime(endTimeAndDate);
         task.setState(state);
@@ -159,8 +159,9 @@ public class Parser {
             return CommandKey.ON;
         } else if (commandKeyString.equalsIgnoreCase("correct")) {
             return CommandKey.EDIT;
-        } else if (commandKeyString.equalsIgnoreCase("every")) {
-            return CommandKey.EVERY;
+            // }
+            // else if (commandKeyString.equalsIgnoreCase("every")) {
+            // return CommandKey.EVERY;
         } else if (commandKeyString.equalsIgnoreCase("priority")) {
             return CommandKey.PRIORITY;
         } else if (commandKeyString.equalsIgnoreCase("status")) {
@@ -191,9 +192,9 @@ public class Parser {
             case AT:
                 parseLocation(word);
                 break;
-            case EVERY:
-                parseFrequency(word);
-                break;
+            // case EVERY:
+            // parseFrequency(word);
+            // break;
             case EDIT:
                 changeTaskObject(word);
                 break;
@@ -498,10 +499,10 @@ public class Parser {
         completeLocation = completeLocation.replaceAll("/", "");
     }
 
-    private void parseFrequency(ArrayList<String> frequency) {
-        frequencyType = frequency.get(1);
-        frequencyValue = Integer.valueOf(frequency.get(0));
-    }
+    // private void parseFrequency(ArrayList<String> frequency) {
+    // frequencyType = frequency.get(1);
+    // frequencyValue = Integer.valueOf(frequency.get(0));
+    // }
 
     private void changeTaskObject(ArrayList<String> word) throws Exception {
         parseTime();
