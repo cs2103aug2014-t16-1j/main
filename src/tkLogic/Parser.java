@@ -580,11 +580,21 @@ public class Parser {
                 + time[1] + ":00";
     }
 
-    private void parsePriority(ArrayList<String> priorityLevel) {
-        priority = priorityLevel.get(0);
+    private void parsePriority(ArrayList<String> priorityLevel) throws Exception {
+        if (priorityLevel.size() == 1) {
+            priority = priorityLevel.get(0);
+        } else {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_PRIORITY,
+                    priorityLevel));
+        }
     }
 
-    private void parseState(ArrayList<String> status) {
-        state = status.get(0);
+    private void parseState(ArrayList<String> status) throws Exception {
+        if (status.size() == 1) {
+            state = status.get(0);
+        } else {
+            throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_STATE,
+                    status));
+        }
     }
 }
