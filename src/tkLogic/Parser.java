@@ -368,10 +368,10 @@ public class Parser {
         String[] date = new String[3];
         if (day.size() == 1) {
             String enteredDate = day.get(0);
-            checkForSlash(enteredDate);
+            checkForSlash(enteredDate, day.get(0));
             date[0] = enteredDate.substring(0, enteredDate.indexOf("/"));
             enteredDate = enteredDate.replaceFirst(date[0] + "/", "");
-            checkForSlash(enteredDate);
+            checkForSlash(enteredDate, day.get(0));
             date[1] = enteredDate.substring(0, enteredDate.indexOf("/"));
             enteredDate = enteredDate.replaceFirst(date[1] + "/", "");
             date[1] = determineMonth(date[1]);
@@ -411,10 +411,10 @@ public class Parser {
         }
     }
 
-    private void checkForSlash(String enteredDate) throws Exception {
-        if (!enteredDate.contains("/")) {
+    private void checkForSlash(String checkingDate, String originalDate) throws Exception {
+        if (!checkingDate.contains("/")) {
             throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_DATE,
-                    enteredDate));
+                    originalDate));
         }
     }
 

@@ -98,6 +98,23 @@ public class ParserTest {
         }
     }
 
+    /*
+     * This is a boundary case for the partition with incorrect date format:
+     * 2/2014
+     */
+    @Test
+    public void testParserAddIncorrectDateFormat() {
+        Parser parser = Parser.getInstance();
+        String input = "add Submit audit report on 2/2014";
+        String expected = "The date format is invalid: 2/2014";
+        try {
+            parser.format(input);
+        } catch (Exception e) {
+            assertEquals("Test that the exception is correct", expected,
+                    e.getMessage());
+        }
+    }
+
     /* This is a boundary case for the partition with only one date and time */
     @Test
     public void testParserAddDeadline() {
