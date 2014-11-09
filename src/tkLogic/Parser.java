@@ -208,9 +208,7 @@ public class Parser {
     }
 
     private void parseDescription(ArrayList<String> description) {
-        if (description.size() == 0) {
-            completeDescription = null;
-        } else {
+        if (description.size() != 0) {
             completeDescription = description.get(0);
             for (int i = 1; i < description.size(); i++) {
                 completeDescription += " " + description.get(i);
@@ -411,7 +409,8 @@ public class Parser {
         }
     }
 
-    private void checkForSlash(String checkingDate, String originalDate) throws Exception {
+    private void checkForSlash(String checkingDate, String originalDate)
+            throws Exception {
         if (!checkingDate.contains("/")) {
             throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_DATE,
                     originalDate));
@@ -497,11 +496,13 @@ public class Parser {
     }
 
     private void parseLocation(ArrayList<String> location) {
-        completeLocation = location.get(0);
-        for (int i = 1; i < location.size(); i++) {
-            completeLocation += " " + location.get(i);
+        if (completeLocation.length() != 0) {
+            completeLocation = location.get(0);
+            for (int i = 1; i < location.size(); i++) {
+                completeLocation += " " + location.get(i);
+            }
+            completeLocation = completeLocation.replaceAll("/", "");
         }
-        completeLocation = completeLocation.replaceAll("/", "");
     }
 
     // private void parseFrequency(ArrayList<String> frequency) {
