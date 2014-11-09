@@ -164,6 +164,23 @@ public class ParserTest {
         }
     }
 
+    /*
+     * This is a boundary case for the partition with incorrect time format:
+     * 20pm
+     */
+    @Test
+    public void testParserAddIncorrectTimeFormat20pm() {
+        Parser parser = Parser.getInstance();
+        String input = "add Submit audit report by 20pm";
+        String expected = "The time format is invalid: 20pm";
+        try {
+            parser.format(input);
+        } catch (Exception e) {
+            assertEquals("Test that the exception is correct", expected,
+                    e.getMessage());
+        }
+    }
+
     /* This is a boundary case for the partition with no date and time */
     @Test
     public void testParserAddGoodToDo() {
