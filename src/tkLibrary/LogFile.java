@@ -1,4 +1,3 @@
-//@author A0111705W
 package tkLibrary;
 
 import java.io.IOException;
@@ -6,6 +5,7 @@ import java.util.logging.Logger;
 import java.util.logging.FileHandler;
 import java.util.logging.SimpleFormatter;
 
+//@author A0111705W
 public class LogFile {
 	private static FileHandler fh;
 	private static SimpleFormatter formatter;

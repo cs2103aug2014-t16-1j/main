@@ -32,6 +32,7 @@ public class Logic {
 		LogFile.newLogger();
 	}
 	
+	// add a task to TasKoord
 	public String add(Task task) {		
 		if (isExistingTask(task)) {
 			return Constants.MESSAGE_DUPLICATED_TASK;
@@ -51,7 +52,7 @@ public class Logic {
 		}
 	}
 	
-	// delete a particular task.
+	// delete a particular task
 	public String delete(Task task) {
 		if (isExistingTask(task)) { 
 			storage.delete(task);
@@ -62,7 +63,8 @@ public class Logic {
 			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
 		}
 	}
-
+	
+	// edit a particular task
 	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
 		if (isExistingTask(taskToBeEdited)) {
 			if (isFreeTimeslots(editedTask)) {
@@ -79,9 +81,7 @@ public class Logic {
 	}
 	
 	//@author A0112068N
-	/*
-	 * for listing, only mention the time, the priority and the state.
-	 */
+	// for listing, only mention the time, the priority and the state.
 	public ArrayList<Task> list(Task task) {
 		ArrayList<Task> res = new ArrayList<Task>();
 		ArrayList<Task> list = storage.load();
@@ -278,6 +278,7 @@ public class Logic {
 		return (task.getStartTime() == null);
 	}
 	
+	// checks if a particular timeslot is free so that a task can be added
 	private boolean isFreeTimeslots(Task task){
 		ArrayList<Task> allTasks = storage.load();
 		ArrayList<Task> queryList = new ArrayList<Task>();
@@ -325,15 +326,15 @@ public class Logic {
 			if (isSameStartTime(task, queriedTask)){
 				return false;
 			}
-			//checks if task's end time is between an existing task's time period
+			// checks if task's end time is between an existing task's time period
 			if (isBetweenStartAndEndTimeForTaskEndTime(task, queriedTask)){
 				return false;
 			}
-			//checks if task's start time is between an existing task's time period
+			// checks if task's start time is between an existing task's time period
 			if (isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
 				return false;
 			}
-			//checks if task's time period is longer than an existing task's time period
+			// checks if task's time period is longer than an existing task's time period
 			if (isBetweenStartAndEndTimeForTaskStartTime(task, queriedTask)){
 				return false;
 			}
@@ -370,7 +371,8 @@ public class Logic {
 		return (queriedTask.getStartTime().compareTo(task.getStartTime()) > 0) 
 				&& (queriedTask.getStartTime().compareTo(task.getEndTime()) < 0);
 	}
-
+	
+	//changes an existing task's priority level
 	public String setPriorityLevel(Task task){
 		if (isExistingTask(task)){
 			task.setPriority(task.getPriorityLevel());
@@ -381,6 +383,7 @@ public class Logic {
 		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
 	}
 	
+	//changes an existing task's status
 	public String setState(Task task){
 		if (isExistingTask(task)) {
 			task.setState(task.getState());
