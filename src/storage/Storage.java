@@ -15,6 +15,7 @@ import tkLibrary.LogFile;
 import tkLibrary.Task;
 
 import org.json.simple.JSONObject;
+//import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
 
@@ -28,8 +29,6 @@ public class Storage {
 	private ArrayList<ArrayList<Task>> stackForUndo;
 	private int currentPos;
 	private int availablePos;
-	private boolean undo_status = false;
-	private boolean redo_status = false;
 	
 	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
 	
@@ -42,7 +41,8 @@ public class Storage {
 		this.listOfTasks = loadFromFile();
 		this.oldTasks = copyList(this.listOfTasks);
 		this.stackForUndo = new ArrayList<ArrayList<Task>> ();
-		this.currentPos = this.availablePos = -1;
+		this.stackForUndo.add(new ArrayList<Task> ());
+		this.currentPos = this.availablePos = 0;
 	}
 	
 	public ArrayList<Task> load() {
@@ -74,9 +74,9 @@ public class Storage {
 	
 	public void add(Task task) {
 		oldTasks = copyList(listOfTasks);
-		push(oldTasks);
 		openFileToWrite(true);
 		store(task);
+		push(copyList(listOfTasks));
 		closeFileToWrite();
 	}
 	
@@ -104,15 +104,14 @@ public class Storage {
 			}
 		} 
 		
-		oldTasks = copyList(listOfTasks);
 		push(oldTasks);
 		listOfTasks.clear();
 		store(newList);
+		push(copyList(listOfTasks));
 	}
 	
 	public void set(Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
-		oldTasks = copyList(listOfTasks);
 		push(oldTasks);
 		
 		for (Task item : listOfTasks) {
@@ -125,12 +124,12 @@ public class Storage {
 		
 		listOfTasks.clear();
 		store(newList);
+		push(copyList(listOfTasks));
 	}
 	
 	//@author A0118919U
 	public void edit(Task oldTask, Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
-		oldTasks = copyList(listOfTasks);
 		push(oldTasks);
 		
 		for (Task item : listOfTasks) {
@@ -143,6 +142,7 @@ public class Storage {
 		
 		listOfTasks.clear();
 		store(newList);
+		push(copyList(listOfTasks));
 	}
 	
 	public void clear() {
@@ -155,57 +155,33 @@ public class Storage {
 	
 	//@author A0112068N
 	public String undo() {
-		if (currentPos >= 0) {
-			undo_status = true ;
-			if((currentPos + 2) <= stackForUndo.size()){
-				ArrayList<Task> list = copyList(listOfTasks);
-				stackForUndo.set((currentPos+1), list);
-				if((currentPos + 2) == stackForUndo.size()){
-					availablePos ++ ;
-				}
-			}else{
-				availablePos++;
-				ArrayList<Task> list = copyList(listOfTasks);
-				stackForUndo.add(list);
-			}
+		if (currentPos > 0) {
+			currentPos --;
 			listOfTasks.clear();
 			store(stackForUndo.get(currentPos));
-			currentPos --;
 			return Constants.MESSAGE_UNDO_DONE;
 		}
+		
 		return "Stack is empty";
 	}
 	
 	public String redo() {
 		if (currentPos < availablePos) {
-			redo_status = true;
-			currentPos++;
+			currentPos ++;
 			listOfTasks.clear();
-			store(stackForUndo.get(currentPos + 1));
-			if(availablePos == (currentPos+1)){
-				availablePos--;
-			}
+			store(stackForUndo.get(currentPos));
 			return Constants.MESSAGE_REDO_DONE;
 		}
 		return "No command to redo.";
 	}
 	
 	private void push(ArrayList<Task> list) {
-		if(undo_status && redo_status){
-			stackForUndo.set(currentPos + 1, list);
-			undo_status = false;
-			redo_status = false;
-			currentPos ++;
-			availablePos = currentPos;
-		}else{
-			currentPos ++; 
-			availablePos = currentPos;
-	    	if (currentPos >= stackForUndo.size()) {
-	    		stackForUndo.add(list);
-	    	} else {
-	    		stackForUndo.set(currentPos, list);
-	    	}
-		}
+		currentPos ++; availablePos = currentPos;
+    	if (currentPos >= stackForUndo.size()) {
+    		stackForUndo.add(list);
+    	} else {
+    		stackForUndo.set(currentPos, list);
+    	}
 	}
 	
 	public void setSynced() {
