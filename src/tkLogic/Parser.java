@@ -336,11 +336,16 @@ public class Parser {
         }
     }
 
-    private void getHour(String[] requiredTime, String newTime, Float timeValue) {
+    private void getHour(String[] requiredTime, String newTime, Float timeValue)
+            throws Exception {
         int hour;
         if (newTime.contains("a") && timeValue == 12) {
             hour = (timeValue.intValue() - 12);
         } else if (newTime.contains("a")) {
+            if (timeValue.intValue() > 11) {
+                throw new Exception(String.format(Constants.EXCEPTIONS_INVALID_TIME,
+                        newTime));
+            }
             hour = timeValue.intValue();
         } else if (newTime.contains("p") && timeValue != 12) {
             hour = (timeValue.intValue() + 12);
