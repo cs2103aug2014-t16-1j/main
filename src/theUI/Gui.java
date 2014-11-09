@@ -32,6 +32,7 @@ public class Gui {
 	private static final String SPACE = "&nbsp";
 	private static final String HTML_TYPE = "text/html";
 	private static final String NO_COMMAND = "";
+	private static final int ALL_TASK = -2;
 
 	// constants for color, size.
 	private static final int HEIGHT = 800;
@@ -286,7 +287,7 @@ public class Gui {
 							+ format("======", SIZE_NORMAL, COLOR_DATE)
 							+ NEW_LINE + NEW_LINE;
 				}
-				if (i == pos) {
+				if (i == pos || pos == ALL_TASK) {
 					display(i + 1, curTask, effect, isIndexed);
 				} else {
 					display(i + 1, curTask, Constants.NO_EFFECT, isIndexed);
@@ -306,7 +307,7 @@ public class Gui {
 				}
 
 				int eff = Constants.NO_EFFECT;
-				if (i == pos) {
+				if (i == pos || pos == ALL_TASK) {
 					eff = effect;
 				}
 				String color = COLOR_DESCRIPTION;

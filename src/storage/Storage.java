@@ -24,7 +24,6 @@ public class Storage {
 	private PrintWriter out;
 	private Scanner in;
 	
-	private ArrayList<Task> oldTasks;
 	private ArrayList<Task> listOfTasks;
 	private ArrayList<ArrayList<Task>> stackForUndo;
 	private int currentPos;
@@ -39,7 +38,6 @@ public class Storage {
 		openFileToWrite(true);
 		closeFileToWrite();
 		this.listOfTasks = loadFromFile();
-		this.oldTasks = copyList(this.listOfTasks);
 		this.stackForUndo = new ArrayList<ArrayList<Task>> ();
 		this.stackForUndo.add(copyList(this.listOfTasks));
 		this.currentPos = this.availablePos = 0;
@@ -73,7 +71,6 @@ public class Storage {
 	}
 	
 	public void add(Task task) {
-		oldTasks = copyList(listOfTasks);
 		openFileToWrite(true);
 		store(task);
 		push(copyList(listOfTasks));
@@ -143,11 +140,11 @@ public class Storage {
 	}
 	
 	public void clear() {
-		oldTasks = new ArrayList<Task> (listOfTasks);
 		listOfTasks.clear();
 		deleteFile();
 		openFileToWrite(false);
 		closeFileToWrite();
+		push(copyList(listOfTasks));
 	}
 	
 	//@author A0112068N
@@ -158,7 +155,6 @@ public class Storage {
 			store(stackForUndo.get(currentPos));
 			return Constants.MESSAGE_UNDO_DONE;
 		}
-		
 		return "Stack is empty";
 	}
 	

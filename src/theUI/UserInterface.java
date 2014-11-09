@@ -48,6 +48,8 @@ public class UserInterface {
 	private static final int COLOR_DONE = 1;
 	private static final int COLOR_WARNING = 2;
 	private static final int NO_TASK = -1;
+	private static final int ALL_TASK = -2;
+	
 
 	// Constants for keywords
 	private static final String KEYWORD_UPCOMING_TASK = "upcoming";
@@ -582,14 +584,15 @@ public class UserInterface {
 
 	private void clear() {
 		try {
+			ArrayList<Task> list = logic.list(new Task());
 			String feedback = logic.clear();
 			if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
-				ArrayList<Task> list = logic.list(new Task());
 				gui.displayDone(feedback, INSERTED);
+				showToUser(list, null, Constants.DELETED, APPENDED);
 				tasksOnScreen.clear();
-				addToStackForUndoAndRedo(list, new Task(), Constants.NO_EFFECT,
-						MESSAGE_TASK_RESTORED, COLOR_DONE, null, null,
-						Constants.NO_EFFECT, feedback, COLOR_DONE);
+				addToStackForUndoAndRedo(list, null, Constants.NO_EFFECT,
+						MESSAGE_TASK_RESTORED, COLOR_DONE, list, null,
+						Constants.DELETED, feedback, COLOR_DONE);
 			} else {
 				gui.displayWarning(feedback, INSERTED);
 				tasksOnScreen.clear();
@@ -653,15 +656,20 @@ public class UserInterface {
 			int ucolor, ArrayList<Task> listForRedo, Task taskForRedo,
 			int redoEffect, String messageForRedo, int rcolor) {
 		int posForUndo = -1, posForRedo = -1;
-
-		if (listForUndo != null) {
+		
+		if (taskForUndo == null) {
+			posForUndo = ALL_TASK;
+		} else if (listForUndo != null) {
 			for (posForUndo = 0; posForUndo < listForUndo.size(); posForUndo++) {
 				if (listForUndo.get(posForUndo).equals(taskForUndo)) {
 					break;
 				}
 			}
 		}
-		if (listForRedo != null) {
+		
+		if (taskForRedo == null) {
+			posForRedo = ALL_TASK;
+		} else if (listForRedo != null) {
 			for (posForRedo = 0; posForRedo < listForRedo.size(); posForRedo++) {
 				if (listForRedo.get(posForRedo).equals(taskForRedo)) {
 					break;
@@ -787,6 +795,9 @@ public class UserInterface {
 			if (list.get(i).equals(task)) {
 				break;
 			}
+		}
+		if (task == null) {
+			i = ALL_TASK;
 		}
 		gui.display(list, i, effect, isAppended, INDEXED);
 	}
