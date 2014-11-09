@@ -21,7 +21,7 @@ public class StorageTest {
 	
 	//@author A0118919U
 	public Storage store  = new Storage("storeTest.txt");
-
+	//This is the optimal case for adding and retrieving the data from file
 	@Test
 	public void testStorageAdd(){
 		Parser parser = Parser.getInstance();
@@ -54,6 +54,7 @@ public class StorageTest {
 		}
 	}
 	
+	//This is the optimal case for delete and undo testing
 	@Test
 	public void testStorageDeleteandUndo() {
         Parser parser = Parser.getInstance();
@@ -90,6 +91,7 @@ public class StorageTest {
         }
     }
     
+	//optimal case for editing the task and comparing against set of given tasks 
     @Test
     public void testStorageEdit() {
         Parser parser = Parser.getInstance();
@@ -128,6 +130,7 @@ public class StorageTest {
         }
     }
 	
+    //optimal case for setting priority and status of task
     @Test
     public void testStorageSet() {
         Parser parser = Parser.getInstance();
@@ -164,6 +167,7 @@ public class StorageTest {
         }
     }
     
+    //boundary case for for undo and redo
     @Test
 	public void testStorageUndoandRedo(){
 		Parser parser = Parser.getInstance();

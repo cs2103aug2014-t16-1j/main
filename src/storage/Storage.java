@@ -15,10 +15,13 @@ import tkLibrary.LogFile;
 import tkLibrary.Task;
 
 import org.json.simple.JSONObject;
-//import org.json.simple.JSONArray;
 import org.json.simple.parser.JSONParser;
 import org.json.simple.parser.ParseException;
-
+/**
+ * This component stores the data into a text file in json format
+ * Logic redirects storage to perform the specified job while storage
+ * converts the task to json and vice versa and performs the operation
+ */
 public class Storage {
 	private String fileName;
 	private PrintWriter out;

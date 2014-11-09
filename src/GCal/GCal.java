@@ -52,6 +52,7 @@ public class GCal {
 	private static Calendar client;
 
 	//@author A0118919U
+	//This checks if a user is online
 	public static boolean isOnline() {
 		Socket socket = new Socket();
 		InetSocketAddress adderess = new InetSocketAddress("www.google.com", 80);
@@ -82,10 +83,13 @@ public class GCal {
 		
 	}
 	
+	//Generates the redirection url after authentication
 	public String getURL() {
 		return codeFlow.newAuthorizationUrl().setRedirectUri(redirectUrl).build();
 	}
 
+    //This method takes in authorization code and generates a new token request to google API
+	// The token response returned back is stored and is used to access Google Calendar API
 	public boolean connectByNewToken(String code) throws IOException {
 		try {
 			TokenResponse tokenRes = new TokenResponse();
@@ -107,6 +111,7 @@ public class GCal {
 		}
 	}
 
+	// This method makes use of existing token stored in file and access the Google API
 	public boolean connectUsingExistingToken() {
 		TokenResponse tokenRes = new TokenResponse();
 		if (validFile()) {
