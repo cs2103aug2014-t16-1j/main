@@ -1,5 +1,6 @@
 package tkLibrary;
 
+//@author A0110493N
 public class UserInput {
     private CommandType command;
     private Task task;
