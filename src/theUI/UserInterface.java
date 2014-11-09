@@ -4,10 +4,13 @@ import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 import tkLibrary.CommandType;
 import tkLibrary.Constants;
 import tkLibrary.GcPacket;
+import tkLibrary.LogFile;
 import tkLibrary.PriorityType;
 import tkLibrary.StateType;
 import tkLibrary.Task;
@@ -72,6 +75,9 @@ public class UserInterface {
 	private Parser parser;
 	private Gui gui;
 	private SwingBrowser browser;
+	
+	// logger
+	private static Logger LOGGER = Logger.getLogger(".TasKoordUILogFile.log");
 
 	// The special packet for implementing undo and redo.
 	private static class UndoAndRedoPack {
@@ -110,6 +116,8 @@ public class UserInterface {
 		logic = new Logic(fileName);
 		gui = new Gui();
 		browser = new SwingBrowser();
+		
+		LogFile.newLogger();
 
 		tasksOnScreen = new ArrayList<Task>();
 		stack = new ArrayList<UndoAndRedoPack>();
@@ -122,6 +130,7 @@ public class UserInterface {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
+				LOGGER.log(Level.WARNING, e.toString());
 				Thread.currentThread().interrupt();
 			}
 
@@ -131,7 +140,7 @@ public class UserInterface {
 					gui.setUserCommand(NO_COMMAND);
 					executeCommands(userCommand);
 				} catch (Exception e) {
-					System.out.println(e.getMessage());
+					LOGGER.log(Level.WARNING, e.toString());
 				}
 			}
 		}
@@ -196,6 +205,7 @@ public class UserInterface {
 			try {
 				Thread.sleep(100);
 			} catch (InterruptedException e) {
+				LOGGER.log(Level.WARNING, e.toString());
 				Thread.currentThread().interrupt();
 			}
 			System.exit(0);
@@ -243,6 +253,7 @@ public class UserInterface {
 				displayPacket(packet);
 			}
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 			gui.displayWarning(MESSAGE_SYNC_ERROR, INSERTED);
 			gui.displayWarning(MESSAGE_SYNC_REMINDER, APPENDED);
@@ -264,6 +275,7 @@ public class UserInterface {
 					return code;
 				}
 			} catch (InterruptedException e) {
+				LOGGER.log(Level.WARNING, e.toString());
 				Thread.currentThread().interrupt();
 			}
 		}
@@ -290,6 +302,7 @@ public class UserInterface {
 				item.setPriority(Constants.PRIORITY_MEDIUM);
 				item.setState(Constants.STATE_PENDING);
 			} catch (Exception e) {
+				LOGGER.log(Level.WARNING, e.toString());
 			}
 			if (!logic.add(item).equals(Constants.MESSAGE_DUPLICATED_TASK)) {
 				list.add(item);
@@ -379,6 +392,7 @@ public class UserInterface {
 			}
 
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -427,6 +441,7 @@ public class UserInterface {
 				showToUser(result, INSERTED);
 			}
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -493,6 +508,7 @@ public class UserInterface {
 				showToUser(list, APPENDED);
 			}
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -544,6 +560,7 @@ public class UserInterface {
 				showToUser(list, APPENDED);
 			}
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -583,6 +600,7 @@ public class UserInterface {
 				tasksOnScreen.clear();
 			}
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -606,6 +624,7 @@ public class UserInterface {
 				tasksOnScreen.clear();
 			}
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -629,6 +648,7 @@ public class UserInterface {
 				tasksOnScreen.clear();
 			}
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -682,6 +702,7 @@ public class UserInterface {
 				showToUser(result, INSERTED);
 			}
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -712,6 +733,7 @@ public class UserInterface {
 				showToUser(list, APPENDED);
 			}
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			e.printStackTrace();
 		}
 	}
@@ -779,6 +801,7 @@ public class UserInterface {
 			Integer.parseInt(input);
 			return true;
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			return false;
 		}
 	}
@@ -787,6 +810,7 @@ public class UserInterface {
 		try {
 			return Integer.parseInt(input);
 		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
 			return 0;
 		}
 	}
