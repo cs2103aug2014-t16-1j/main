@@ -41,7 +41,7 @@ public class Storage {
 		this.listOfTasks = loadFromFile();
 		this.oldTasks = copyList(this.listOfTasks);
 		this.stackForUndo = new ArrayList<ArrayList<Task>> ();
-		this.stackForUndo.add(new ArrayList<Task> ());
+		this.stackForUndo.add(copyList(this.listOfTasks));
 		this.currentPos = this.availablePos = 0;
 	}
 	
@@ -104,7 +104,6 @@ public class Storage {
 			}
 		} 
 		
-		push(oldTasks);
 		listOfTasks.clear();
 		store(newList);
 		push(copyList(listOfTasks));
@@ -112,7 +111,6 @@ public class Storage {
 	
 	public void set(Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
-		push(oldTasks);
 		
 		for (Task item : listOfTasks) {
 			if (item.equals(newTask)) {
@@ -130,7 +128,6 @@ public class Storage {
 	//@author A0118919U
 	public void edit(Task oldTask, Task newTask) {
 		ArrayList<Task> newList = new ArrayList<Task>();
-		push(oldTasks);
 		
 		for (Task item : listOfTasks) {
 			if (item.equals(oldTask)) {
