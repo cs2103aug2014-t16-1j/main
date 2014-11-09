@@ -34,7 +34,7 @@ public class UserInterface {
 	private static final String MESSAGE_NO_INTERNET = "No internet connection available!";
 	private static final String MESSAGE_SYNC_ERROR = "Unable to sync, please try again!";
 	private static final String MESSAGE_WAITING = "Please follow the link and accept it!";
-	private static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete";
+	private static final String MESSAGE_SYNC_COMPLETE = "Synchronization is completed.";
 	private static final String clientEmail = "505774929571-compute@developer.gserviceaccount.com";
 	private static final String MESSAGE_SYNC_REMINDER = "Please ensure that you have shared your calendar with: "
 			+ clientEmail;
