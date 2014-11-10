@@ -116,5 +116,17 @@ public class UITest {
 		ui.executeCommands("redo");
 		assertEquals(ui.getDisplayedMessage(),
 				"<font size = 4 color = #F92672>No command to redo</font><br>");
+		
+		/*
+		 * tests for "edit"
+		 */
+		ui.executeCommands("list");
+		ui.executeCommands("edit 3 correct from 8pm to 11pm on 13/11/14");
+		assertEquals(ui.getDisplayedMessage(), 
+				"<font size = 4 color = #F92672>Warning: timeslot of edited task is taken, task still added to TasKoord.</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Thu, 13 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><b><u><font size = 3 color = #A6E22E>01. </font></u></b><b><u><font size = 4 color = #E6DB74>[20:00</font></u></b><b><u><font size = 4 color = #E6DB74> - 23:00]</font></u></b><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b><u><font size = 4 color = #66D9EF>homework</font></u></b><br>");
+		ui.executeCommands("edit homework correct homework abt math");
+		assertEquals(ui.getDisplayedMessage(), 
+				"<font size = 4 color = #A6E22E>Task edited!</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Thu, 13 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><b><u><font size = 3 color = #A6E22E>01. </font></u></b><b><u><font size = 4 color = #E6DB74>[20:00</font></u></b><b><u><font size = 4 color = #E6DB74> - 23:00]</font></u></b><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b><u><font size = 4 color = #66D9EF>homework abt math</font></u></b><br>");
+		
 	}
 }

@@ -210,7 +210,6 @@ public class UserInterface {
 		} else {
 			gui.displayWarning(MESSAGE_INFORMAT_CMD, INSERTED);
 		}
-		System.out.println(getDisplayedMessage());
 	}	
 
 	// sync with google calendar
@@ -329,7 +328,7 @@ public class UserInterface {
 		gui.displayFile();
 		tasksOnScreen.clear();
 	}
-
+	
 	private void add(Task task) {
 		if (task.getDescription() == null) {
 			gui.displayWarning(Constants.MESSAGE_NO_ADD_INFO, INSERTED);
@@ -337,6 +336,7 @@ public class UserInterface {
 			return;
 		}
 
+		// check if a task is in correct form.
 		if (task.getStartTime() != null && task.getEndTime() != null) {
 			if (task.getStartTime().compareTo(task.getEndTime()) >= 0) {
 				gui.displayWarning(Constants.MESSAGE_ENDTIME_BEFORE_STARTTIME,
@@ -509,7 +509,11 @@ public class UserInterface {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * @param task: this is to identify the task to be edited
+	 * @param updatedTask: new information.
+	 */
 	private void edit(Task task, Task updatedTask) {
 		try {
 			ArrayList<Task> list = new ArrayList<Task>();
@@ -650,7 +654,10 @@ public class UserInterface {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/*
+	 * This function stores everything in a state, help displaying the undo and redo.
+	 */
 	private void addToStackForUndoAndRedo(ArrayList<Task> listForUndo,
 			Task taskForUndo, int undoEffect, String messageForUndo,
 			int ucolor, ArrayList<Task> listForRedo, Task taskForRedo,
@@ -689,7 +696,10 @@ public class UserInterface {
 			stack.set(currentPos, pack);
 		}
 	}
-
+	
+	/*
+	 * search for a task, only mention the task description here
+	 */
 	private void search(Task task) {
 		if (task.getDescription() == null) {
 			gui.displayWarning(Constants.MESSAGE_NO_SEARCH_INFO, INSERTED);
@@ -710,6 +720,9 @@ public class UserInterface {
 		}
 	}
 
+	/*
+	 * update a task, only mention the priority and the status here
+	 */
 	private void set(Task task) {
 		try {
 			ArrayList<Task> list = new ArrayList<Task>();
