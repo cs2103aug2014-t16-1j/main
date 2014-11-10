@@ -1,0 +1,496 @@
+//@author: a0111705w
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\Constants.java
+	 */
+
+	// logic constants
+	public static final String MESSAGE_CLASHING_TIMESLOTS = "Warning: timeslot is taken, task still added to TasKoord.";
+	public static final String MESSAGE_EDIT_CLASHING_TIMESLOTS = "Warning: timeslot of edited task is taken, task still added to TasKoord.";
+	public static final String MESSAGE_TASK_ADDED = "Task added to TasKoord!";
+	public static final String MESSAGE_TASK_DOES_NOT_EXIST = "Task does not exist!";
+	public static final String MESSAGE_TASK_DELETED = "Tasks were deleted from TasKoord:";
+	public static final String MESSAGE_TASK_EDITED = "Task edited!";
+	public static final String MESSAGE_EDIT_TASK_DOES_NOT_EXIST = "Cannot edit because task does not exist.";
+	public static final String MESSAGE_EDIT_TASK_CLASHES = "Cannot edit because task clashes with other tasks.";
+	public static final String MESSAGE_TASK_CLEARED = "All tasks cleared from TasKoord.";
+	public static final String MESSAGE_DUPLICATED_TASK = "This task has been already in the list.";
+	public static final String MESSAGE_UNDO_DONE = "The command was undone.";
+	public static final String MESSAGE_REDO_DONE = "The command was redone.";
+	public static final String MESSAGE_PRIORITY_SET = "Priority level set for task.";
+	public static final String MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST = "Cannot set priority because task does not exist";
+	public static final String MESSAGE_STATE_COMPLETED = "State changed to 'completed'.";
+	public static final String MESSAGE_STATE_DISCARDED = "State changed to 'discarded'.";
+	public static final String MESSAGE_STATE_PENDING = "State changed to 'pending'.";
+	public static final String MESSAGE_MORE_THAN_ONE_TASK_FOUND = "There are more than 1 task found. Specify the task.";
+	public static final String MESSAGE_NO_START_TIME = "Please indicate a start time for your task.";
+	
+	//Access Token
+	public static final String CODE_REJECTED = "You have denied the request, unable to sync.";
+	public static final String CODE_NO_CODE = "You have not accepted the request, unable to sync.";
+	
+	// storage constants
+	public static final String STARTTIME = "STARTTIME";
+	public static final String ENDTIME = "ENDTIME";
+	public static final String LOCATION = "LOCATION";
+	public static final String DESCRIPTION = "DESCRIPTION";
+	public static final String FREQUENCY = "FREQUENCY";
+	public static final String FREQUENCY_TYPE = "FREQUENCY_TYPE";
+	public static final String STATE_TYPE = "STATE_TYPE";
+	public static final String PRIORITY_TYPE = "PRIORITY";
+	public static final String SYNC_STATUS = "SYNC";
+	public static final String END_OBJECT_SIGNAL = "END";
+	
+	// constants for frequency type
+	public static final String FREQUENCY_DAY = "DAY";
+	public static final String FREQUENCY_WEEK = "WEEK";
+	public static final String FREQUENCY_MONTH = "MONTH";
+	public static final String FREQUENCY_YEAR = "YEAR";
+	
+	// constants for state type
+	public static final String STATE_COMPLETED = "COMPLETED";
+	public static final String STATE_PENDING = "PENDING";
+	public static final String STATE_DISCARDED = "DISCARDED";
+	public static final String STATE_NULL = "NULL";
+	
+	// constants for state type
+    public static final String PRIORITY_LOW = "LOW";
+    public static final String PRIORITY_MEDIUM = "MEDIUM";
+    public static final String PRIORITY_HIGH = "HIGH";
+    public static final String PRIORITY_NULL = "NULL";
+    
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\Constants.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\Constants.java
+	 */
+
+    // constants for UI
+    public static final int LISTUPCOMINGTIME_DEFAULT = 5;
+    public static final String MESSAGE_NO_RESULT = "There is no such task.";
+    public static final String MESSAGE_NO_SEARCH_INFO = "Please specify a keyword to search for!";
+    public static final String MESSAGE_NO_ADD_INFO = "Please specify the task you want to add!";
+    public static final String MESSAGE_NO_DELETE_INFO = "Please specify the task you want to delete!";
+    public static final String MESSAGE_NO_RESULT_LIST = "There is nothing to list.";
+    public static final String MESSAGE_UPDATE_STATUS_AND_PRIORITY = "Task status changed to: %s and priority changed to: %s";
+    public static final String MESSAGE_ENDTIME_BEFORE_STARTTIME = "The end time cannot be before the start time.";
+    
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\Constants.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\LogFile.java
+	 */
+
+public class LogFile {
+	private static FileHandler fh;
+	private static SimpleFormatter formatter;
+
+	public static void newLogger(){
+		try {  
+			Logger logger = Logger.getLogger(".TasKoordLogFile.log");
+
+			fh = new FileHandler(".TasKoordLogFile.log");
+			logger.addHandler(fh);
+
+			formatter = new SimpleFormatter();
+			fh.setFormatter(formatter);
+
+		} catch (SecurityException e) {
+			e.printStackTrace();
+		} catch (IOException e) {
+			e.printStackTrace();  
+		}
+	}
+}
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\LogFile.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\PriorityType.java
+	 */
+
+public enum PriorityType {
+	HIGH, MEDIUM, LOW
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\PriorityType.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+	 */
+
+/*
+ * Basically the logic functions should be very clear and simple.
+ * So that UserInterface have to parse the command and call the logic.
+ */
+public class Logic {
+	private Storage storage;
+	private GCal gcal;
+	private static Logger LOGGER = Logger.getLogger(".TasKoordLogFile.log");
+
+	public Logic(String fileName) {
+		storage = new Storage(fileName);
+		gcal = new GCal();
+		LogFile.newLogger();
+	}
+	
+	// add a task to TasKoord
+	public String add(Task task) {		
+		if (isExistingTask(task)) {
+			return Constants.MESSAGE_DUPLICATED_TASK;
+		}
+		
+		if (isFreeTimeslots(task)) {
+			storage.add(task);
+			LOGGER.info("Task added.");
+			return Constants.MESSAGE_TASK_ADDED;
+		} else {
+			if (isWithoutStartTime(task)){
+				return Constants.MESSAGE_NO_START_TIME;
+			}
+			storage.add(task);
+			LOGGER.info("Task added.");
+			return Constants.MESSAGE_CLASHING_TIMESLOTS;
+		}
+	}
+	
+	// delete a particular task
+	public String delete(Task task) {
+		if (isExistingTask(task)) { 
+			storage.delete(task);
+			LOGGER.info("Task deleted.");
+			return Constants.MESSAGE_TASK_DELETED;
+		} else {
+			LOGGER.info("No such task");
+			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
+		}
+	}
+	
+	// edit a particular task
+	public String edit(Task taskToBeEdited, Task editedTask) throws Exception {
+		if (isExistingTask(taskToBeEdited)) {
+			if (isFreeTimeslots(editedTask)) {
+				storage.edit(taskToBeEdited, editedTask);
+				LOGGER.info("Task edited");
+				return Constants.MESSAGE_TASK_EDITED;
+			} else {
+				storage.edit(taskToBeEdited, editedTask);
+				return Constants.MESSAGE_EDIT_CLASHING_TIMESLOTS;
+			}
+		} else {
+			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
+		}
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+	 */
+
+	/*
+	 * searching a task by keyword
+	 * only consider the description
+	 */
+	public ArrayList<Task> search(String keyword) {
+		ArrayList<Task> allTasks = storage.load();
+		ArrayList<Task> searchResults = new ArrayList<Task>();
+		
+		for (Task item : allTasks){
+			if (item.getDescription().toLowerCase().contains(keyword.toLowerCase())){
+				searchResults.add(item);
+			}
+		}
+		searchResults = sort(searchResults);
+		LOGGER.info("Tasks with keyword found.");
+		return searchResults;
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+	 */
+
+	// this is to check if a task already exists using description and location to check
+	private boolean isExistingTask(Task task) {
+		ArrayList<Task> queryList = storage.load();
+		for (Task item : queryList) {
+			if (item.equals(task)) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	private boolean isWithoutStartTime(Task task){
+		return (task.getStartTime() == null);
+	}
+	
+	// checks if a particular timeslot is free so that a task can be added
+	private boolean isFreeTimeslots(Task task){
+		ArrayList<Task> allTasks = storage.load();
+		ArrayList<Task> queryList = new ArrayList<Task>();
+		
+		if (isFloatingTask(task)){
+			return true;
+		}
+		
+		if (isWithoutStartTime(task)){
+			return false;
+		}
+		
+		for(Task item: allTasks){
+			if (isTimedTask(item)){
+				queryList.add(item);
+			}
+		}
+		
+		if (queryList.isEmpty()){
+			return true;
+		}
+		
+		/*
+		 * for deadline tasks, the time when it is due is start time
+		 * instead of deadline for efficiency in sorting
+		 */
+		if (isDeadlineTask(task)){
+			for (Task queriedTask: queryList){
+				if (isDeadlineTask(queriedTask)){
+					if (isSameStartTime(task, queriedTask)){
+						return false;
+					}
+				}
+				if (isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
+					return false;
+				}
+				if (isSameEndTime(task, queriedTask)){
+					return false;
+				}
+			}
+			return true;
+		}
+		
+		for (Task queriedTask: queryList){
+			if (isSameStartTime(task, queriedTask)){
+				return false;
+			}
+			// checks if task's end time is between an existing task's time period
+			if (isBetweenStartAndEndTimeForTaskEndTime(task, queriedTask)){
+				return false;
+			}
+			// checks if task's start time is between an existing task's time period
+			if (isBetweenStartAndEndTimeForTaskStartTime(queriedTask, task)){
+				return false;
+			}
+			// checks if task's time period is longer than an existing task's time period
+			if (isBetweenStartAndEndTimeForTaskStartTime(task, queriedTask)){
+				return false;
+			}
+		}
+		return true;
+	}
+	
+	private boolean isFloatingTask(Task task){
+		return (task.getEndTime() == null && task.getStartTime() == null);
+	}
+	
+	private boolean isDeadlineTask(Task task){
+		return (task.getEndTime() == null);
+	}
+	
+	private boolean isTimedTask(Task task){
+		return (task.getStartTime() != null && task.getEndTime() != null);
+	}
+	
+	private boolean isSameStartTime(Task task, Task queriedTask){
+		return (task.getStartTime().compareTo(queriedTask.getStartTime()) == 0);
+	}
+	
+	private boolean isSameEndTime(Task task, Task queriedTask){
+		return (task.getStartTime().compareTo(queriedTask.getEndTime()) == 0);
+	}
+	
+	private boolean isBetweenStartAndEndTimeForTaskEndTime(Task task, Task queriedTask){
+		return (task.getEndTime().compareTo(queriedTask.getEndTime()) < 0)
+				&& (task.getEndTime().compareTo(queriedTask.getStartTime()) > 0);
+	}
+		
+	private boolean isBetweenStartAndEndTimeForTaskStartTime(Task task, Task queriedTask){
+		return (queriedTask.getStartTime().compareTo(task.getStartTime()) > 0) 
+				&& (queriedTask.getStartTime().compareTo(task.getEndTime()) < 0);
+	}
+	
+	//changes an existing task's priority level
+	public String setPriorityLevel(Task task){
+		if (isExistingTask(task)){
+			task.setPriority(task.getPriorityLevel());
+			LOGGER.info("Task priority changed.");
+			return Constants.MESSAGE_PRIORITY_SET;
+		}
+		LOGGER.info("Task does not exist.");
+		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
+	}
+	
+	//changes an existing task's status
+	public String setState(Task task){
+		if (isExistingTask(task)) {
+			task.setState(task.getState());
+			LOGGER.info("Task state changed.");
+			switch (task.getState()){
+				case COMPLETED:
+					LOGGER.info("State changed to completed");
+					return Constants.MESSAGE_STATE_COMPLETED;	
+				case DISCARDED:
+					LOGGER.info("State changed to discarded");
+					return Constants.MESSAGE_STATE_DISCARDED;
+				case PENDING:
+					LOGGER.info("State changed to pending");
+					return Constants.MESSAGE_STATE_PENDING;
+			}
+		}
+		LOGGER.info("Task does not exist.");
+		return Constants.MESSAGE_PRIORITY_TASK_DOES_NOT_EXIST;
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\LogicTest.java
+	 */
+
+package tkLogic;
+
+import static org.junit.Assert.*;
+
+import org.junit.Test;
+
+import java.util.ArrayList;
+
+import tkLibrary.Task;
+import tkLibrary.UserInput;
+import tkLibrary.Constants;
+
+public class LogicTest {
+
+	@Test
+	public void test() {
+		Logic testLogic = new Logic("logicTest.txt");
+		testLogic.clear();
+
+		Parser parser = Parser.getInstance();
+
+		try{
+			String userCommand = "add study from 9am to 11am on 12 Sep 2014 at home";
+			UserInput userInput = parser.format(userCommand);
+			Task task = userInput.getTask();
+			
+			//test for first add
+			String message = testLogic.add(task);
+			assertEquals(Constants.MESSAGE_TASK_ADDED, message);
+			
+			//test for duplicated task
+			message = testLogic.add(task);
+			assertEquals(Constants.MESSAGE_DUPLICATED_TASK, message);
+			
+			//test for clashing task
+			userCommand = "add play games from 9am to 10am on 12 Sep 2014 at home";
+			userInput = parser.format(userCommand);
+			task = userInput.getTask();
+			message = testLogic.add(task);
+			assertEquals(Constants.MESSAGE_CLASHING_TIMESLOTS, message);
+			
+			//test for clear
+			message = testLogic.clear();
+			assertEquals(Constants.MESSAGE_TASK_CLEARED, message);
+			
+			//test for editing time
+			userCommand = "add play games from 9am to 10am on 12 Sep 2014 at home";
+			userInput = parser.format(userCommand);
+			task = userInput.getTask();
+			testLogic.add(task);
+			String userCommandEdited = "edit play games correct from 10am to 11am on 12 Sep 2014 at home";
+			UserInput userInputEdited = parser.format(userCommandEdited);
+			Task editedTask = userInputEdited.getTask();
+			message = testLogic.edit(task, editedTask);
+			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
+			
+			//test for editing location
+			userCommandEdited = "edit play games correct from 10am to 11am on 12 Sep 2014 at school";
+			userInputEdited = parser.format(userCommandEdited);
+			editedTask = userInputEdited.getTask();
+			message = testLogic.edit(task, editedTask);
+			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
+			
+			//test for editing date
+			userCommandEdited = "edit play games correct from 10am to 11am on 13 Sep 2014 at school";
+			userInputEdited = parser.format(userCommandEdited);
+			editedTask = userInputEdited.getTask();
+			message = testLogic.edit(task, editedTask);
+			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
+			
+			//test for editing description
+			userCommandEdited = "edit play games from 10am to 11am on 13 Sep 2014 at school";
+			userInputEdited = parser.format(userCommandEdited);
+			editedTask = userInputEdited.getTask();
+			message = testLogic.edit(task, editedTask);
+			assertEquals(Constants.MESSAGE_TASK_EDITED, message);
+			
+			//test for searching an existing task
+			userCommand = "search play";
+			userInput = parser.format(userCommand);
+			task = userInput.getTask();
+			ArrayList<Task> expectedResults = testLogic.search(task.getDescription());
+			Task actualResult = editedTask;
+			assertTrue(expectedResults.get(0).equals(actualResult));
+			
+			//test for searching a task that does not exist
+			userCommand = "search ball";
+			userInput = parser.format(userCommand);
+			task = userInput.getTask();
+			expectedResults = testLogic.search(task.getDescription());
+			assertTrue(expectedResults.isEmpty());
+			
+		}catch (Exception e) {
+			System.out.println("test: ");
+			e.printStackTrace();
+			assert (false);
+		}
+	}
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\LogicTest.java
+
+
+
+
+

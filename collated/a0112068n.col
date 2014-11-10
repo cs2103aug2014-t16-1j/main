@@ -1,0 +1,2213 @@
+//@author: a0112068n
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\GCal\GCal.java
+	 */
+
+	public GcPacket sync(ArrayList<Task> tkList) throws IOException {
+		com.google.api.services.calendar.model.Calendar calendar = client
+				.calendars().get("primary").execute();
+		ArrayList<Event> gcEvents = listEvent(calendar.getId());
+		ArrayList<Task> gcList = new ArrayList<Task> ();
+		GcPacket packet = new GcPacket();
+		
+		for(Event event : gcEvents) {
+			gcList.add(convertToTkTask(event));
+		}
+	
+		deleteTaskFromTk(tkList, gcList, packet);
+		deleteTaskFromGc(tkList, calendar, gcEvents, gcList, packet);
+		addTaskFromTkToGc(tkList, calendar, gcList, packet);
+		addTaskFromGcToTk(tkList, gcEvents, gcList, packet, calendar);
+		
+		java.util.Calendar time = java.util.Calendar.getInstance(TimeZone.getTimeZone("UTC"));
+		DateTime newTime = new DateTime(time.getTime(), TimeZone.getTimeZone("UTC"));
+		updateLastSyncedTime(newTime.getValue());
+		
+		return packet;
+	}
+
+	private void deleteTaskFromGc(ArrayList<Task> tkList,
+			com.google.api.services.calendar.model.Calendar calendar,
+			ArrayList<Event> gcEvents, ArrayList<Task> gcList, GcPacket packet)
+			throws IOException {
+		long lastSyncedTime = getLastSyncedTime();
+		for (int i = 0; i < gcList.size(); i ++) {
+			Task task = gcList.get(i);
+			Event event = gcEvents.get(i);
+			if (event.getDescription() != null
+					&& event.getDescription().contains(MESSAGE_ORIGINAL_CREATOR)
+					&& event.getUpdated().getValue() <= lastSyncedTime) {
+				boolean existing = false;
+				for (Task item : tkList) {
+					if (item.equals(task)) {
+						existing = true;
+						break;
+					}
+				}
+				if (!existing) {
+					packet.taskDeletedFromGC.add(task);
+					client.events().delete(calendar.getId(), gcEvents.get(i).getId()).execute();
+				}
+			}
+		}
+	}
+
+	private void deleteTaskFromTk(ArrayList<Task> tkList,
+			ArrayList<Task> gcList, GcPacket packet) {
+		for (int i = 0; i < tkList.size(); i ++) {
+			Task task = tkList.get(i);
+			if (task.getStartTime() != null && task.isSynced()) {
+				boolean existing = false;
+				for (Task item : gcList) {
+					if (item.equals(task)) {
+						existing = true;
+						break;
+					}
+				}
+				if (!existing) {
+					packet.taskDeletedFromTK.add(task);
+				}
+			}
+		}
+	}
+
+	private void addTaskFromGcToTk(ArrayList<Task> tkList,
+			ArrayList<Event> gcEvents, ArrayList<Task> gcList, GcPacket packet,
+			com.google.api.services.calendar.model.Calendar calendar) throws IOException {
+		long lastSyncedTime = getLastSyncedTime();
+		for (int i = 0; i < gcList.size(); i++)
+			if (gcEvents.get(i).getSummary() != null) {
+				Event event = gcEvents.get(i);
+				if (event.getDescription() == null
+						|| !event.getDescription().contains(MESSAGE_ORIGINAL_CREATOR)
+						|| event.getUpdated().getValue() > lastSyncedTime) {
+					Task task = gcList.get(i);
+					boolean existing = false;
+					for (Task item : tkList) {
+						if (item.equals(task)) {
+							existing = true;
+							break;
+						}
+					}
+					if (!existing) {
+						packet.taskAddedToTK.add(task);
+					}
+					if (event.getDescription() == null) {
+						event.setDescription(MESSAGE_ORIGINAL_CREATOR);
+					} else if (!event.getDescription().contains(MESSAGE_ORIGINAL_CREATOR)) {
+						event.setDescription(event.getDescription() + " "
+								+ MESSAGE_ORIGINAL_CREATOR);
+					}
+					client.events()
+							.update(calendar.getId(), event.getId(), event)
+							.execute();
+				}
+			}
+	}
+
+	private void addTaskFromTkToGc(ArrayList<Task> tkList,
+			com.google.api.services.calendar.model.Calendar calendar,
+			ArrayList<Task> gcList, GcPacket packet) throws IOException {
+		
+		for (int i = 0; i < tkList.size(); i ++) {
+			Task task = tkList.get(i);
+			
+			if (task.getStartTime() != null && !task.isSynced()) {
+				boolean existing = false;
+				for (Task item : gcList) {
+					if (item.equals(task)) {
+						existing = true;
+						break;
+					}
+				}
+				packet.taskAddedToGC.add(task);
+				if (!existing) {
+					insertEvent(task, calendar.getId());
+				}
+			}
+		}
+	}
+	
+	private long getLastSyncedTime() {
+		try {
+			long result = 0;
+			Scanner in = new Scanner(new File (fileToStoreSyncedTime));
+			if (in.hasNextLong()) {
+				result = in.nextLong();
+			}
+			in.close();
+			return result;
+		} catch (Exception e) {
+			return 0;
+		}
+	}
+	
+	private void updateLastSyncedTime(long time) {
+		try {
+			PrintWriter out = new PrintWriter(new FileWriter(fileToStoreSyncedTime, false));
+			out.println(time);
+			out.close();
+		} catch (IOException e) {
+		}
+	}
+	
+	public Task convertToTkTask(Event event) {
+		Task task = new Task();
+		task.setDescription(event.getSummary());
+		task.setLocation(event.getLocation());
+		
+		DateTime startDateTime = event.getStart().getDateTime();
+		DateTime endDateTime = event.getEnd().getDateTime();
+		
+		if (startDateTime == null) {
+			startDateTime = event.getStart().getDate();
+			startDateTime = new DateTime(startDateTime.toStringRfc3339() + START_OF_DAY);
+		}
+		if (endDateTime == null) {
+			endDateTime = event.getEnd().getDate();
+			endDateTime = new DateTime(endDateTime.toStringRfc3339() + START_OF_DAY);
+		}
+		
+		java.util.Calendar start = DateTimeConverter(startDateTime);
+		java.util.Calendar end = DateTimeConverter(endDateTime);
+		
+		task.setStartTime(start);
+		if (start.compareTo(end) < 0) {
+			task.setEndTime(end);
+		}
+		
+		return task;
+	}
+	
+    public java.util.Calendar DateTimeConverter (DateTime originalTime) {
+        Date time = new Date(originalTime.getValue());
+        java.util.Calendar result = java.util.Calendar.getInstance();
+        result.setTime(time);
+        return result;
+    }
+
+	public ArrayList<Event> listEvent(String calId) throws IOException {
+		ArrayList<Event> result = new ArrayList<Event>();
+		String pageToken = null;
+		
+		do {
+		  Events events = client.events().list(calId).setPageToken(pageToken).execute();
+		  List<Event> items = events.getItems();
+		  for (Event event : items) {
+		    result.add(event);
+		  }
+		  pageToken = events.getNextPageToken();
+		} while (pageToken != null);
+		
+		return result;
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\GCal\GCal.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+	 */
+
+	public void delete(Task taskToBeDeleted) {
+		ArrayList<Task> newList = new ArrayList<Task>();
+		
+		for (Task item : listOfTasks) {
+			if (!item.equals(taskToBeDeleted)) {
+				newList.add(item);
+			}
+		} 
+		
+		listOfTasks.clear();
+		store(newList);
+		push(copyList(listOfTasks));
+	}
+	
+	public void set(Task newTask) {
+		ArrayList<Task> newList = new ArrayList<Task>();
+		
+		for (Task item : listOfTasks) {
+			if (item.equals(newTask)) {
+				item.setPriority(newTask.getPriorityLevel());
+				item.setState(newTask.getState());
+			}
+			newList.add(item);
+		}
+		
+		listOfTasks.clear();
+		store(newList);
+		push(copyList(listOfTasks));
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+	 */
+
+	public String undo() {
+		if (currentPos > 0) {
+			currentPos --;
+			listOfTasks.clear();
+			store(stackForUndo.get(currentPos));
+			return Constants.MESSAGE_UNDO_DONE;
+		}
+		return "Stack is empty";
+	}
+	
+	public String redo() {
+		if (currentPos < availablePos) {
+			currentPos ++;
+			listOfTasks.clear();
+			store(stackForUndo.get(currentPos));
+			return Constants.MESSAGE_REDO_DONE;
+		}
+		return "No command to redo.";
+	}
+	
+	private void push(ArrayList<Task> list) {
+		currentPos ++; availablePos = currentPos;
+    	if (currentPos >= stackForUndo.size()) {
+    		stackForUndo.add(list);
+    	} else {
+    		stackForUndo.set(currentPos, list);
+    	}
+	}
+	
+	public void setSynced() {
+		ArrayList<Task> newList = copyList(listOfTasks);
+		for(Task item : newList) {
+			item.setSynced();
+		}
+		listOfTasks.clear();
+		store(newList);
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\theUI\Gui.java
+	 */
+
+/**
+ *         This class used to communicate with user.
+ */
+public class Gui {
+
+	private static final String HEADER_GOOD_TO_DO_TASKS = "===GOOD-TO-DO TASKS===";
+	private static final String NEW_LINE = "<br>";
+	private static final String SPACE = "&nbsp";
+	private static final String HTML_TYPE = "text/html";
+	private static final String NO_COMMAND = "";
+	private static final int ALL_TASK = -2;
+
+	// constants for color, size.
+	private static final int HEIGHT = 800;
+	private static final int WIDTH = 500;
+	private static final Color COLOR_CARET = Color.white;
+	private static final Color COLOR_BACKGROUND = new Color(0x272822);
+	private static final Color COLOR_FOREGROUND = new Color(0xF8F8F0);
+	private static final String COLOR_DONE = "#A6E22E";
+	private static final String COLOR_WARNING = "#F92672";
+	private static final String COLOR_HOUR = "#E6DB74";
+	private static final String COLOR_DESCRIPTION = "#66D9EF";
+	private static final String COLOR_LOCATION = "#CECEF6";
+	private static final String COLOR_DATE = "#FD971F";
+	private static final String SIZE_NORMAL = "4";
+	private static final String SIZE_NUMBER = "3";
+	private static final String COLOR_DESCRIPTION_HIGH = "#FE2E2E";
+	private static final String COLOR_DESCRIPTION_LOW = "#A4A4A4";
+	private static final String COLOR_STATE = "#A6E22E";
+	private static final String helpFile = "help.html";
+	private static final String STYLE = "<head><style>"
+			+ "p  { font-family:consolas; font-size:100%; }"
+			+ "</style></head>";
+	private static final Font COMMAND_FONT = new Font("consolas",
+			Font.TRUETYPE_FONT, 19);
+
+	// graphic components.
+	private JFrame frame = new JFrame("TasKoord");
+	private JTextField commandBox = new JTextField();
+	private JTextPane displayBox = new JTextPane();
+	private SwingBrowser browser = new SwingBrowser();
+
+	// stack and variables for calling previous command.
+	private ArrayList<String> commandStack = new ArrayList<String>();
+	private int currentPos = 0;
+	private String currentCommand = "";
+	private boolean upDownTyped = false;
+
+	public String displayText = "";
+	private String userCommand = NO_COMMAND;
+
+	public Gui() {
+		initialize();
+		listenToUserCommand();
+		addToFrame();
+	}
+
+	// initialize the color, size, .. of components.
+	public void initialize() {
+		commandBox.setEditable(true);
+		displayBox.setEditable(false);
+
+		displayBox.setPreferredSize(new Dimension(WIDTH, HEIGHT));
+
+		displayBox.setContentType(HTML_TYPE);
+		commandBox.setFont(COMMAND_FONT);
+		commandBox.setCaretColor(COLOR_CARET);
+
+		commandBox.setBackground(COLOR_BACKGROUND);
+		displayBox.setBackground(COLOR_BACKGROUND);
+		commandBox.setForeground(COLOR_FOREGROUND);
+		displayBox.setForeground(COLOR_FOREGROUND);
+
+		JFrame.setDefaultLookAndFeelDecorated(true);
+		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+	}
+
+	// add components to the frame and show the GUI.
+	public void addToFrame() {
+		Container content = frame.getContentPane();
+		BorderLayout border = new BorderLayout();
+		content.setLayout(border);
+
+		content.add(commandBox, BorderLayout.SOUTH);
+		frame.add(new JScrollPane(displayBox));
+
+		frame.pack();
+		frame.setVisible(true);
+	}
+
+	// listen to user action.
+	public void listenToUserCommand() {
+		commandBox.addActionListener(new ActionListener() {
+			public void actionPerformed(ActionEvent e) {
+				System.out.println("Text=" + commandBox.getText());
+				commandStack.add(commandBox.getText());
+				currentPos = commandStack.size();
+				upDownTyped = false;
+				setUserCommand(commandBox.getText());
+				clearCommandBox();
+			}
+		});
+
+		commandBox.addKeyListener(new KeyListener() {
+			public void keyPressed(KeyEvent keyEvent) {
+				if (keyEvent.getKeyCode() == KeyEvent.VK_UP) {
+					if (!upDownTyped) {
+						currentCommand = commandBox.getText();
+						upDownTyped = true;
+					}
+					if (currentPos - 1 >= 0) {
+						currentPos--;
+						commandBox.setText(commandStack.get(currentPos));
+					}
+				} else if (keyEvent.getKeyCode() == KeyEvent.VK_DOWN) {
+					if (!upDownTyped) {
+						currentCommand = commandBox.getText();
+						upDownTyped = true;
+					}
+					if (currentPos + 1 < commandStack.size()) {
+						currentPos++;
+						commandBox.setText(commandStack.get(currentPos));
+					} else {
+						currentPos = commandStack.size();
+						commandBox.setText(currentCommand);
+					}
+				} else if (currentPos == commandStack.size()) {
+					currentCommand = commandBox.getText();
+				}
+			}
+
+			public void keyReleased(KeyEvent keyEvent) {
+			}
+
+			public void keyTyped(KeyEvent keyEvent) {
+
+			}
+		});
+	}
+	
+	public void runBrowser(String url) {
+		browser.runBrowser(url);
+	}
+	
+	public void setBrowserCode(String code) {
+		browser.setCode(code);
+	}
+	
+	public String getBrowserCode() {
+		return browser.code;
+	}
+
+	public void displayWarning(String text, boolean isAppended) {
+		if (isAppended) {
+			displayText += formatWithNewLine(text, SIZE_NORMAL, COLOR_WARNING);
+		} else {
+			displayText = formatWithNewLine(text, SIZE_NORMAL, COLOR_WARNING);
+		}
+		setDisplayBox();
+	}
+
+	public void displayDone(String text, boolean isAppended) {
+		if (isAppended) {
+			displayText += formatWithNewLine(text, SIZE_NORMAL, COLOR_DONE);
+		} else {
+			displayText = formatWithNewLine(text, SIZE_NORMAL, COLOR_DONE);
+		}
+		setDisplayBox();
+	}
+
+	private void display(int no, Task task, int effect, boolean isIndexed) {
+		String res = format(intToString(no, isIndexed), SIZE_NUMBER,
+				COLOR_DONE, effect);
+
+		if (task.getStartTime() != null) {
+			if (task.getEndTime() == null) {
+				res += format("[", SIZE_NORMAL, COLOR_HOUR, effect);
+				res += format(
+						convertCalendarToString(task.getStartTime(),
+								Constants.FORMAT_HOUR) + "]", SIZE_NORMAL,
+						COLOR_HOUR, effect);
+			} else {
+				res += format(
+						"["
+								+ convertCalendarToString(task.getStartTime(),
+										Constants.FORMAT_HOUR), SIZE_NORMAL,
+						COLOR_HOUR, effect);
+			}
+		}
+		if (task.getEndTime() != null) {
+			String startTimeString = convertCalendarToString(
+					task.getStartTime(), Constants.FORMAT_DATE);
+			String endTimeString = convertCalendarToString(task.getEndTime(),
+					Constants.FORMAT_DATE);
+			if (startTimeString.equals(endTimeString)) {
+				res += format(
+						" - "
+								+ convertCalendarToString(task.getEndTime(),
+										Constants.FORMAT_HOUR) + "]",
+						SIZE_NORMAL, COLOR_HOUR, effect);
+			} else {
+				res += format(
+						" - "
+								+ convertCalendarToString(task.getEndTime(),
+										Constants.FORMAT_DATE_DATE_AND_HOUR)
+								+ "]", SIZE_NORMAL, COLOR_HOUR, effect);
+			}
+		}
+
+		if (task.getState() != StateType.PENDING && task.getState() != null) {
+			res += format("  [" + task.getState() + "]", SIZE_NORMAL,
+					COLOR_STATE, effect);
+		}
+		if (task.getStartTime() != null) {
+			res += NEW_LINE;
+		}
+
+		for (int i = 1; i <= 10; i++) {
+			res += SPACE;
+		}
+
+		if (task.getDescription() != null) {
+			String color = COLOR_DESCRIPTION;
+			if (task.getPriorityLevel() == PriorityType.HIGH) {
+				color = COLOR_DESCRIPTION_HIGH;
+			} else if (task.getPriorityLevel() == PriorityType.LOW) {
+				color = COLOR_DESCRIPTION_LOW;
+			}
+			res += format(task.getDescription(), SIZE_NORMAL, color, effect);
+		}
+
+		if (task.getLocation() != null) {
+			res += format(" @ " + task.getLocation(), SIZE_NORMAL,
+					COLOR_LOCATION, effect);
+		}
+
+		displayText += res + NEW_LINE;
+	}
+
+	public void display(ArrayList<Task> lists, int pos, int effect,
+			boolean isAppended, boolean isIndexed) {
+		if (!isAppended) {
+			displayText = "";
+		}
+
+		Task preTask = null, curTask;
+		for (int i = 0; i < lists.size(); i++) {
+			if (!checkFloatingTask(lists.get(i))) {
+				curTask = lists.get(i);
+				if (preTask == null
+						|| !convertCalendarToString(preTask.getStartTime(),
+								Constants.FORMAT_EEE).equals(
+								convertCalendarToString(curTask.getStartTime(),
+										Constants.FORMAT_EEE))) {
+					displayText += NEW_LINE
+							+ format("======", SIZE_NORMAL, COLOR_DATE)
+							+ format(
+									"["
+											+ convertCalendarToString(
+													curTask.getStartTime(),
+													Constants.FORMAT_EEE) + "]",
+									SIZE_NORMAL, COLOR_DATE)
+							+ format("======", SIZE_NORMAL, COLOR_DATE)
+							+ NEW_LINE + NEW_LINE;
+				}
+				if (i == pos || pos == ALL_TASK) {
+					display(i + 1, curTask, effect, isIndexed);
+				} else {
+					display(i + 1, curTask, Constants.NO_EFFECT, isIndexed);
+				}
+				preTask = curTask;
+			}
+		}
+
+		boolean flag = true;
+		for (int i = 0; i < lists.size(); i++) {
+			if (checkFloatingTask(lists.get(i))) {
+				if (flag) {
+					displayText += NEW_LINE
+							+ formatWithNewLine(HEADER_GOOD_TO_DO_TASKS,
+									SIZE_NORMAL, COLOR_DATE) + NEW_LINE;
+					flag = false;
+				}
+
+				int eff = Constants.NO_EFFECT;
+				if (i == pos || pos == ALL_TASK) {
+					eff = effect;
+				}
+				String color = COLOR_DESCRIPTION;
+				if (lists.get(i).getPriorityLevel() == PriorityType.HIGH) {
+					color = COLOR_DESCRIPTION_HIGH;
+				} else if (lists.get(i).getPriorityLevel() == PriorityType.LOW) {
+					color = COLOR_DESCRIPTION_LOW;
+				}
+				displayText += format(intToString(i + 1, isIndexed),
+						SIZE_NUMBER, COLOR_DONE);
+				displayText += format(lists.get(i).getDescription(),
+						SIZE_NORMAL, color, eff);
+
+				if (lists.get(i).getLocation() != null)
+					displayText += format(" @ " + lists.get(i).getLocation(),
+							SIZE_NORMAL, COLOR_LOCATION, eff);
+
+				if (lists.get(i).getState() != StateType.PENDING) {
+					displayText += format(
+							" [" + lists.get(i).getState() + "] ", SIZE_NORMAL,
+							COLOR_STATE, eff);
+				}
+
+				displayText += NEW_LINE;
+			}
+		}
+
+		setDisplayBox();
+	}
+
+	private String intToString(int no, boolean isIndexed) {
+		if (!isIndexed) {
+			return "";
+		}
+		if (no < 10) {
+			return "0" + no + ". ";
+		} else {
+			return Integer.toString(no) + ". ";
+		}
+	}
+
+	private boolean checkFloatingTask(Task task) {
+		return (task.getStartTime() == null);
+	}
+
+	private void setDisplayBox() {
+		displayBox.setText(STYLE + "<p>" + displayText);
+	}
+
+	public void clearDisplayBox() {
+		displayText = "";
+		setDisplayBox();
+	}
+
+	private void clearCommandBox() {
+		commandBox.setText(NO_COMMAND);
+	}
+
+	public String getUserCommand() {
+		return userCommand;
+	}
+
+	public void setUserCommand(String command) {
+		userCommand = command;
+	}
+
+	private String convertCalendarToString(Calendar time, String FORMAT) {
+		if (time == null) {
+			return null;
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+		return formatter.format(time.getTime());
+	}
+
+	private String format(String text, String size, String color) {
+		return "<font size = " + size + " color = " + color + ">" + text
+				+ "</font>";
+	}
+
+	private String formatWithNewLine(String text, String size, String color) {
+		return "<font size = " + size + " color = " + color + ">" + text
+				+ "</font><br>";
+	}
+
+	private String format(String text, String size, String color, int effect) {
+		String res = "<font size = " + size + " color = " + color + ">" + text
+				+ "</font>";
+		if (effect == Constants.HIGHLIGH) {
+			return "<b><u>" + res + "</u></b>";
+		} else if (effect == Constants.DELETED) {
+			return "<strike>" + res + "</strike>";
+		} else {
+			return res;
+		}
+	}
+
+	public void displayFile() {
+		try {
+			InputStream in = Gui.class.getResourceAsStream(helpFile);
+			String text = convertStreamToString(in);
+			displayBox.setText(text);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	private String convertStreamToString(java.io.InputStream is) {
+		@SuppressWarnings("resource")
+		Scanner s = new Scanner(is).useDelimiter("\\A");
+		return s.hasNext() ? s.next() : "";
+	}
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\theUI\Gui.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\theUI\UITest.java
+	 */
+
+public class UITest {
+
+	private UserInterface ui;
+
+	@Before
+	public void initObj() {
+		ui = new UserInterface("testing.txt");
+		ui.executeCommands("clear");
+	}
+
+	@Test
+	public void testAddCommand() {
+		/*
+		 * test for "adding" partition
+		 */
+
+		// boundary case
+		ui.executeCommands("add");
+		assertEquals(
+				ui.getDisplayedMessage(),
+				"<font size = 4 color = #F92672>Please specify the task you want to add!</font><br>");
+
+		// add an event
+		ui.executeCommands("add Meeting from 9am to 10am on 24 Oct 2015 at Boardroom");
+		assertEquals(
+				ui.getDisplayedMessage(),
+				"<font size = 4 color = #A6E22E>Task added to TasKoord!</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><b><u><font size = 3 color = #A6E22E>01. </font></u></b><b><u><font size = 4 color = #E6DB74>[09:00</font></u></b><b><u><font size = 4 color = #E6DB74> - 10:00]</font></u></b><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b><u><font size = 4 color = #66D9EF>Meeting</font></u></b><b><u><font size = 4 color = #CECEF6> @ Boardroom</font></u></b><br>");
+
+		// add a floating task
+		ui.executeCommands("add read Harry Potter");
+		assertEquals(
+				ui.getDisplayedMessage(),
+				"<font size = 4 color = #A6E22E>Task added to TasKoord!</font><br><br><font size = 4 color = #FD971F>===GOOD-TO-DO TASKS===</font><br><br><font size = 3 color = #A6E22E>01. </font><b><u><font size = 4 color = #66D9EF>read Harry Potter</font></u></b><br>");
+
+		// add a deadline
+		ui.executeCommands("add submit V0.5 by 10/11/14");
+		assertEquals(
+				ui.getDisplayedMessage(),
+				"<font size = 4 color = #A6E22E>Task added to TasKoord!</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Mon, 10 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><b><u><font size = 3 color = #A6E22E>01. </font></u></b><b><u><font size = 4 color = #E6DB74>[</font></u></b><b><u><font size = 4 color = #E6DB74>23:59]</font></u></b><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b><u><font size = 4 color = #66D9EF>submit V0.5</font></u></b><br>");
+
+		/*
+		 * tests for "delete" partition
+		 */
+		// boundary case
+		ui.executeCommands("delete");
+		assertEquals(
+				ui.getDisplayedMessage(),
+				"<font size = 4 color = #F92672>Please specify the task you want to delete!</font><br>");
+
+		// case: no task matches
+		ui.executeCommands("delete eat ice cream");
+		assertEquals(ui.getDisplayedMessage(),
+				"<font size = 4 color = #F92672>Task does not exist!</font><br>");
+
+		// case: task matches
+		ui.executeCommands("delete Harry");
+		assertEquals(
+				ui.getDisplayedMessage(),
+				"<font size = 4 color = #A6E22E>Tasks were deleted from TasKoord:</font><br><br><font size = 4 color = #FD971F>===GOOD-TO-DO TASKS===</font><br><br><font size = 3 color = #A6E22E>01. </font><strike><font size = 4 color = #66D9EF>read Harry Potter</font></strike><br>");
+
+		/*
+		 * tests for "list" partition
+		 */
+		// boundary case
+		ui.executeCommands("list");
+		assertEquals(
+				ui.getDisplayedMessage(),
+				"<br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Mon, 10 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[</font><font size = 4 color = #E6DB74>23:59]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>submit V0.5</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>02. </font><font size = 4 color = #E6DB74>[09:00</font><font size = 4 color = #E6DB74> - 10:00]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>Meeting</font><font size = 4 color = #CECEF6> @ Boardroom</font><br>");
+		
+		// list upcoming task
+		ui.executeCommands("list upcoming tasks for next 365 days");
+		assertEquals(
+				ui.getDisplayedMessage(),
+				"<br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Mon, 10 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[</font><font size = 4 color = #E6DB74>23:59]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>submit V0.5</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Sat, 24 Oct 2015]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>02. </font><font size = 4 color = #E6DB74>[09:00</font><font size = 4 color = #E6DB74> - 10:00]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>Meeting</font><font size = 4 color = #CECEF6> @ Boardroom</font><br>");
+		
+		// list on specific day
+		ui.executeCommands("list on 10/11/14");
+		assertEquals(ui.getDisplayedMessage(),
+				"<br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Mon, 10 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[</font><font size = 4 color = #E6DB74>23:59]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>submit V0.5</font><br>");
+		
+		/*
+		 * tests for "search"
+		 */
+		ui.executeCommands("add go fishing from 5pm to 7pm on 14/11/14");
+		ui.executeCommands("add homework from 9pm to 11pm on 13/11/14");
+		ui.executeCommands("add housework from 9pm to 11pm on 12/11/14");
+		ui.executeCommands("search work");
+		assertEquals(ui.getDisplayedMessage(),
+				"<br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Wed, 12 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>01. </font><font size = 4 color = #E6DB74>[21:00</font><font size = 4 color = #E6DB74> - 23:00]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>housework</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Thu, 13 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><font size = 3 color = #A6E22E>02. </font><font size = 4 color = #E6DB74>[21:00</font><font size = 4 color = #E6DB74> - 23:00]</font><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<font size = 4 color = #66D9EF>homework</font><br>");
+		
+		/*
+		 * tests for "undo"
+		 */
+		ui.executeCommands("list");
+		ui.executeCommands("delete 4");
+		ui.executeCommands("undo");
+		assertEquals(ui.getDisplayedMessage(),
+				"<font size = 4 color = #A6E22E>Task restored.</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Fri, 14 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><b><u><font size = 3 color = #A6E22E>01. </font></u></b><b><u><font size = 4 color = #E6DB74>[17:00</font></u></b><b><u><font size = 4 color = #E6DB74> - 19:00]</font></u></b><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b><u><font size = 4 color = #66D9EF>go fishing</font></u></b><br>");
+		
+		/*
+		 * tests for "redo"
+		 */
+		ui.executeCommands("redo");
+		assertEquals(ui.getDisplayedMessage(),
+				"<font size = 4 color = #A6E22E>Tasks were deleted from TasKoord:</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Fri, 14 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><strike><font size = 3 color = #A6E22E>01. </font></strike><strike><font size = 4 color = #E6DB74>[17:00</font></strike><strike><font size = 4 color = #E6DB74> - 19:00]</font></strike><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<strike><font size = 4 color = #66D9EF>go fishing</font></strike><br>");
+		
+		// boundary case: no task to redo
+		ui.executeCommands("redo");
+		assertEquals(ui.getDisplayedMessage(),
+				"<font size = 4 color = #F92672>No command to redo</font><br>");
+	}
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\theUI\UITest.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\theUI\UserInterface.java
+	 */
+
+/**
+ *         This is UI Controller. That takes commands from GUI, implements
+ *         commands using Parser and Logic, then sends GUI the feedbacks
+ *
+ */
+public class UserInterface {
+	
+	// Constants for google calendar integration
+	private static final String TASKS_ADDED_TO_GC = "<br>Tasks added to Google Calendar: ";
+	private static final String TASKS_DELETED_FROM_GC = "<br>Tasks deleted from Google Calendar: ";
+	private static final String TASKS_ADDED_TO_TK = "<br>Tasks added to TasKoord: ";
+	private static final String TASKS_DELETED_FROM_TK = "<br>Tasks deleted from TasKoord: ";
+	private static final String MESSAGE_SYNCING = "Syncing is in progress, it may take a few minutes to complete...";
+	private static final String MESSAGE_NO_INTERNET = "No internet connection available!";
+	private static final String MESSAGE_SYNC_ERROR = "Unable to sync, please try again!";
+	private static final String MESSAGE_WAITING = "Please follow the link and accept it!";
+	private static final String MESSAGE_SYNC_COMPLETE = "Synchronization is complete.";
+	private static final String clientEmail = "914087031259-compute@developer.gserviceaccount.com";
+	private static final String MESSAGE_SYNC_REMINDER = "If you still cannot sync, try sharing your calendar with: "
+			+ clientEmail;
+
+	// Local constants
+	private static final boolean APPENDED = true;
+	private static final boolean INSERTED = false;
+	private static final boolean INDEXED = true;
+	private static final boolean NO_INDEX = false;
+	private static final int COLOR_DONE = 1;
+	private static final int COLOR_WARNING = 2;
+	private static final int NO_TASK = -1;
+	private static final int ALL_TASK = -2;
+	
+
+	// Constants for keywords
+	private static final String KEYWORD_UPCOMING_TASK = "upcoming";
+	private static final String KEYWORD_FLOATING_TASK = "floating";
+	private static final String KEYWORD_INVALID_CMD = "invalid";
+
+	// Some local messages that will be shown to user.
+	private static final String MESSAGE_TASK_EDITED_FOR_UNDO = "Task edited.";
+	private static final String MESSAGE_TASK_RESTORED_FOR_UNDO = "Task restored.";
+	private static final String MESSAGE_TASK_DELETED_FOR_UNDO = "Task deleted.";
+	private static final String MESSAGE_NO_UNDO = "No command to undo";
+	private static final String MESSAGE_NO_REDO = "No command to redo";
+	private static final String MESSAGE_TASK_RESTORED = "All tasks restored.";
+	private static final String MESSAGE_INFORMAT_CMD = "Informat command";
+	private static final String MESSAGE_WRONG_CMD = "Cannot understand the command!";
+	private static final String MESSAGE_GOODBYE = "Good Bye !!!";
+	private static final String MESSAGE_WELCOME = "Welcome to TasKoord!! <br> If this is your first time using TasKoord, "
+			+ "please type 'help' for more information.";
+	private static final String NO_COMMAND = "";
+
+	// Components that interact with UI
+	private Logic logic;
+	private Parser parser;
+	private Gui gui;
+	
+	// logger
+	private static Logger LOGGER = Logger.getLogger(".TasKoordUILogFile.log");
+
+	// The special packet for implementing undo and redo.
+	private static class UndoAndRedoPack {
+		public String statusForUndo, statusForRedo;
+		public ArrayList<Task> tasksForUndo, tasksForRedo;
+		public Integer effectForUndo, effectForRedo;
+		public Integer posToDoEffectForUndo, posToDoEffectForRedo;
+		public Integer colorForUndo, colorForRedo;
+
+		public UndoAndRedoPack(int posForUndo, ArrayList<Task> listForUndo,
+				int undoEffect, String messageForUndo, int ucolor,
+				int posForRedo, ArrayList<Task> listForRedo, int redoEffect,
+				String messageForRedo, int rcolor) {
+			this.posToDoEffectForUndo = posForUndo;
+			this.tasksForUndo = listForUndo;
+			this.effectForUndo = undoEffect;
+			this.statusForUndo = messageForUndo;
+			this.colorForUndo = ucolor;
+
+			this.posToDoEffectForRedo = posForRedo;
+			this.tasksForRedo = listForRedo;
+			this.effectForRedo = redoEffect;
+			this.statusForRedo = messageForRedo;
+			this.colorForRedo = rcolor;
+		}
+	}
+
+	// Stack used for undo and redo
+	private ArrayList<UndoAndRedoPack> stack;
+	private ArrayList<Task> tasksOnScreen;
+	private int currentPos;
+	private int availablePos;
+
+	public UserInterface(String fileName) {
+		parser = Parser.getInstance();
+		logic = new Logic(fileName);
+		gui = new Gui();
+		
+		LogFile.newLogger();
+
+		tasksOnScreen = new ArrayList<Task>();
+		stack = new ArrayList<UndoAndRedoPack>();
+		currentPos = availablePos = -1;
+	}
+
+	public void run() {
+		showBeginScreen();
+		while (true) {
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				Thread.currentThread().interrupt();
+			}
+
+			String userCommand = gui.getUserCommand();
+			if (!userCommand.equals(NO_COMMAND)) {
+				try {
+					gui.setUserCommand(NO_COMMAND);
+					executeCommands(userCommand);
+				} catch (Exception e) {
+					LOGGER.log(Level.WARNING, e.toString());
+				}
+			}
+		}
+	}
+
+	// Show welcome message and all tasks at the beginning
+	private void showBeginScreen() {
+		gui.displayDone(MESSAGE_WELCOME, INSERTED);
+		ArrayList<Task> list = logic.load();
+		if (!list.isEmpty()) {
+			gui.display(list, NO_TASK, Constants.NO_EFFECT, APPENDED, INDEXED);
+		}
+	}
+
+	// execute command received from GUI.
+	public void executeCommands(String userCommand) {
+		UserInput userInput;
+		CommandType command;
+		Task task;
+
+		try {
+			userInput = parser.format(userCommand);
+			command = userInput.getCommand();
+			task = userInput.getTask();
+		} catch (Exception e) {
+			if (e.getMessage().contains(KEYWORD_INVALID_CMD)) {
+				gui.displayWarning(String.format(
+						Constants.EXCEPTIONS_INVALID_USERCOMMAND, userCommand,
+						e.getMessage()), INSERTED);
+			} else {
+				gui.displayWarning(MESSAGE_WRONG_CMD, INSERTED);
+				e.printStackTrace();
+			}
+			return;
+		}
+
+		if (command == CommandType.ADD) {
+			add(task);
+		} else if (command == CommandType.DELETE) {
+			delete(task);
+		} else if (command == CommandType.UNDO) {
+			undo();
+		} else if (command == CommandType.EDIT) {
+			Task newTask = userInput.getEditedTask();
+			edit(task, newTask);
+		} else if (command == CommandType.CLEAR) {
+			clear();
+		} else if (command == CommandType.LIST) {
+			list(task);
+		} else if (command == CommandType.SEARCH) {
+			search(task);
+		} else if (command == CommandType.SET) {
+			set(task);
+		} else if (command == CommandType.REDO) {
+			redo();
+		} else if (command == CommandType.SYNC) {
+			sync();
+		} else if (command == CommandType.HELP) {
+			help();
+		} else if (command == CommandType.EXIT) {
+			gui.displayDone(MESSAGE_GOODBYE, INSERTED);
+			try {
+				Thread.sleep(100);
+			} catch (InterruptedException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				Thread.currentThread().interrupt();
+			}
+			System.exit(0);
+		} else {
+			gui.displayWarning(MESSAGE_INFORMAT_CMD, INSERTED);
+		}
+		System.out.println(getDisplayedMessage());
+	}	
+
+	// sync with google calendar
+	private void sync() {
+		if (!logic.isOnline()) {
+			gui.displayWarning(MESSAGE_NO_INTERNET, INSERTED);
+		} else {
+			gui.displayDone(MESSAGE_SYNCING, INSERTED);
+			if (logic.connectUsingExistingToken()) {
+				try {
+					GcPacket packet = logic.sync(logic.load());
+					gui.displayDone(MESSAGE_SYNC_COMPLETE, INSERTED);
+					displayPacket(packet);
+					return;
+				} catch (IOException e) {
+					syncWithNewToken(logic.getURL());
+					e.printStackTrace();
+				}
+			} else {
+				syncWithNewToken(logic.getURL());
+			}
+		}
+	}
+
+	private void syncWithNewToken(String url) {
+		try {
+			String code = getTokenPopup(url);
+			if (code == Constants.CODE_NO_CODE) {
+				gui.displayWarning(Constants.CODE_NO_CODE, INSERTED);
+			} else if (code == Constants.CODE_REJECTED) {
+				gui.displayWarning(Constants.CODE_REJECTED, INSERTED);
+			} else {
+				gui.displayDone(MESSAGE_SYNCING, INSERTED);
+
+				logic.connectByNewToken(code);
+				GcPacket packet = logic.sync(logic.load());
+
+				gui.displayDone(MESSAGE_SYNC_COMPLETE, INSERTED);
+				displayPacket(packet);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+			gui.displayWarning(MESSAGE_SYNC_ERROR, INSERTED);
+			gui.displayWarning(MESSAGE_SYNC_REMINDER, APPENDED);
+		}
+	}
+
+	// open browser to get authority from user.
+	public String getTokenPopup(String url) {
+		gui.displayDone(MESSAGE_WAITING, INSERTED);
+		gui.runBrowser(url);
+		while (true) {
+			try {
+				Thread.sleep(100);
+				String code = gui.getBrowserCode();
+				if (!code.equals(NO_COMMAND)) {
+					gui.setBrowserCode(NO_COMMAND);
+					return code;
+				}
+			} catch (InterruptedException e) {
+				LOGGER.log(Level.WARNING, e.toString());
+				Thread.currentThread().interrupt();
+			}
+		}
+	}
+
+	// display what were changed after syncing.
+	private void displayPacket(GcPacket packet) {
+		ArrayList<Task> list = new ArrayList<Task>();
+
+		for (Task item : packet.taskDeletedFromTK) {
+			if (logic.delete(item).equals(Constants.MESSAGE_TASK_DELETED)) {
+				list.add(item);
+			}
+		}
+
+		if (list.size() != 0) {
+			gui.displayDone(TASKS_DELETED_FROM_TK, APPENDED);
+			gui.display(list, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
+		}
+
+		list.clear();
+		for (Task item : packet.taskAddedToTK) {
+			try {
+				item.setPriority(Constants.PRIORITY_MEDIUM);
+				item.setState(Constants.STATE_PENDING);
+			} catch (Exception e) {
+				LOGGER.log(Level.WARNING, e.toString());
+			}
+			if (!logic.add(item).equals(Constants.MESSAGE_DUPLICATED_TASK)) {
+				list.add(item);
+			}
+		}
+		if (list.size() != 0) {
+			gui.displayDone(TASKS_ADDED_TO_TK, APPENDED);
+			gui.display(list, NO_TASK, Constants.NO_EFFECT, APPENDED, NO_INDEX);
+		}
+
+		if (packet.taskDeletedFromGC.size() != 0) {
+			gui.displayDone(TASKS_DELETED_FROM_GC, APPENDED);
+			gui.display(packet.taskDeletedFromGC, NO_TASK, Constants.NO_EFFECT,
+					APPENDED, NO_INDEX);
+		}
+
+		if (packet.taskAddedToGC.size() != 0) {
+			gui.displayDone(TASKS_ADDED_TO_GC, APPENDED);
+			gui.display(packet.taskAddedToGC, NO_TASK, Constants.NO_EFFECT,
+					APPENDED, NO_INDEX);
+		}
+
+		logic.setSynced();
+	}
+
+	private void help() {
+		gui.displayFile();
+		tasksOnScreen.clear();
+	}
+
+	private void add(Task task) {
+		if (task.getDescription() == null) {
+			gui.displayWarning(Constants.MESSAGE_NO_ADD_INFO, INSERTED);
+			tasksOnScreen.clear();
+			return;
+		}
+
+		if (task.getStartTime() != null && task.getEndTime() != null) {
+			if (task.getStartTime().compareTo(task.getEndTime()) >= 0) {
+				gui.displayWarning(Constants.MESSAGE_ENDTIME_BEFORE_STARTTIME,
+						INSERTED);
+				gui.displayWarning("<br>", APPENDED);
+				gui.displayWarning(
+						"Start time: "
+								+ convertCalendarToString(task.getStartTime(),
+										Constants.FORMAT_DATE_DATE_AND_HOUR),
+						APPENDED);
+				gui.displayWarning(
+						"End time  : "
+								+ convertCalendarToString(task.getEndTime(),
+										Constants.FORMAT_DATE_DATE_AND_HOUR),
+						APPENDED);
+				tasksOnScreen.clear();
+				return;
+			}
+		}
+
+		try {
+			if (task.getState() == null) {
+				task.setState(StateType.PENDING);
+			}
+			if (task.getPriorityLevel() == null) {
+				task.setPriority(PriorityType.MEDIUM);
+			}
+
+			String feedback = logic.add(task);
+			ArrayList<Task> list = searchTaskOfSameDay(task);
+
+			if (feedback.equals(Constants.MESSAGE_TASK_ADDED)) {
+				addToStackForUndoAndRedo(list, task, Constants.DELETED,
+						MESSAGE_TASK_DELETED_FOR_UNDO, COLOR_DONE, list, task,
+						Constants.HIGHLIGH, feedback, COLOR_DONE);
+				gui.displayDone(feedback, INSERTED);
+				showToUser(list, task, Constants.HIGHLIGH, APPENDED);
+			} else if (feedback.equals(Constants.MESSAGE_CLASHING_TIMESLOTS)) {
+				addToStackForUndoAndRedo(list, task, Constants.DELETED,
+						MESSAGE_TASK_DELETED_FOR_UNDO, COLOR_DONE, list, task,
+						Constants.HIGHLIGH, feedback, COLOR_WARNING);
+				gui.displayWarning(feedback, INSERTED);
+				showToUser(list, task, Constants.HIGHLIGH, APPENDED);
+			} else if (feedback.equals(Constants.MESSAGE_NO_START_TIME)) {
+				gui.displayWarning(feedback, INSERTED);
+				tasksOnScreen.clear();
+			} else {
+				gui.displayWarning(feedback, INSERTED);
+				showToUser(list, task, Constants.HIGHLIGH, APPENDED);
+			}
+
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	private ArrayList<Task> searchTaskOfSameDay(Task task) {
+		Task taskToSearch = new Task();
+		taskToSearch.setStartTime(task.getStartTime());
+		taskToSearch.setEndTime(task.getEndTime());
+		if (taskToSearch.getStartTime() == null) {
+			taskToSearch.setDescription(KEYWORD_FLOATING_TASK);
+		}
+		ArrayList<Task> list = logic.list(taskToSearch);
+		return list;
+	}
+
+	private void list(Task task) {
+		try {
+			String cmdInfo = task.getDescription();
+			if (cmdInfo != null) {
+				cmdInfo = cmdInfo.toLowerCase();
+			}
+
+			if (task.getState() == null && task.getStartTime() == null) {
+				task.setState(StateType.PENDING);
+			}
+
+			if (cmdInfo != null && cmdInfo.contains(KEYWORD_UPCOMING_TASK)
+					&& task.getStartTime() == null) {
+				int time = Constants.LISTUPCOMINGTIME_DEFAULT;
+				String s = getFirstInt(cmdInfo);
+				if (!s.equals("")) {
+					time = Integer.parseInt(s);
+				}
+
+				Calendar endTime = Calendar.getInstance();
+				endTime.add(Calendar.DAY_OF_MONTH, time);
+				task.setStartTime(Calendar.getInstance());
+				task.setEndTime(endTime);
+			}
+
+			ArrayList<Task> result = logic.list(task);
+			if (result.size() == 0) {
+				gui.displayDone(Constants.MESSAGE_NO_RESULT_LIST, INSERTED);
+				tasksOnScreen.clear();
+			} else {
+				showToUser(result, INSERTED);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	private void delete(Task task) {
+		if (task.getDescription() == null) {
+			gui.displayWarning(Constants.MESSAGE_NO_DELETE_INFO, INSERTED);
+			tasksOnScreen.clear();
+			return;
+		}
+		try {
+			ArrayList<Task> list = new ArrayList<Task>();
+
+			if (isInteger(task.getDescription())) {
+				int noOfTask = toInteger(task.getDescription());
+				if (noOfTask <= tasksOnScreen.size()) {
+					Task taskToBeDeleted = tasksOnScreen.get(noOfTask - 1);
+					list = searchTaskOfSameDay(taskToBeDeleted);
+
+					String feedback = logic.delete(taskToBeDeleted);
+					if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
+						addToStackForUndoAndRedo(list, taskToBeDeleted,
+								Constants.HIGHLIGH,
+								MESSAGE_TASK_RESTORED_FOR_UNDO, COLOR_DONE,
+								list, taskToBeDeleted, Constants.DELETED,
+								feedback, COLOR_DONE);
+						gui.displayDone(feedback, INSERTED);
+						showToUser(list, taskToBeDeleted, Constants.DELETED,
+								APPENDED);
+					} else {
+						gui.displayWarning(feedback, INSERTED);
+						tasksOnScreen.clear();
+					}
+					return;
+				}
+			}
+
+			list = logic.search(task.getDescription());
+
+			if (list.isEmpty()) {
+				gui.displayWarning(Constants.MESSAGE_TASK_DOES_NOT_EXIST,
+						INSERTED);
+				tasksOnScreen.clear();
+			} else if (list.size() == 1) {
+				Task taskToBeDeleted = list.get(0);
+				list = searchTaskOfSameDay(taskToBeDeleted);
+
+				String feedback = logic.delete(taskToBeDeleted);
+				if (feedback.equals(Constants.MESSAGE_TASK_DELETED)) {
+					addToStackForUndoAndRedo(list, taskToBeDeleted,
+							Constants.HIGHLIGH, MESSAGE_TASK_RESTORED_FOR_UNDO,
+							COLOR_DONE, list, taskToBeDeleted,
+							Constants.DELETED, feedback, COLOR_DONE);
+					gui.displayDone(feedback, INSERTED);
+					showToUser(list, taskToBeDeleted, Constants.DELETED,
+							APPENDED);
+				} else {
+					gui.displayWarning(feedback, INSERTED);
+					tasksOnScreen.clear();
+				}
+			} else {
+				gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND,
+						INSERTED);
+				showToUser(list, APPENDED);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	private void edit(Task task, Task updatedTask) {
+		try {
+			ArrayList<Task> list = new ArrayList<Task>();
+
+			if (isInteger(task.getDescription())) {
+				int noOfTask = toInteger(task.getDescription());
+				if (noOfTask <= tasksOnScreen.size()) {
+					Task taskToBeEdited = new Task(
+							tasksOnScreen.get(noOfTask - 1));
+
+					ArrayList<Task> oldList = searchTaskOfSameDay(taskToBeEdited);
+					Task oldTask = new Task(taskToBeEdited);
+
+					String feedback = logic.edit(taskToBeEdited, updatedTask);
+					taskToBeEdited.update(updatedTask);
+
+					list = searchTaskOfSameDay(taskToBeEdited);
+
+					displayFeedbackForEditing(oldList, oldTask, list,
+							taskToBeEdited, feedback);
+					return;
+				}
+			}
+
+			list = logic.search(task.getDescription());
+			if (list.size() == 0) {
+				gui.displayDone(Constants.MESSAGE_TASK_DOES_NOT_EXIST, INSERTED);
+				tasksOnScreen.clear();
+			} else if (list.size() == 1) {
+				Task taskToBeEdited = new Task(list.get(0));
+
+				ArrayList<Task> oldList = searchTaskOfSameDay(taskToBeEdited);
+				Task oldTask = new Task(taskToBeEdited);
+
+				String feedback = logic.edit(taskToBeEdited, updatedTask);
+				taskToBeEdited.update(updatedTask);
+
+				list = searchTaskOfSameDay(taskToBeEdited);
+
+				displayFeedbackForEditing(oldList, oldTask, list,
+						taskToBeEdited, feedback);
+			} else {
+				gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND,
+						INSERTED);
+				showToUser(list, APPENDED);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	private void displayFeedbackForEditing(ArrayList<Task> oldList,
+			Task oldTask, ArrayList<Task> list, Task task, String feedback) {
+		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
+			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH,
+					MESSAGE_TASK_EDITED_FOR_UNDO, COLOR_DONE, list, task,
+					Constants.HIGHLIGH, feedback, COLOR_DONE);
+			gui.displayDone(feedback, INSERTED);
+			showToUser(list, task, Constants.HIGHLIGH, APPENDED);
+		} else if (feedback.equals(Constants.MESSAGE_EDIT_CLASHING_TIMESLOTS)) {
+			addToStackForUndoAndRedo(oldList, oldTask, Constants.HIGHLIGH,
+					MESSAGE_TASK_EDITED_FOR_UNDO, COLOR_WARNING, list, task,
+					Constants.HIGHLIGH, feedback, COLOR_WARNING);
+			gui.displayWarning(feedback, INSERTED);
+			showToUser(list, task, Constants.HIGHLIGH, APPENDED);
+		} else {
+			gui.displayWarning(feedback, INSERTED);
+			tasksOnScreen.clear();
+		}
+	}
+
+	private void clear() {
+		try {
+			ArrayList<Task> list = logic.load();
+			String feedback = logic.clear();
+			if (feedback.equals(Constants.MESSAGE_TASK_CLEARED)) {
+				gui.displayDone(feedback, INSERTED);
+				showToUser(list, null, Constants.DELETED, APPENDED);
+				tasksOnScreen.clear();
+				addToStackForUndoAndRedo(list, null, Constants.NO_EFFECT,
+						MESSAGE_TASK_RESTORED, COLOR_DONE, list, null,
+						Constants.DELETED, feedback, COLOR_DONE);
+			} else {
+				gui.displayWarning(feedback, INSERTED);
+				tasksOnScreen.clear();
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	private void undo() {
+		try {
+			String feedback = logic.undo();
+
+			if (feedback.equals(Constants.MESSAGE_UNDO_DONE) && currentPos >= 0) {
+				UndoAndRedoPack pack = stack.get(currentPos);
+				if (pack.colorForUndo == COLOR_DONE) {
+					gui.displayDone(pack.statusForUndo, INSERTED);
+				} else {
+					gui.displayWarning(pack.statusForUndo, INSERTED);
+				}
+				gui.display(pack.tasksForUndo, pack.posToDoEffectForUndo,
+						pack.effectForUndo, APPENDED, INDEXED);
+				currentPos--;
+			} else {
+				gui.displayWarning(MESSAGE_NO_UNDO, INSERTED);
+				tasksOnScreen.clear();
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	private void redo() {
+		try {
+			String feedback = logic.redo();
+			if (feedback.equals(Constants.MESSAGE_REDO_DONE)
+					&& currentPos < availablePos) {
+				currentPos++;
+				UndoAndRedoPack pack = stack.get(currentPos);
+				if (pack.colorForRedo == COLOR_DONE) {
+					gui.displayDone(pack.statusForRedo, INSERTED);
+				} else {
+					gui.displayWarning(pack.statusForRedo, INSERTED);
+				}
+				gui.display(pack.tasksForRedo, pack.posToDoEffectForRedo,
+						pack.effectForRedo, APPENDED, INDEXED);
+			} else {
+				gui.displayWarning(MESSAGE_NO_REDO, INSERTED);
+				tasksOnScreen.clear();
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	private void addToStackForUndoAndRedo(ArrayList<Task> listForUndo,
+			Task taskForUndo, int undoEffect, String messageForUndo,
+			int ucolor, ArrayList<Task> listForRedo, Task taskForRedo,
+			int redoEffect, String messageForRedo, int rcolor) {
+		int posForUndo = -1, posForRedo = -1;
+		
+		if (taskForUndo == null) {
+			posForUndo = ALL_TASK;
+		} else if (listForUndo != null) {
+			for (posForUndo = 0; posForUndo < listForUndo.size(); posForUndo++) {
+				if (listForUndo.get(posForUndo).equals(taskForUndo)) {
+					break;
+				}
+			}
+		}
+		
+		if (taskForRedo == null) {
+			posForRedo = ALL_TASK;
+		} else if (listForRedo != null) {
+			for (posForRedo = 0; posForRedo < listForRedo.size(); posForRedo++) {
+				if (listForRedo.get(posForRedo).equals(taskForRedo)) {
+					break;
+				}
+			}
+		}
+
+		UndoAndRedoPack pack = new UndoAndRedoPack(posForUndo, listForUndo,
+				undoEffect, messageForUndo, ucolor, posForRedo, listForRedo,
+				redoEffect, messageForRedo, rcolor);
+
+		currentPos++;
+		availablePos = currentPos;
+		if (currentPos >= stack.size()) {
+			stack.add(pack);
+		} else {
+			stack.set(currentPos, pack);
+		}
+	}
+
+	private void search(Task task) {
+		if (task.getDescription() == null) {
+			gui.displayWarning(Constants.MESSAGE_NO_SEARCH_INFO, INSERTED);
+			tasksOnScreen.clear();
+			return;
+		}
+		try {
+			ArrayList<Task> result = logic.search(task.getDescription());
+			if (result.size() == 0) {
+				gui.displayDone(Constants.MESSAGE_NO_RESULT, INSERTED);
+				tasksOnScreen.clear();
+			} else {
+				showToUser(result, INSERTED);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	private void set(Task task) {
+		try {
+			ArrayList<Task> list = new ArrayList<Task>();
+
+			if (isInteger(task.getDescription())) {
+				int noOfTask = toInteger(task.getDescription());
+				if (noOfTask <= tasksOnScreen.size()) {
+					Task taskToBeEdited = tasksOnScreen.get(noOfTask - 1);
+					editTheTask(task, taskToBeEdited);
+					return;
+				}
+			}
+
+			list = logic.search(task.getDescription());
+			if (list.size() == 0) {
+				gui.displayDone(Constants.MESSAGE_NO_RESULT, INSERTED);
+				tasksOnScreen.clear();
+			} else if (list.size() == 1) {
+				Task taskToBeEdited = list.get(0);
+				editTheTask(task, taskToBeEdited);
+			} else {
+				gui.displayWarning(Constants.MESSAGE_MORE_THAN_ONE_TASK_FOUND,
+						INSERTED);
+				showToUser(list, APPENDED);
+			}
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			e.printStackTrace();
+		}
+	}
+
+	private void editTheTask(Task task, Task taskToBeEdited) {
+		ArrayList<Task> originalList;
+		originalList = new ArrayList<Task>(searchTaskOfSameDay(taskToBeEdited));
+		Task originalTask = new Task(taskToBeEdited);
+
+		updateNewPriorityAndState(task, taskToBeEdited);
+		String feedback = logic.set(taskToBeEdited);
+
+		if (feedback.equals(Constants.MESSAGE_TASK_EDITED)) {
+			String message = String.format(
+					Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY,
+					taskToBeEdited.getState(),
+					taskToBeEdited.getPriorityLevel());
+			String messageForUndo = String.format(
+					Constants.MESSAGE_UPDATE_STATUS_AND_PRIORITY,
+					originalTask.getState(), originalTask.getPriorityLevel());
+
+			ArrayList<Task> list = searchTaskOfSameDay(taskToBeEdited);
+			addToStackForUndoAndRedo(originalList, originalTask,
+					Constants.HIGHLIGH, messageForUndo, COLOR_DONE, list,
+					taskToBeEdited, Constants.HIGHLIGH, messageForUndo,
+					COLOR_DONE);
+
+			gui.displayDone(message, INSERTED);
+			showToUser(list, taskToBeEdited, Constants.HIGHLIGH, APPENDED);
+		} else {
+			gui.displayWarning(feedback, INSERTED);
+			tasksOnScreen.clear();
+		}
+	}
+
+	private void updateNewPriorityAndState(Task task, Task newTask) {
+		if (task.getPriorityLevel() != null) {
+			newTask.setPriority(task.getPriorityLevel());
+		}
+		if (task.getState() != null) {
+			newTask.setState(task.getState());
+		}
+	}
+
+	private void showToUser(ArrayList<Task> list, boolean isAppended) {
+		tasksOnScreen = new ArrayList<Task>(list);
+		gui.display(list, -1, Constants.NO_EFFECT, isAppended, INDEXED);
+	}
+
+	private void showToUser(ArrayList<Task> list, Task task, int effect,
+			boolean isAppended) {
+		tasksOnScreen = new ArrayList<Task>(list);
+
+		int i;
+		for (i = 0; i < list.size(); i++) {
+			if (list.get(i).equals(task)) {
+				break;
+			}
+		}
+		if (task == null) {
+			i = ALL_TASK;
+		}
+		gui.display(list, i, effect, isAppended, INDEXED);
+	}
+
+	public boolean isInteger(String input) {
+		try {
+			Integer.parseInt(input);
+			return true;
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			return false;
+		}
+	}
+
+	public int toInteger(String input) {
+		try {
+			return Integer.parseInt(input);
+		} catch (Exception e) {
+			LOGGER.log(Level.WARNING, e.toString());
+			return 0;
+		}
+	}
+
+	private String convertCalendarToString(Calendar time, String FORMAT) {
+		if (time == null) {
+			return null;
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+		return formatter.format(time.getTime());
+	}
+
+	private String getFirstInt(String s) {
+		String result = "";
+		for (int i = 0; i < s.length(); i++) {
+			if (Character.isDigit(s.charAt(i))) {
+				for (int j = i; j < s.length()
+						&& Character.isDigit(s.charAt(j)); j++) {
+					result = result + s.charAt(j);
+				}
+				break;
+			}
+		}
+		return result;
+	}
+
+	// this is for unit testing.
+	public String getDisplayedMessage() {
+		return gui.displayText;
+	}
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\theUI\UserInterface.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\Constants.java
+	 */
+
+    // more constants for UI
+	public static final int HIGHLIGH = 1;
+	public static final int DELETED = 2; 
+	public static final int NO_EFFECT = 0;
+	
+	public static final String EXCEPTIONS_INVALID_USERCOMMAND = "Your input is invalid: %1$s <br>%2$s";
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\Constants.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\GcPacket.java
+	 */
+
+	public GcPacket() {
+		taskAddedToTK = new ArrayList<Task> ();
+		taskAddedToGC = new ArrayList<Task> ();
+		taskDeletedFromTK = new ArrayList<Task> ();
+		taskDeletedFromGC = new ArrayList<Task> ();
+	}
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\GcPacket.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\StateType.java
+	 */
+
+public enum StateType {
+	COMPLETED, PENDING, DISCARDED
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\StateType.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\Task.java
+	 */
+
+/**
+ * 		The class that defines a task
+ * 		and related function to do with this task.
+ */
+public class Task {
+	private Calendar startTime;
+	private Calendar endTime;
+	private int frequency;
+	private FrequencyType frequencyType;
+	private StateType state;
+	private String location;
+	private String description;
+	private PriorityType priorityLevel;
+	private int sync;
+	private boolean blocked;
+
+	public Task() {
+		this.startTime = null;
+		this.endTime = null;
+		this.location = null;
+		this.description = null;
+		this.state = null;
+		this.priorityLevel = null;
+		this.sync = 0;
+		this.blocked = false;
+	}
+
+	public Task(Task task) {
+		if (task.getStartTime() == null) {
+			this.startTime = null;
+		} else {
+			this.startTime = (Calendar) task.getStartTime().clone();
+		}
+
+		if (task.getEndTime() == null) {
+			this.endTime = null;
+		} else {
+			this.endTime = (Calendar) task.getEndTime().clone();
+		}
+
+		this.location = task.getLocation();
+		this.description = task.getDescription();
+		this.priorityLevel = task.getPriorityLevel();
+		this.state = task.getState();
+		this.sync = task.getSyncedValue();
+		this.blocked = task.isBlocked();
+	}
+
+	public void block() {
+		this.blocked = true;
+	}
+
+	public void free() {
+		this.blocked = false;
+	}
+
+	public boolean isBlocked() {
+		return this.blocked;
+	}
+
+	public boolean isSynced() {
+		return this.sync == 1;
+	}
+
+	public void update(Task task) {
+		if (task.getStartTime() != null) {
+			this.startTime = (Calendar) task.getStartTime().clone();
+		}
+		if (task.getEndTime() != null) {
+			this.endTime = (Calendar) task.getEndTime().clone();
+		}
+
+		if (task.getStartTime() != null && task.getEndTime() == null) {
+			this.startTime = (Calendar) task.getStartTime().clone();
+			this.endTime = null;
+		}
+
+		if (task.getLocation() != null && task.getLocation() != "") {
+			this.location = task.getLocation();
+		}
+		if (task.getDescription() != null && task.getDescription() != "") {
+			this.description = task.getDescription();
+		}
+		if (task.getPriorityLevel() != null) {
+			this.priorityLevel = task.getPriorityLevel();
+		}
+		if (task.getState() != null) {
+			this.state = task.getState();
+		}
+	}
+
+	public void setStartTime(Calendar time) {
+		this.startTime = time;
+	}
+
+	public boolean equals(Task task) {
+		if (task == null) {
+			return false;
+		}
+		if (!convertCalendarToString(this.startTime, Constants.FORMAT_DATE_CMP)
+				.equals(convertCalendarToString(task.getStartTime(),
+						Constants.FORMAT_DATE_CMP))) {
+			return false;
+		}
+
+		if (!convertCalendarToString(this.endTime, Constants.FORMAT_DATE_CMP)
+				.equals(convertCalendarToString(task.getEndTime(),
+						Constants.FORMAT_DATE_CMP))) {
+			return false;
+		}
+
+		if (this.description == null) {
+			if (task.getDescription() != null) {
+				return false;
+			}
+		} else if (!this.description.equalsIgnoreCase(task.getDescription())) {
+			return false;
+		}
+
+		if (this.location == null) {
+			if (task.getLocation() != null) {
+				return false;
+			}
+		} else if (!this.location.equalsIgnoreCase(task.getLocation())) {
+			return false;
+		}
+
+		return true;
+	}
+
+	public void setStartTime(String time) {
+		if (time != null) {
+			Calendar cal = Calendar.getInstance();
+			SimpleDateFormat sdf = new SimpleDateFormat(
+					Constants.FORMAT_DATE_HOUR);
+			try {
+				cal.setTime(sdf.parse(time));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			this.startTime = cal;
+		}
+	}
+
+	public void setEndTime(Calendar time) {
+		this.endTime = time;
+	}
+
+	public void setEndTime(String time) {
+		if (time != null) {
+			Calendar cal = Calendar.getInstance();
+			SimpleDateFormat sdf = new SimpleDateFormat(
+					Constants.FORMAT_DATE_HOUR);
+			try {
+				cal.setTime(sdf.parse(time));
+			} catch (ParseException e) {
+				e.printStackTrace();
+			}
+			this.endTime = cal;
+		}
+	}
+
+	public void setFrequency(int frequency) {
+		this.frequency = frequency;
+	}
+
+	public void setFrequencyType(String frequencyType) {
+		if (frequencyType == null) {
+		} else if (frequencyType.equalsIgnoreCase(Constants.FREQUENCY_DAY)) {
+			this.frequencyType = FrequencyType.DAY;
+		} else if (frequencyType.equalsIgnoreCase(Constants.FREQUENCY_WEEK)) {
+			this.frequencyType = FrequencyType.WEEK;
+		} else if (frequencyType.equalsIgnoreCase(Constants.FREQUENCY_MONTH)) {
+			this.frequencyType = FrequencyType.MONTH;
+		} else if (frequencyType.equalsIgnoreCase(Constants.FREQUENCY_YEAR)) {
+			this.frequencyType = FrequencyType.YEAR;
+		}
+	}
+
+	public void setState(StateType state) {
+		this.state = state;
+	}
+
+	public void setState(String state) throws Exception {
+		if (state.equalsIgnoreCase(Constants.STATE_COMPLETED)) {
+			this.state = StateType.COMPLETED;
+		} else if (state.equalsIgnoreCase(Constants.STATE_PENDING)) {
+			this.state = StateType.PENDING;
+		} else if (state.equalsIgnoreCase(Constants.STATE_DISCARDED)) {
+			this.state = StateType.DISCARDED;
+		} else if (state.equalsIgnoreCase(Constants.STATE_NULL)) {
+			this.state = null;
+		} else {
+			throw new Exception(String.format(
+					Constants.EXCEPTIONS_INVALID_STATE, state));
+		}
+	}
+
+	public void setLocation(String location) {
+		this.location = location;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
+	}
+
+	public void setPriority(PriorityType priorityLevel) {
+		this.priorityLevel = priorityLevel;
+	}
+
+	public void setPriority(String priorityLevel) throws Exception {
+		if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_LOW)) {
+			this.priorityLevel = PriorityType.LOW;
+		} else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_MEDIUM)) {
+			this.priorityLevel = PriorityType.MEDIUM;
+		} else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_HIGH)) {
+			this.priorityLevel = PriorityType.HIGH;
+		} else if (priorityLevel.equalsIgnoreCase(Constants.PRIORITY_NULL)) {
+			this.priorityLevel = null;
+		} else {
+			throw new Exception(String.format(
+					Constants.EXCEPTIONS_INVALID_PRIORITY, priorityLevel));
+		}
+	}
+
+	public void setSynced() {
+		this.sync = 1;
+	}
+
+	public void setNotSynced() {
+		this.sync = 0;
+	}
+
+	public Calendar getStartTime() {
+		return this.startTime;
+	}
+
+	public Calendar getEndTime() {
+		return this.endTime;
+	}
+
+	public int getFrequency() {
+		return this.frequency;
+	}
+
+	public FrequencyType getFrequencyType() {
+		return this.frequencyType;
+	}
+
+	public String getLocation() {
+		return this.location;
+	}
+
+	public String getDescription() {
+		return this.description;
+	}
+
+	public StateType getState() {
+		return this.state;
+	}
+
+	public PriorityType getPriorityLevel() {
+		return this.priorityLevel;
+	}
+
+	private String convertCalendarToString(Calendar time, String FORMAT) {
+		if (time == null) {
+			return "null";
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);
+		return formatter.format(time.getTime());
+	}
+
+	public void setSyncedValue(int syncedValue) {
+		this.sync = syncedValue;
+	}
+
+	public int getSyncedValue() {
+		return this.sync;
+	}
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLibrary\Task.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+	 */
+
+	// for listing, only mention the time, the priority and the state.
+	public ArrayList<Task> list(Task task) {
+		ArrayList<Task> res = new ArrayList<Task>();
+		ArrayList<Task> list = storage.load();
+		
+		boolean isDeadline = false, isEvent = false, isFloating = false;
+		if (task.getDescription() != null) {
+			isDeadline = task.getDescription().toLowerCase().contains("deadline");
+			isEvent = task.getDescription().toLowerCase().contains("event");
+			isFloating = task.getDescription().toLowerCase().contains("floating");
+		}
+		if (!isDeadline && !isEvent && !isFloating) {
+			isDeadline = isEvent = isFloating = true;
+		}
+		
+		for (Task item : list) {
+			if (isIncluded(task, item)) {
+				if (isDeadline && item.getStartTime() != null 
+						&& item.getEndTime() == null) {
+					res.add(item);
+				} else if (isEvent && item.getStartTime() != null 
+						&& item.getEndTime() != null) {
+					res.add(item);
+				} else if (isFloating && item.getStartTime() == null 
+						&& item.getEndTime() == null) {
+					res.add(item);
+				} 
+			}
+		}
+		res = sort(res);
+		LOGGER.info("Tasks acquired to be displayed.");
+		return res;
+	}
+
+	public String undo() {
+		LOGGER.info("Last command undone.");
+		return storage.undo();
+	}
+	
+	public String redo() {
+		LOGGER.info("Next command redone.");
+		return storage.redo();
+	}
+	
+	public String clear() {
+		storage.clear();
+		LOGGER.info("Tasks cleared from TasKoord.");
+		return Constants.MESSAGE_TASK_CLEARED;
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+	 */
+
+	private ArrayList<Task> sort(ArrayList<Task> list) {
+		Collections.sort(list, new Comparator<Task>() {
+	        @Override
+	        public int compare(Task  task1, Task  task2) {
+	        	String s1 = convertCalendarToString(task1.getStartTime(), 
+	        			Constants.FORMAT_DATE_CMP);
+	        	String s2 = convertCalendarToString(task2.getStartTime(), 
+	        			Constants.FORMAT_DATE_CMP);
+	        	String e1 = convertCalendarToString(task1.getEndTime(), 
+	        			Constants.FORMAT_DATE_CMP);
+	        	String e2 = convertCalendarToString(task2.getEndTime(), 
+	        			Constants.FORMAT_DATE_CMP);
+	        	String n1 = task1.getDescription().toLowerCase();
+	        	String n2 = task2.getDescription().toLowerCase();
+	        			
+	            if (s1 == null && s2 != null ) {
+	            	return 1;
+	            } else if (s1 != null && s2 == null ) {
+	            	return -1;
+	            } else if (s1 == null && s2 == null ) {
+	            	return n1.compareTo(n2);
+	            }
+	            
+	            if (s1.compareTo(s2) != 0) {
+	            	return s1.compareTo(s2);
+	            } 
+	            
+	            if (e1 == null && e2 != null ) {
+	            	return 1;
+	            } else if (e1 != null && e2 == null ) {
+	            	return -1;
+	            } else if (e1 == null && e2 == null ) {
+	            	return n1.compareTo(n2);
+	            }
+	            
+	            if (e1.compareTo(e2) != 0) {
+	            	return e1.compareTo(e2);
+	            }
+	            return n1.compareTo(n2);
+	        }
+	    });
+		LOGGER.info("Tasks sorted.");
+		return list;
+	}
+	
+	public String set(Task newTask) {
+		if (isExistingTask(newTask)) {
+			storage.set(newTask);
+			return Constants.MESSAGE_TASK_EDITED;
+		} else {
+			return Constants.MESSAGE_TASK_DOES_NOT_EXIST;
+		}
+	}
+	
+	private boolean isIncluded(Task feature, Task task) {
+		if (feature.getStartTime() != null) {
+			String featureStartTime = convertCalendarToString(feature.getStartTime(), 
+					Constants.FORMAT_DATE);
+			String featureEndTime = convertCalendarToString(feature.getEndTime(), 
+					Constants.FORMAT_DATE);
+			if (featureEndTime == null) {
+				featureEndTime = featureStartTime;
+			}
+			
+			String startTime = convertCalendarToString(task.getStartTime(), 
+					Constants.FORMAT_DATE);
+			String endTime = convertCalendarToString(task.getEndTime(), 
+					Constants.FORMAT_DATE);
+	
+			if (startTime == null && endTime == null) {
+				return false;
+			} else if (startTime != null && endTime !=null) {
+				if (startTime.compareTo(featureEndTime) > 0 
+						|| featureStartTime.compareTo(endTime) > 0) {
+					return false;
+				}
+			} else if (startTime != null && (startTime.compareTo(featureStartTime) < 0 
+					|| startTime.compareTo(featureEndTime) > 0)) {
+				return false;
+			} else if (endTime != null && (endTime.compareTo(featureStartTime) < 0 
+					|| endTime.compareTo(featureEndTime) > 0)) {
+				return false;
+			}
+		}
+		
+		if (feature.getFrequencyType() != null
+				&& feature.getFrequencyType()!=task.getFrequencyType()) {
+			return false;
+		}
+		
+		if (feature.getState() != null
+				&& feature.getState()!=task.getState()) {
+			return false;
+		}
+		
+		if (feature.getPriorityLevel() != null
+				&& feature.getPriorityLevel()!=task.getPriorityLevel()) {
+			return false;
+		}
+		
+		return true;
+	}
+	
+	private String convertCalendarToString(Calendar time, String FORMAT) {
+		if (time == null) {
+			return null;
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat(FORMAT);     
+		return formatter.format(time.getTime());
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+	 */
+
+	public ArrayList<Task> load() {
+		return storage.load();
+	}
+
+	public void setSynced() {
+		storage.setSynced();
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+
+
+
+
+

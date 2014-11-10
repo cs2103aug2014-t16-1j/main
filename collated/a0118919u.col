@@ -1,0 +1,839 @@
+//@author: a0118919u
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\GCal\GCal.java
+	 */
+
+	//This checks if a user is online
+	public static boolean isOnline() {
+		Socket socket = new Socket();
+		InetSocketAddress adderess = new InetSocketAddress("www.google.com", 80);
+		try {
+			socket.connect(adderess);
+			return true;
+		} catch (IOException e) {
+			e.printStackTrace();
+			return false;
+		} finally {
+			try {
+				socket.close();
+			} catch (IOException e) {
+			}
+		}
+	}
+	
+	public GCal() {
+		initFlow();
+	}
+
+	private void initFlow() {
+		httpTransport = new NetHttpTransport();
+		jsonFactory = new JacksonFactory();
+		codeFlow = new GoogleAuthorizationCodeFlow.Builder(httpTransport,
+				jsonFactory, clientId, clientSecret,
+				Arrays.asList(CalendarScopes.CALENDAR)).build();
+		
+	}
+	
+	//Generates the redirection url after authentication
+	public String getURL() {
+		return codeFlow.newAuthorizationUrl().setRedirectUri(redirectUrl).build();
+	}
+
+    //This method takes in authorization code and generates a new token request to google API
+	// The token response returned back is stored and is used to access Google Calendar API
+	public boolean connectByNewToken(String code) throws IOException {
+		try {
+			TokenResponse tokenRes = new TokenResponse();
+			AuthorizationCodeTokenRequest tokenRequest = codeFlow.newTokenRequest(code)
+					.setRedirectUri(redirectUrl);
+			tokenRes = tokenRequest.execute();
+			writeFile(tokenRes.getAccessToken());
+			Credential credential = codeFlow
+					.createAndStoreCredential(tokenRes, clientName);
+			HttpRequestInitializer initializer = credential;
+			Calendar.Builder builder = new Calendar.Builder(httpTransport,
+					jsonFactory, initializer);
+			builder.setApplicationName(clientName);
+			client = builder.build();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	// This method makes use of existing token stored in file and access the Google API
+	public boolean connectUsingExistingToken() {
+		TokenResponse tokenRes = new TokenResponse();
+		if (validFile()) {
+			System.out.println(readFile());
+			tokenRes.setAccessToken(readFile());
+			try {
+				Credential credential = codeFlow.createAndStoreCredential(tokenRes,
+						clientName);
+				HttpRequestInitializer initializer = credential;
+				Calendar.Builder builder = new Calendar.Builder(httpTransport,
+						jsonFactory, initializer);
+				builder.setApplicationName(clientName);
+				client = builder.build();
+				return true;
+			} catch (Exception e) {
+				e.printStackTrace();
+				return false;
+			}
+		} else {
+			return false;
+		}
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\GCal\GCal.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\GCal\GCal.java
+	 */
+
+	public String insertEvent(Task task, String calId) throws IOException {
+		Event event = new Event();
+		event.setSummary(task.getDescription());
+		event.setLocation(task.getLocation());
+		
+		Date startDate = task.getStartTime().getTime();
+		DateTime start = new DateTime(startDate, TimeZone.getTimeZone("UTC"));
+		event.setStart(new EventDateTime().setDateTime(start));
+		
+		if (task.getEndTime() != null) {
+			Date endDate = task.getEndTime().getTime();
+			DateTime end = new DateTime(endDate, TimeZone.getTimeZone("UTC"));
+			event.setEnd(new EventDateTime().setDateTime(end));
+		} else {
+			event.setEnd(new EventDateTime().setDateTime(start));
+		}
+		
+		event.setDescription(MESSAGE_ORIGINAL_CREATOR);
+		
+		client.events().insert(calId, event).execute();
+		return event.getId();
+	}
+	
+	public static boolean validFile() {
+		File f = new File("GToken");
+		if (f.exists()) {
+			if (readFile().equals("")) {
+				return false;
+			} else {
+				return true;
+			}
+		} else {
+			return false;
+		}
+	}
+	
+	public static String readFile() {
+		String token = "";
+		try {
+			BufferedReader in = new BufferedReader(new FileReader("GToken"));
+			token = in.readLine();
+			in.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+			System.err.println("Please generate the token again");
+		}
+		return token;
+	}
+
+	public static boolean writeFile(String token) {
+		try {
+			FileWriter fstream = new FileWriter("GToken", false);
+			BufferedWriter bufferedWriter = new BufferedWriter(fstream);
+			bufferedWriter.write(token);
+			bufferedWriter.close();
+			return true;
+		} catch (Exception e) {
+			e.printStackTrace();
+			return false;
+		}
+	}
+
+	public static void clearFile() {
+		try {
+			FileWriter fstream = new FileWriter("GToken", false);
+			BufferedWriter bufferedWriter = new BufferedWriter(fstream);
+			bufferedWriter.write("");
+			bufferedWriter.close();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\GCal\GCal.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\GCal\SwingBrowser.java
+	 */
+
+/**
+ *         This is Simple Browser for the purpose of google authentication
+ *         That takes in user input and authenticates using oauth2 protocol.
+ *         The authentication code is then returned back to the UI Controller for further processing
+ */
+public class SwingBrowser {
+	
+    public String code = "";
+    private WebEngine engine;
+    
+    private static final String MESSAGE_SUCCESS = "Success";
+    private static final String MESSAGE_DENIED = "Denied";
+    private static final String MESSAGE_ERROR_UNEXPECTED = "Unexpected error.";
+    private static final String MESSAGE_ERROR_LOADING = "Loading error...";
+    
+    
+    private final JFrame frame = new JFrame();
+    private final JPanel panel = new JPanel(new BorderLayout());
+    private final JLabel lblStatus = new JLabel();
+	private final JFXPanel jfxPanel = new JFXPanel();
+    private final JTextField txtURL = new JTextField();
+    private final JProgressBar progressBar = new JProgressBar();
+    
+    public SwingBrowser() {
+        initComponents();
+    }
+
+    private void initComponents() {
+        createScene();
+
+        progressBar.setPreferredSize(new Dimension(150, 18));
+        progressBar.setStringPainted(true);
+
+        JPanel statusBar = new JPanel(new BorderLayout(5, 0));
+        statusBar.setBorder(BorderFactory.createEmptyBorder(3, 5, 3, 5));
+        statusBar.add(lblStatus, BorderLayout.CENTER);
+        statusBar.add(progressBar, BorderLayout.EAST);
+
+        panel.add(jfxPanel, BorderLayout.CENTER);
+        panel.add(statusBar, BorderLayout.SOUTH);
+
+        frame.getContentPane().add(panel);
+
+        frame.setPreferredSize(new Dimension(1024, 600));
+        frame.pack();
+        frame.addWindowListener( new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+            	setCode(Constants.CODE_NO_CODE);
+                frame.setVisible(false);
+            }
+        } );
+    }
+
+    private void createScene() {
+
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+
+                WebView view = new WebView();
+                engine = view.getEngine();
+
+                engine.titleProperty().addListener(new ChangeListener<String>() {
+                    @Override
+                    public void changed(ObservableValue<? extends String> observable, String oldValue, final String newValue) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                frame.setTitle(newValue);
+                                if (newValue != null && newValue.contains(MESSAGE_SUCCESS)) {
+                                	setCode(newValue.substring(13));
+                                	frame.setVisible(false);
+                                } else if (newValue != null && newValue.contains(MESSAGE_DENIED)) {
+                                	setCode(Constants.CODE_REJECTED);
+                                	frame.setVisible(false);
+                                }
+                            }
+                        });
+                    }
+                });
+
+                engine.setOnStatusChanged(new EventHandler<WebEvent<String>>() {
+                    @Override
+                    public void handle(final WebEvent<String> event) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                lblStatus.setText(event.getData());
+                            }
+                        });
+                    }
+                });
+
+                engine.locationProperty().addListener(new ChangeListener<String>() {
+                    @Override
+                    public void changed(ObservableValue<? extends String> ov, String oldValue, final String newValue) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                txtURL.setText(newValue);
+                            }
+                        });
+                    }
+                });
+
+                engine.getLoadWorker().workDoneProperty().addListener(new ChangeListener<Number>() {
+                    @Override
+                    public void changed(ObservableValue<? extends Number> observableValue, Number oldValue, final Number newValue) {
+                        SwingUtilities.invokeLater(new Runnable() {
+                            @Override
+                            public void run() {
+                                progressBar.setValue(newValue.intValue());
+                            }
+                        });
+                    }
+                });
+
+                engine.getLoadWorker()
+                        .exceptionProperty()
+                        .addListener(new ChangeListener<Throwable>() {
+
+                            public void changed(ObservableValue<? extends Throwable> o, Throwable old, final Throwable value) {
+                                if (engine.getLoadWorker().getState() == FAILED) {
+                                    SwingUtilities.invokeLater(new Runnable() {
+                                        @Override
+                                        public void run() {
+                                            JOptionPane.showMessageDialog(
+                                            panel,
+                                            (value != null)
+                                            ? engine.getLocation() + "\n" + value.getMessage()
+                                            : engine.getLocation() + "\n" + MESSAGE_ERROR_UNEXPECTED,
+                                            MESSAGE_ERROR_LOADING,
+                                            JOptionPane.ERROR_MESSAGE);
+                                        }
+                                    });
+                                }
+                            }
+                        });
+
+                jfxPanel.setScene(new Scene(view));
+                
+            }
+        });
+    }
+
+    public void loadURL(final String url) {
+        Platform.runLater(new Runnable() {
+            @Override
+            public void run() {
+                String tmp = toURL(url);
+
+                if (tmp == null) {
+                    tmp = toURL("http://" + url);
+                }
+
+                engine.load(tmp);
+            }
+        });
+    }
+
+    private static String toURL(String str) {
+        try {
+            return new URL(str).toExternalForm();
+        } catch (MalformedURLException exception) {
+            return null;
+        }
+    }
+
+    public void runBrowser(String url) {
+        frame.setVisible(true);
+        loadURL(url);
+    }
+    
+    public void setCode(String code) {
+    	this.code = code;
+    }
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\GCal\SwingBrowser.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\jsonConverter.java
+	 */
+
+	@SuppressWarnings("unchecked")
+	public static JSONObject taskToJSON(Task task)
+	{
+		JSONObject jTask=new JSONObject();
+		jTask.put(Constants.DESCRIPTION, task.getDescription());
+		jTask.put(Constants.LOCATION, task.getLocation());
+		jTask.put(Constants.STARTTIME, convertCalendarToString(task.getStartTime()));
+		jTask.put(Constants.ENDTIME, convertCalendarToString(task.getEndTime()));
+		jTask.put(Constants.FREQUENCY, new Integer(task.getFrequency()));
+		jTask.put(Constants.SYNC_STATUS, new Integer(task.getSyncedValue()));
+		
+		if(task.getFrequencyType() != null){
+			jTask.put(Constants.FREQUENCY_TYPE, task.getFrequencyType().toString());
+		}else{
+			jTask.put(Constants.FREQUENCY_TYPE, null);
+		}
+		
+		if(task.getPriorityLevel() != null){
+			jTask.put(Constants.PRIORITY_TYPE, task.getPriorityLevel().toString());
+		}else{
+			jTask.put(Constants.PRIORITY_TYPE,"NULL");
+		}
+		
+		if(task.getState() != null){
+			jTask.put(Constants.STATE_TYPE, task.getState().toString());
+		}else{
+			jTask.put(Constants.STATE_TYPE, "NULL");
+		}
+		
+		return jTask;
+	}		
+	
+	public static Task jsonToTask(JSONObject obj){
+		Task temp = null;
+		try{
+			temp = new Task();
+			temp.setDescription((String) obj.get(Constants.DESCRIPTION));
+			temp.setLocation((String) obj.get(Constants.LOCATION));
+			temp.setStartTime((String) obj.get(Constants.STARTTIME));
+			temp.setEndTime((String) obj.get(Constants.ENDTIME));
+			temp.setSyncedValue(Integer.parseInt(obj.get(Constants.SYNC_STATUS).toString()));
+			temp.setFrequency(Integer.parseInt(obj.get(Constants.FREQUENCY).toString()));
+			
+			if(obj.get(Constants.FREQUENCY_TYPE) != null){
+				temp.setFrequencyType((String) obj.get(Constants.FREQUENCY_TYPE));
+			}else{
+				temp.setFrequencyType(null);
+			}
+			
+			if(obj.get(Constants.PRIORITY_TYPE) != null){
+				temp.setPriority((String) obj.get(Constants.PRIORITY_TYPE));
+			}else{
+				temp.setPriority("NULL");
+			}
+			
+			if(obj.get(Constants.STATE_TYPE) != null){
+				temp.setState((String) obj.get(Constants.STATE_TYPE));
+			}else{
+				temp.setState("NULL");
+			}
+		}catch(Exception e){
+			e.printStackTrace();
+		}
+		return temp;	
+	}
+	
+	private static String convertCalendarToString(Calendar time) {
+		if (time == null) {
+			return null;
+		}
+		SimpleDateFormat formatter = new SimpleDateFormat(Constants.FORMAT_DATE_HOUR);     
+		return formatter.format(time.getTime());
+	}
+}
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\jsonConverter.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+	 */
+
+	public Storage(String fileName) {
+		this.fileName = fileName;
+		LogFile.newLogger();
+		openFileToWrite(true);
+		closeFileToWrite();
+		this.listOfTasks = loadFromFile();
+		this.stackForUndo = new ArrayList<ArrayList<Task>> ();
+		this.stackForUndo.add(copyList(this.listOfTasks));
+		this.currentPos = this.availablePos = 0;
+	}
+	
+	public ArrayList<Task> load() {
+		return copyList(listOfTasks);
+	}
+	
+	public ArrayList<Task> loadFromFile() {
+		ArrayList<Task> list = new ArrayList<Task> ();
+		Task task = new Task();
+		
+		openFileToRead();
+		JSONParser parser = new JSONParser();
+		try{
+			while (in.hasNextLine()) {
+				String line = in.nextLine();
+				Object obj = parser.parse(line.trim());
+				JSONObject jsonObject = (JSONObject) obj;
+				task = jsonConverter.jsonToTask(jsonObject);
+				list.add(task);
+				task = new Task();
+			}
+		} catch(ParseException e){
+			System.out.println("Parse Exception:");
+			e.printStackTrace();
+		}
+		closeFileToRead();
+		return list;
+	}
+	
+	public void add(Task task) {
+		openFileToWrite(true);
+		store(task);
+		push(copyList(listOfTasks));
+		closeFileToWrite();
+	}
+	
+	private void store(Task task) {
+		listOfTasks.add(task);
+		JSONObject jTask= jsonConverter.taskToJSON(task);
+		out.print(jTask.toString() + "\r\n");
+	}
+	
+	public void store(ArrayList<Task> list) {
+		openFileToWrite(false);
+		for (Task task : list) {
+			store(task);
+		}
+		closeFileToWrite();
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+	 */
+
+	public void edit(Task oldTask, Task newTask) {
+		ArrayList<Task> newList = new ArrayList<Task>();
+		
+		for (Task item : listOfTasks) {
+			if (item.equals(oldTask)) {
+				item.update(newTask);
+				item.setSyncedValue(0);
+			}
+			newList.add(item);
+		}
+		
+		listOfTasks.clear();
+		store(newList);
+		push(copyList(listOfTasks));
+	}
+	
+	public void clear() {
+		listOfTasks.clear();
+		deleteFile();
+		openFileToWrite(false);
+		closeFileToWrite();
+		push(copyList(listOfTasks));
+	}
+	
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+	 */
+
+	private ArrayList<Task> copyList(ArrayList<Task> list) {
+		ArrayList<Task> result = new ArrayList<Task> ();
+		for (Task item : list) {
+			result.add(new Task(item));
+		}
+		return result;
+	}
+	
+	private void openFileToWrite(boolean append) {
+		try {
+			out = new PrintWriter(new FileWriter(fileName, append));
+		} catch (IOException e) {
+			System.out.println(e.getMessage());
+			LOGGER.log(Level.WARNING, "File Not Found", e);
+		}
+	}
+	
+	private void closeFileToWrite() {
+		out.close();
+	}
+
+	private void openFileToRead() {
+		try {
+			in = new Scanner(new File(fileName));
+		} catch (FileNotFoundException e) {
+			System.out.println(e.getMessage());
+			LOGGER.log(Level.WARNING, "File Not Found", e);
+		}
+	}
+
+	private void closeFileToRead() {
+		in.close();
+	}
+	
+	private void deleteFile() {
+		File f = new File(fileName);
+		f.delete();
+	}
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\Storage.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\StorageTest.java
+	 */
+
+	public Storage store  = new Storage("storeTest.txt");
+	//This is the optimal case for adding and retrieving the data from file
+	@Test
+	public void testStorageAdd(){
+		Parser parser = Parser.getInstance();
+        String input1 = "add Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
+        String input2 = "add playing from 6pm to 7pm on 29 Oct 2014 at Court";
+        UserInput userInput;
+		try{
+			store.clear();
+			userInput = parser.format(input1);
+			Task task1 = userInput.getTask();
+			store.add(task1);
+			userInput = parser.format(input2);
+			Task task2 = userInput.getTask();
+			store.add(task2);
+			ArrayList<Task> list = store.loadFromFile();
+			assertEquals("Test if task description was added successfully", "Meeting", list.get(0).getDescription());
+			assertEquals("Test if task description was added successfully", "Boardroom", list.get(0).getLocation());
+			assertEquals("Test that the Start Time is correctly recorded",
+                    "Fri Sep 12 09:00:00 SGT 2014", list.get(0).getStartTime().getTime().toString());
+			assertEquals("Test that the End Time is correctly recorded",
+                    "Fri Sep 12 10:00:00 SGT 2014", list.get(0).getEndTime().getTime().toString());
+			assertEquals("Test that the State is correctly set", null,list.get(0).getState());
+			assertEquals("Test that the frequency is as default", 0,list.get(0).getFrequency());
+			assertEquals("Test that the frequency is as default", null,list.get(0).getFrequencyType());
+		}
+		catch(Exception e){
+			System.out.println("testStorageAdd: ");
+            e.printStackTrace();
+            assert (false);
+		}
+	}
+	
+	//This is the optimal case for delete and undo testing
+	@Test
+	public void testStorageDeleteandUndo() {
+        Parser parser = Parser.getInstance();
+        String input1 = "add Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
+        String input2 = "add playing from 6pm to 7pm on 29 Oct 2014 at Court";
+        String input = "delete Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
+        UserInput userInput;
+        try {
+        	store.clear();
+			userInput = parser.format(input1);
+			Task task1 = userInput.getTask();
+			store.add(task1);
+			userInput = parser.format(input2);
+			Task task2 = userInput.getTask();
+			store.add(task2);
+            userInput = parser.format(input);
+            Task task = userInput.getTask();
+            store.delete(task);
+            store.undo();
+            ArrayList<Task> list = store.loadFromFile();
+            assertEquals("Test if task description was deleted successfully", "Meeting", list.get(0).getDescription());
+			assertEquals("Test if task description was deleted successfully", "Boardroom", list.get(0).getLocation());
+			assertEquals("Test that the Start Time is correctly recorded",
+                    "Fri Sep 12 09:00:00 SGT 2014", list.get(0).getStartTime().getTime().toString());
+			assertEquals("Test that the End Time is correctly recorded",
+                    "Fri Sep 12 10:00:00 SGT 2014", list.get(0).getEndTime().getTime().toString());
+			assertEquals("Test that the State is correctly set", null,list.get(0).getState());
+			assertEquals("Test that the frequency is as default", 0,list.get(0).getFrequency());
+			assertEquals("Test that the frequency is as default", null,list.get(0).getFrequencyType());
+        } catch (Exception e) {
+            System.out.println("testStorageDeleteandUndo: ");
+            e.printStackTrace();
+            assert (false);
+        }
+    }
+    
+	//optimal case for editing the task and comparing against set of given tasks 
+    @Test
+    public void testStorageEdit() {
+        Parser parser = Parser.getInstance();
+        String input1 = "add Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
+        String input2 = "add playing from 6pm to 7pm on 29 Oct 2014 at Court";
+        UserInput userInput;
+        String input =
+                "edit Meeting from 9am to 10am on 12 Sep 2014 at Boardroom"
+                        + " correct Board Meeting from 9pm to 11pm on 12 Dec 2014 at Home";
+        try {
+        	store.clear();
+			userInput = parser.format(input1);
+			Task task1 = userInput.getTask();
+			store.add(task1);
+			userInput = parser.format(input2);
+			Task task2 = userInput.getTask();
+			store.add(task2);
+            userInput = parser.format(input);
+            Task task = userInput.getTask();
+            Task editedTask = userInput.getEditedTask();
+            store.edit(task, editedTask);
+            ArrayList<Task> list = store.loadFromFile();
+            assertEquals("Test if task description was edited successfully", "Board Meeting", list.get(0).getDescription());
+			assertEquals("Test if task description was edited successfully", "Home", list.get(0).getLocation());
+			assertEquals("Test that the Start Time is correctly recorded",
+                    "Fri Dec 12 21:00:00 SGT 2014", list.get(0).getStartTime().getTime().toString());
+			assertEquals("Test that the End Time is correctly recorded",
+                    "Fri Dec 12 23:00:00 SGT 2014", list.get(0).getEndTime().getTime().toString());
+			assertEquals("Test that the State is correctly set", null,list.get(0).getState());
+			assertEquals("Test that the frequency is as default", 0,list.get(0).getFrequency());
+			assertEquals("Test that the frequency is as default", null,list.get(0).getFrequencyType());
+        } catch (Exception e) {
+            System.out.println("testStorageEdit: ");
+            e.printStackTrace();
+            assert (false);
+        }
+    }
+	
+    //optimal case for setting priority and status of task
+    @Test
+    public void testStorageSet() {
+        Parser parser = Parser.getInstance();
+        String input1 = "add Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
+        String input2 = "add playing from 6pm to 7pm on 29 Oct 2014 at Court";
+        String input = "set Meeting from 9am to 10am on 12 Sep 2014 at Boardroom priority high status completed";
+        UserInput userInput;
+        try {
+        	store.clear();
+			userInput = parser.format(input1);
+			Task task1 = userInput.getTask();
+			store.add(task1);
+			userInput = parser.format(input2);
+			Task task2 = userInput.getTask();
+			store.add(task2);
+            userInput = parser.format(input);
+            Task task = userInput.getTask();
+            store.set(task);
+            ArrayList<Task> list = store.loadFromFile();
+            assertEquals("Test if task description was successfully set", "Meeting", list.get(0).getDescription());
+			assertEquals("Test if task description was successfully set", "Boardroom", list.get(0).getLocation());
+			assertEquals("Test that the Start Time is correctly recorded",
+                    "Fri Sep 12 09:00:00 SGT 2014", list.get(0).getStartTime().getTime().toString());
+			assertEquals("Test that the End Time is correctly recorded",
+                    "Fri Sep 12 10:00:00 SGT 2014", list.get(0).getEndTime().getTime().toString());
+			assertEquals("Test that the State is correctly set", StateType.COMPLETED,list.get(0).getState());
+			assertEquals("Test that the frequency is as default", 0,list.get(0).getFrequency());
+			assertEquals("Test that the frequency is as default", null,list.get(0).getFrequencyType());
+			assertEquals("Test that the priority is correctly recorded",PriorityType.HIGH, list.get(0).getPriorityLevel());
+        } catch (Exception e) {
+            System.out.println("testStorageSet: ");
+            e.printStackTrace();
+            assert (false);
+        }
+    }
+    
+    //boundary case for for undo and redo
+    @Test
+	public void testStorageUndoandRedo(){
+		Parser parser = Parser.getInstance();
+        String input1 = "add playing from 6pm to 7pm on 29 Oct 2014 at Court";
+        String input2 = "add Meeting from 9am to 10am on 12 Sep 2014 at Boardroom";
+        UserInput userInput;
+		try{
+			store.clear();
+			userInput = parser.format(input1);
+			Task task1 = userInput.getTask();
+			store.add(task1);
+			userInput = parser.format(input2);
+			Task task2 = userInput.getTask();
+			store.add(task2);
+			store.undo();
+			store.redo();
+			ArrayList<Task> list = store.loadFromFile();
+			assertEquals("Test if task description was added successfully", "Meeting", list.get(1).getDescription());
+			assertEquals("Test if task description was added successfully", "Boardroom", list.get(1).getLocation());
+			assertEquals("Test that the Start Time is correctly recorded",
+                    "Fri Sep 12 09:00:00 SGT 2014", list.get(1).getStartTime().getTime().toString());
+			assertEquals("Test that the End Time is correctly recorded",
+                    "Fri Sep 12 10:00:00 SGT 2014", list.get(1).getEndTime().getTime().toString());
+			assertEquals("Test that the State is correctly set", null,list.get(1).getState());
+			assertEquals("Test that the frequency is as default", 0,list.get(1).getFrequency());
+			assertEquals("Test that the frequency is as default", null,list.get(1).getFrequencyType());
+		}
+		catch(Exception e){
+			System.out.println("testStorageRedo: ");
+            e.printStackTrace();
+            assert (false);
+		}
+	}
+	
+    public void clear(){
+    	store.clear();
+    }
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\storage\StorageTest.java
+
+
+
+
+
+	/**
+	 * origin: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+	 */
+
+	public boolean isOnline(){
+		return GCal.isOnline();
+	}
+	
+	public String getURL(){
+		return gcal.getURL();
+	}
+	
+	public boolean connectUsingExistingToken(){
+		return gcal.connectUsingExistingToken();
+	}
+
+	public boolean connectByNewToken(String code) throws IOException{
+		return gcal.connectByNewToken(code);
+	}
+	
+	public boolean isValidFile(){
+		return GCal.validFile();
+	}
+	
+	public GcPacket sync(ArrayList<Task> list) throws IOException{
+		return gcal.sync(list);
+	}
+}
+
+	// End of segment: T:\GitHub\cs2103aug2014-t16-1j\main\src\tkLogic\Logic.java
+
+
+
+
+
