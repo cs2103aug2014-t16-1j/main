@@ -822,6 +822,18 @@ public class UITest {
 		ui.executeCommands("redo");
 		assertEquals(ui.getDisplayedMessage(),
 				"<font size = 4 color = #F92672>No command to redo</font><br>");
+		
+		/*
+		 * tests for "edit"
+		 */
+		ui.executeCommands("list");
+		ui.executeCommands("edit 3 correct from 8pm to 11pm on 13/11/14");
+		assertEquals(ui.getDisplayedMessage(), 
+				"<font size = 4 color = #F92672>Warning: timeslot of edited task is taken, task still added to TasKoord.</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Thu, 13 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><b><u><font size = 3 color = #A6E22E>01. </font></u></b><b><u><font size = 4 color = #E6DB74>[20:00</font></u></b><b><u><font size = 4 color = #E6DB74> - 23:00]</font></u></b><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b><u><font size = 4 color = #66D9EF>homework</font></u></b><br>");
+		ui.executeCommands("edit homework correct homework abt math");
+		assertEquals(ui.getDisplayedMessage(), 
+				"<font size = 4 color = #A6E22E>Task edited!</font><br><br><font size = 4 color = #FD971F>======</font><font size = 4 color = #FD971F>[Thu, 13 Nov 2014]</font><font size = 4 color = #FD971F>======</font><br><br><b><u><font size = 3 color = #A6E22E>01. </font></u></b><b><u><font size = 4 color = #E6DB74>[20:00</font></u></b><b><u><font size = 4 color = #E6DB74> - 23:00]</font></u></b><br>&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp<b><u><font size = 4 color = #66D9EF>homework abt math</font></u></b><br>");
+		
 	}
 }
 
@@ -1026,7 +1038,6 @@ public class UserInterface {
 		} else {
 			gui.displayWarning(MESSAGE_INFORMAT_CMD, INSERTED);
 		}
-		System.out.println(getDisplayedMessage());
 	}	
 
 	// sync with google calendar
@@ -1145,7 +1156,7 @@ public class UserInterface {
 		gui.displayFile();
 		tasksOnScreen.clear();
 	}
-
+	
 	private void add(Task task) {
 		if (task.getDescription() == null) {
 			gui.displayWarning(Constants.MESSAGE_NO_ADD_INFO, INSERTED);
@@ -1153,6 +1164,7 @@ public class UserInterface {
 			return;
 		}
 
+		// check if a task is in correct form.
 		if (task.getStartTime() != null && task.getEndTime() != null) {
 			if (task.getStartTime().compareTo(task.getEndTime()) >= 0) {
 				gui.displayWarning(Constants.MESSAGE_ENDTIME_BEFORE_STARTTIME,
@@ -1325,7 +1337,11 @@ public class UserInterface {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/**
+	 * @param task: this is to identify the task to be edited
+	 * @param updatedTask: new information.
+	 */
 	private void edit(Task task, Task updatedTask) {
 		try {
 			ArrayList<Task> list = new ArrayList<Task>();
@@ -1466,7 +1482,10 @@ public class UserInterface {
 			e.printStackTrace();
 		}
 	}
-
+	
+	/*
+	 * This function stores everything in a state, help displaying the undo and redo.
+	 */
 	private void addToStackForUndoAndRedo(ArrayList<Task> listForUndo,
 			Task taskForUndo, int undoEffect, String messageForUndo,
 			int ucolor, ArrayList<Task> listForRedo, Task taskForRedo,
@@ -1505,7 +1524,10 @@ public class UserInterface {
 			stack.set(currentPos, pack);
 		}
 	}
-
+	
+	/*
+	 * search for a task, only mention the task description here
+	 */
 	private void search(Task task) {
 		if (task.getDescription() == null) {
 			gui.displayWarning(Constants.MESSAGE_NO_SEARCH_INFO, INSERTED);
@@ -1526,6 +1548,9 @@ public class UserInterface {
 		}
 	}
 
+	/*
+	 * update a task, only mention the priority and the status here
+	 */
 	private void set(Task task) {
 		try {
 			ArrayList<Task> list = new ArrayList<Task>();
