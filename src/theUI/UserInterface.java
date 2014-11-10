@@ -210,7 +210,8 @@ public class UserInterface {
 		} else {
 			gui.displayWarning(MESSAGE_INFORMAT_CMD, INSERTED);
 		}
-	}
+		System.out.println(getDisplayedMessage());
+	}	
 
 	// sync with google calendar
 	private void sync() {
